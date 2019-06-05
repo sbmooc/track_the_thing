@@ -82,13 +82,12 @@ class Riders(models.Model):
         self.assigned_trackers.add(tracker)
         event = RiderEvents(datetime, 'tracker_assigned', deposit * -1, self)
         event.save()
-        notes = RiderNotes(self, datetime, notes, event)
-        notes.save()
+        RiderNotes(self, datetime, notes, event).save()
         self.balance -= deposit
         self.save()
 
     def tracker_remove_assignment(self, tracker, notes, datetime, deposit):
-        self.assigned_trackers.add(tracker)
+        self.assigned_trackers.remove(tracker)
         event = RiderEvents(datetime, 'tracker_remove_assignment', deposit, self)
         event.save()
         notes = RiderNotes(self, datetime, notes, event)
