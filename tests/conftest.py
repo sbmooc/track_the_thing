@@ -1,0 +1,1 @@
+# todo add in here about calling django.setup()

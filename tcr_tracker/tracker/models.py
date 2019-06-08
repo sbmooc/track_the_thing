@@ -77,6 +77,10 @@ class Riders(models.Model):
     cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES)
     balance = FloatField(null=True, default=0)
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
     # todo link riders who are in pairs? or does the capnumber do that???
     # todo add checkpoints stuff!
 
@@ -134,7 +138,7 @@ class Riders(models.Model):
             deposit * -1
         )
         if notes:
-            self._add_rider_and_tracker_notes(
+            self._record_tracker_rider_notes(
                 datetime,
                 tracker,
                 notes,
@@ -153,14 +157,14 @@ class Riders(models.Model):
             deposit * -1
         )
         if notes:
-            self._add_rider_and_tracker_notes(
+            self._record_tracker_rider_notes(
                 datetime,
                 tracker,
                 notes,
                 rider_event,
                 tracker_event
             )
-        self.balance -= deposit
+        self.balance += deposit
         self.save()
 
     def tracker_possession_add(self, tracker, notes, datetime):
@@ -186,6 +190,15 @@ class Riders(models.Model):
         if tracker not in self.current_tracker:
             raise
 
+    class Meta:
+        verbose_name_plural = 'Riders'
+
+    def __str__(self):
+        return f'{self.id}: {self.full_name} (Cap: {self.cap_number})'
+
+    def get_absolute_url(self):
+        # todo!!!
+        pass
 
 class RiderEvents(models.Model):
     # user_id = Column(Integer, ForeignKey('users.id'))
@@ -239,6 +252,8 @@ class Trackers(models.Model):
     def record_location(self):
         pass
 
+    class Meta:
+        verbose_name_plural = 'Trackers'
 
 class TrackerEvents(models.Model):
     # user_id = Column(Integer, ForeignKey('users.id'))

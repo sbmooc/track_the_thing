@@ -1,9 +1,8 @@
-from datetime import datetime, tzinfo
+from datetime import datetime
 
 import django
-import pytz
-
 django.setup()
+import pytz
 from django.test import TestCase
 from tcr_tracker.tracker.models import Riders, Trackers, RiderEvents, \
     TrackerEvents, TrackerNotes, RiderNotes
@@ -98,12 +97,25 @@ class TestRiders(TestCase):
         )
 
     def test_add_multiple_tracker_assignment(self):
-        self.rider_1.tracker_add_assignment(self.tracker_1)
-        self.rider_1.tracker_add_assignment(self.tracker_2)
+        self.rider_1.tracker_add_assignment(
+            self.tracker_1,
+            None,
+            self.test_datetime,
+            100
+        )
+        self.rider_1.tracker_add_assignment(
+            self.tracker_2,
+            None,
+            self.test_datetime,
+            100
+        )
         rider_from_db = Riders.objects.get(id=1)
         trackers = rider_from_db.assigned_trackers.all()
         self.assertEqual(
             len(trackers), 2
+        )
+        self.assertEqual(
+            rider_from_db.balance, -200
         )
         self.assertEqual(
             trackers[0], self.tracker_1
@@ -113,19 +125,30 @@ class TestRiders(TestCase):
         )
 
     def test_remove_tracker_assignment(self):
-        self.rider_1.tracker_add_assignment(self.tracker_1)
-        self.rider_1.save()
+        self.rider_1.tracker_add_assignment(
+            self.tracker_1,
+            None,
+            self.test_datetime,
+            100
+        )
         rider_from_db = Riders.objects.get(id=1)
         trackers = rider_from_db.assigned_trackers.all()
         self.assertEqual(
             trackers[0], self.tracker_1
         )
-        self.rider_1.assign_tracker_remove(self.tracker_1)
-        self.rider_1.save()
-        rider_from_db = Riders.objects.get(id=1)
+        self.rider_1.tracker_remove_assignment(
+            self.tracker_1,
+            None,
+            self.test_datetime,
+            100
+        )
+        rider_from_db.refresh_from_db()
         trackers = rider_from_db.assigned_trackers.all()
         self.assertEqual(
             len(trackers), 0
+        )
+        self.assertEqual(
+            rider_from_db.balance, 0
         )
 
 
