@@ -3,6 +3,8 @@ from django.db import models
 from django.db.models import CharField, DateField, FloatField, TextField, \
     DateTimeField, ForeignKey
 
+from tcr_tracker.tracker.errors import TrackerStillInPossession, \
+    TrackerNotAssigned
 
 TRACKER_WORKING_STATUS = (
     ('working', 'Working'),
@@ -45,9 +47,10 @@ RIDER_EVENT_CATEGORIES = (
     ('finish_race', 'Finish Race'),
     ('scratch', 'Scratch'),
     ('arrive_checkpoint', 'Arrive Checkpoint'),
-    ('tracker_assigned', 'Tracker Assigned'),
-    ('tracker_remove_assignment', 'Tracker remove assignment')
-    # todo - should have tracker events here too???
+    ('add_tracker_assignment', 'Tracker Assigned'),
+    ('remove_tracker_assignment', 'Tracker remove assignment'),
+    ('add_tracker_possession', 'Tracker Possession Add'),
+    ('remove_tracker_possession', 'Tracker Possession Remove')
 )
 
 TRACKER_OWNER = (
@@ -73,40 +76,122 @@ class Riders(models.Model):
     email = CharField(max_length=50)
     cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES)
-    balance = FloatField()
+    balance = FloatField(null=True, default=0)
     # todo link riders who are in pairs? or does the capnumber do that???
     # todo add checkpoints stuff!
+
+    def _record_tracker_rider_notes(
+        self,
+        tracker,
+        datetime,
+        notes,
+        rider_event,
+        tracker_event
+    ):
+
+        RiderNotes(
+            rider=self,
+            datetime=datetime,
+            notes=notes,
+            event=rider_event
+        ).save()
+        TrackerNotes(
+            tracker=tracker,
+            datetime=datetime,
+            notes=notes,
+            event=tracker_event
+        ).save()
+
+    def _record_tracker_rider_events(
+        self,
+        tracker,
+        event_type,
+        datetime,
+        balance_change
+    ):
+        rider_event = RiderEvents(
+            datetime=datetime,
+            event_type=event_type,
+            balance_change=balance_change,
+            rider=self
+        )
+        rider_event.save()
+        tracker_event = TrackerEvents(
+            datetime=datetime,
+            event_type=event_type,
+            tracker=tracker
+        )
+        tracker_event.save()
+        return rider_event, tracker_event
 
     def tracker_add_assignment(self, tracker, notes, datetime, deposit):
         # todo add in logging here
         self.assigned_trackers.add(tracker)
-        event = RiderEvents(datetime, 'tracker_assigned', deposit * -1, self)
-        event.save()
-        RiderNotes(self, datetime, notes, event).save()
+        rider_event, tracker_event = self._record_tracker_rider_events(
+            tracker,
+            'add_tracker_assignment',
+            datetime,
+            deposit * -1
+        )
+        if notes:
+            self._add_rider_and_tracker_notes(
+                datetime,
+                tracker,
+                notes,
+                rider_event,
+                tracker_event
+            )
         self.balance -= deposit
         self.save()
 
     def tracker_remove_assignment(self, tracker, notes, datetime, deposit):
         self.assigned_trackers.remove(tracker)
-        event = RiderEvents(datetime, 'tracker_remove_assignment', deposit, self)
-        event.save()
-        notes = RiderNotes(self, datetime, notes, event)
-        notes.save()
-        self.balance += deposit
+        rider_event, tracker_event = self._record_tracker_rider_events(
+            tracker,
+            'add',
+            datetime,
+            deposit * -1
+        )
+        if notes:
+            self._add_rider_and_tracker_notes(
+                datetime,
+                tracker,
+                notes,
+                rider_event,
+                tracker_event
+            )
+        self.balance -= deposit
         self.save()
 
-    def tracker_possession_add(self):
-        pass
+    def tracker_possession_add(self, tracker, notes, datetime):
+        if tracker not in self.assigned_trackers:
+            raise TrackerNotAssigned()
+        self.current_tracker.add(tracker)
+        event = RiderEvents(
+            datetime=datetime,
+            event_type='tracker_add_possession',
+            rider=self
+        )
+        event.save()
+        if notes:
+            RiderNotes(
+                rider=self,
+                datetime=datetime,
+                notes=notes,
+                events=event
+            ).save()
+        self.save()
 
-    def tracker_possession_remove(self):
-        pass
+    def tracker_possession_remove(self, tracker, notes, datetime):
+        if tracker not in self.current_tracker:
+            raise
 
 
 class RiderEvents(models.Model):
     # user_id = Column(Integer, ForeignKey('users.id'))
     datetime = DateTimeField()
     event_type = CharField(max_length=50, choices=RIDER_EVENT_CATEGORIES)
-    balance_change = FloatField()
+    balance_change = FloatField(null=True)
     rider = ForeignKey(Riders,
                        on_delete=models.CASCADE,
                        related_name='events')
@@ -116,11 +201,14 @@ class RiderNotes(models.Model):
     rider = ForeignKey(Riders,
                        on_delete=models.CASCADE,
                        related_name='notes')
-    datetime = DateTimeField()
-    notes = TextField()
-    events = ForeignKey(RiderEvents,
-                        on_delete=models.CASCADE,
-                        related_name='notes')
+    datetime = DateTimeField(null=True)
+    notes = TextField(null=True)
+    event = ForeignKey(
+        RiderEvents,
+        on_delete=models.CASCADE,
+        related_name='notes',
+        null=True
+    )
 
 
 class Trackers(models.Model):
@@ -138,9 +226,18 @@ class Trackers(models.Model):
                                 null=True)
     rider_possess = ForeignKey(Riders,
                                on_delete=models.CASCADE,
-                               related_name='possessed_trackers',
+                               related_name='current_tracker',
                                null=True)
     #location = relationship('tracker_locations')
+
+    def record_test(self):
+        pass
+
+    def record_lost(self):
+        pass
+
+    def record_location(self):
+        pass
 
 
 class TrackerEvents(models.Model):
