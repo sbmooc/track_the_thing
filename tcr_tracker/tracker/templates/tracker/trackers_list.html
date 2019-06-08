@@ -1,0 +1,6 @@
+{% extends 'tracker/blank.html' %}
+{% block content %}
+{%  for tracker in trackers_list %}
+    <p>{{  tracker.id}}</p>
+{% endfor %}
+{% endblock %}
