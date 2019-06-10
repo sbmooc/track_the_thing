@@ -1,6 +1,42 @@
-{% extends 'tracker/blank.html' %}
+{% extends 'tracker/base.html' %}
 {% block content %}
-{%  for tracker in trackers_list %}
-    <p>{{  tracker.id}}</p>
-{% endfor %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Trackers</a>
+        </li>
+    </ol>
+        <div class="row mb-3">
+            <div class="col-sm">
+                <button type="button" class="btn btn-secondary btn-block">Assignable
+                </button>
+            </div>
+            <div class="col-sm">
+                <button type="button" class="btn btn-secondary btn-block">Working
+                </button>
+            </div>
+            <div class="col-sm">
+                <button type="button" class="btn btn-secondary btn-block">TCR Owned
+                </button>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Status</th>
+                <th scope="col">Location</th>
+                <th scope="col">Assignable</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for tracker in trackers_list %}
+                <tr>
+                    <th scope="row">{{ tracker.id }}</th>
+                    <td>{{ tracker.tracker_loan_status }}</td>
+                    <td>{{ tracker.rider_assigned }}</td>
+                    <td>{{ tracker.assignable }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 {% endblock %}

@@ -243,6 +243,15 @@ class Trackers(models.Model):
                                null=True)
     #location = relationship('tracker_locations')
 
+    @property
+    def assignable(self):
+        # todo
+        return 'YES'
+
+    @property
+    def tracker_loan_status(self):
+        return self.get_loan_status_display()
+
     def record_test(self):
         pass
 
