@@ -236,11 +236,13 @@ class Trackers(models.Model):
     rider_assigned = ForeignKey(Riders,
                                 on_delete=models.CASCADE,
                                 related_name='assigned_trackers',
-                                null=True)
+                                null=True,
+                                blank=True)
     rider_possess = ForeignKey(Riders,
                                on_delete=models.CASCADE,
                                related_name='current_tracker',
-                               null=True)
+                               null=True,
+                               blank=True)
     #location = relationship('tracker_locations')
 
     @property
