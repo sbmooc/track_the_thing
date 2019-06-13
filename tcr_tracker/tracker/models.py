@@ -194,7 +194,8 @@ class Riders(models.Model):
         verbose_name_plural = 'Riders'
 
     def __str__(self):
-        return f'{self.id}: {self.full_name} (Cap: {self.cap_number})'
+        # return f'{self.id}: {self.full_name} (Cap: {self.cap_number})'
+        return f'{self.full_name}'
 
     def get_absolute_url(self):
         # todo!!!
@@ -243,6 +244,7 @@ class Trackers(models.Model):
                                related_name='current_tracker',
                                null=True,
                                blank=True)
+    rider_url = "https://www.bbc.co.uk/"
     #location = relationship('tracker_locations')
 
     @property

@@ -63,29 +63,74 @@
     </div>
 
 <!--main content-->
-    <div class="row justify-content-center">
+
+<!--New table layout-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h4>Trackers</h4>
+            </div>
+        </div>
+        <table class="table table-hover table-responsive-sm">
+          <thead>
+            <tr>
+              <th scope="col">ESN</th>
+              <th scope="col">Status</th>
+              <th scope="col">Location</th>
+              <th scope="col" class="d-none d-sm-table-cell">Assignable</th>
+            </tr>
+          </thead>
+          <tbody>
             {% for tracker in trackers_list %}
-                <div class="card mx-2 mb-3" style="width: 18rem" id="tid-{{ tracker.id }}">
-                    <div class="card-body">
-                        <h5 class="card-title">ID: {{ tracker.id }}</h5>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">ESN: {{ tracker.esn_number }}</li>
-                        <li class="list-group-item">Last Test Date: {{ tracker.last_test_date }}</li>
-                    </ul>
-                    <div class="card-body justify-content-center">
-                        <a href="#" class="">
-                            <button type="button" class="my-1 btn btn-primary">
-                                Record changes
-                            </button>
-                        </a>
-                        <a href="#" class="">
-                            <button type="button" class="my-1 btn btn-primary">
-                                Go to rider
-                            </button>
-                        </a>
-                    </div>
-                </div>
+                <tr>
+                  <td>{{ tracker.esn_number }}</td>
+                  <td>
+                      <div class="row">{{ tracker.working_status }}</div>
+                      <div class="row">{{ tracker.last_test_date }}</div>
+                  </td>
+                  <td>
+                      {% if tracker.rider_possess %}
+                        <div>With rider:</div>
+                        <div><a href={{ tracker.rider_url }}>{{ tracker.rider_possess }}</a></div>
+                      {% endif %}
+                  </td>
+                  <td class="d-none d-sm-table-cell">
+                      <!--Need to replace with just assignable field when written-->
+                      {% if tracker.rider_assigned %}
+                        No
+                      {% else %}
+                        {{ tracker.assignable }}
+                      {% endif %}
+                  </td>
+                </tr>
             {% endfor %}
+          </tbody>
+        </table>
     </div>
+<!--Original card layout-->
+    <!--<div class="row justify-content-center">-->
+            <!--{% for tracker in trackers_list %}-->
+                <!--<div class="card mx-2 mb-3" style="width: 18rem" id="tid-{{ tracker.id }}">-->
+                    <!--<div class="card-body">-->
+                        <!--<h5 class="card-title">ID: {{ tracker.id }}</h5>-->
+                    <!--</div>-->
+                    <!--<ul class="list-group list-group-flush">-->
+                        <!--<li class="list-group-item">ESN: {{ tracker.esn_number }}</li>-->
+                        <!--<li class="list-group-item">Last Test Date: {{ tracker.last_test_date }}</li>-->
+                    <!--</ul>-->
+                    <!--<div class="card-body justify-content-center">-->
+                        <!--<a href="#" class="">-->
+                            <!--<button type="button" class="my-1 btn btn-primary">-->
+                                <!--Record changes-->
+                            <!--</button>-->
+                        <!--</a>-->
+                        <!--<a href="#" class="">-->
+                            <!--<button type="button" class="my-1 btn btn-primary">-->
+                                <!--Go to rider-->
+                            <!--</button>-->
+                        <!--</a>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--{% endfor %}-->
+    <!--</div>-->
 {% endblock %}
