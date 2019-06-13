@@ -77,6 +77,7 @@ class Riders(models.Model):
     cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES)
     balance = FloatField(null=True, default=0)
+    rider_url = "https://www.bbc.co.uk/"
 
     @property
     def full_name(self):

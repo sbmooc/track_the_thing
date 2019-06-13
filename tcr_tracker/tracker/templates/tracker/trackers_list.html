@@ -1,51 +1,20 @@
 {% extends 'tracker/base.html' %}
 {% block content %}
 
-<!--Original search & tag bar - commented out for now-->
-    <!--<nav class=" navbar-expand-lg navbar-light bg-light my-3 py-1">-->
-        <!--<div class="collapse navbar-collapse" id="navbarTogglerDemo01">-->
-            <!--<ul class="navbar-nav mr-auto mt-2 mt-lg-0">-->
-                <!--<li>-->
-                    <!--<form class="form-inline my-2 my-lg-0">-->
-                        <!--<input class="form-control mr-sm-2" type="search"-->
-                               <!--placeholder="Search" aria-label="Search">-->
-                        <!--<button class="btn btn-outline-success my-2 my-sm-0" type="submit">-->
-                            <!--Search-->
-                        <!--</button>-->
-                    <!--</form>-->
-                <!--</li>-->
-                <!--<li class="nav-item">-->
-                    <!--<a class="nav-link" href="#">-->
-                        <!--<button type="button"-->
-                                <!--class="btn btn-secondary btn-block">Assignable-->
-                        <!--</button>-->
-                    <!--</a>-->
-                <!--</li>-->
-                <!--<li class="nav-item">-->
-                    <!--<a class="nav-link" href="#">-->
-                        <!--<button type="button"-->
-                                <!--class="btn btn-secondary btn-block">Assignable-->
-                        <!--</button>-->
-                    <!--</a>-->
-                <!--</li>-->
-            <!--</ul>-->
-        <!--</div>-->
-    <!--</nav>-->
-
-<!--Current search and tag bar-->
+<!--Tracker search and tag bar-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
                 <a href="#">
                     <button type="button"
-                            class="btn btn-secondary btn-block">Working
+                            class="btn btn-secondary btn-block" data-toggle="button">Working
                     </button>
                 </a>
             </div>
             <div class="col my-2">
                 <a href="#">
                     <button type="button"
-                            class="btn btn-secondary btn-block">Assignable
+                            class="btn btn-secondary btn-block" data-toggle="button">Assignable
                     </button>
                 </a>
             </div>
@@ -85,8 +54,8 @@
                 <tr>
                   <td>{{ tracker.esn_number }}</td>
                   <td>
-                      <div class="row">{{ tracker.working_status }}</div>
-                      <div class="row">{{ tracker.last_test_date }}</div>
+                      <div>{{ tracker.working_status }}</div>
+                      <div>{{ tracker.last_test_date }}</div>
                   </td>
                   <td>
                       {% if tracker.rider_possess %}
