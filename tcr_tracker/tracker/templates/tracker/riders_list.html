@@ -1,12 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{% for rider in riders_list %}
-<p> {{ rider.full_name }}</p>
-{% endfor %}
-</body>
-</html>
+{% extends 'tracker/base.html' %}
+{% block content %}
+
+<!--Rider search and tag bar-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <a href="#">
+                    <button type="button"
+                            class="btn btn-secondary btn-block text-nowrap" data-toggle="button">In progress
+                    </button>
+                </a>
+            </div>
+            <div class="col my-2">
+                <a href="#">
+                    <button type="button"
+                            class="btn btn-secondary btn-block" data-toggle="button">Finished
+                    </button>
+                </a>
+            </div>
+            <div class="col my-2">
+                <a href="#">
+                    <button type="button"
+                            class="btn btn-secondary btn-block" data-toggle="button">Scratched
+                    </button>
+                </a>
+            </div>
+            <div class="col-sm my-2">
+                <form class="form-inline" role="search">
+                    <div class="input-group">
+                        <input type="text" class="form-control mr-sm-2" placeholder="Search" name="srch-term" id="srch-term">
+                        <div class="input-group-btn">
+                            <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<!--main content-->
+
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h4>Riders</h4>
+            </div>
+        </div>
+        <table class="table table-hover table-responsive-sm">
+          <thead>
+            <tr>
+              <th scope="col">Cap No.</th>
+              <th scope="col">Name</th>
+              <th scope="col">Tracker</th>
+              <th scope="col" class="d-none d-sm-table-cell">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rider in riders_list %}
+                <tr>
+                  <td>{{ rider.cap_number }}</td>
+                    <td><a href={{ rider.rider_url }}>{{ rider.full_name }}</a></td>
+                  <td>{{ rider.current_tracker }}</td>
+                  <td class="d-none d-sm-table-cell">
+                      <!--Need to add logic to models-->
+                      <div><b>In progress</b></div>
+                      <div>Checkpoint 5</div>
+                  </td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+{% endblock %}

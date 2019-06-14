@@ -77,6 +77,7 @@ class Riders(models.Model):
     cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES)
     balance = FloatField(null=True, default=0)
+    rider_url = "https://www.bbc.co.uk/"
 
     @property
     def full_name(self):
@@ -194,7 +195,8 @@ class Riders(models.Model):
         verbose_name_plural = 'Riders'
 
     def __str__(self):
-        return f'{self.id}: {self.full_name} (Cap: {self.cap_number})'
+        # return f'{self.id}: {self.full_name} (Cap: {self.cap_number})'
+        return f'{self.full_name}'
 
     def get_absolute_url(self):
         # todo!!!
@@ -236,11 +238,14 @@ class Trackers(models.Model):
     rider_assigned = ForeignKey(Riders,
                                 on_delete=models.CASCADE,
                                 related_name='assigned_trackers',
-                                null=True)
+                                null=True,
+                                blank=True)
     rider_possess = ForeignKey(Riders,
                                on_delete=models.CASCADE,
                                related_name='current_tracker',
-                               null=True)
+                               null=True,
+                               blank=True)
+    rider_url = "https://www.bbc.co.uk/"
     #location = relationship('tracker_locations')
 
     @property
