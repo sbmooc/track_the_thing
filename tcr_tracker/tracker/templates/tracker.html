@@ -1,5 +1,7 @@
 {% extends 'tracker/base.html' %}
 {% block content %}
+
+<!--status headers-->
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
@@ -17,13 +19,15 @@
             <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
         </div>
     </div>
+
+<!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
                 <a href="#">
                     <!--todo: disable or enable based on user permissions-->
                     <button type="button"
-                            class="btn btn-secondary btn-block" disabled>Record test
+                            class="btn btn-secondary btn-block text-nowrap" disabled>Record test
                     </button>
                 </a>
             </div>
@@ -31,10 +35,68 @@
                 <a href="#">
                     <!--todo: change to assign or retrieve based on tracker.rider_possess (but stick in back end-->
                     <button type="button"
-                            class="btn btn-secondary btn-block">Retrieve from rider
+                            class="btn btn-secondary btn-block text-nowrap">Retrieve from rider
                     </button>
                 </a>
             </div>
         </div>
     </div>
+
+<!--Notes list-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h5>Notes</h5>
+            </div>
+        </div>
+        <ul class="list-group">
+            <!--todo: replace with for-loop-->
+            <li class="list-group-item">
+                <div style="color: grey; font-style: italic">
+                    <!--todo: replace with date and user-->
+                    14/06/2019 15:39 - Anna Haslock
+                </div>
+                <div>
+                    <!--todo: replace with event info and notes-->
+                    (Retrieval: Rider - Ben Kirby) Slightly damaged housing
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div style="color: grey; font-style: italic">
+                    02/06/2019 10:17 - Rory Kemper
+                </div>
+                <div>
+                    (Note) Dropped it, cracked the casing
+                </div>
+            </li>
+        </ul>
+    </div>
+
+<!--Events list-->
+<!--<div class="container-fluid my-2">-->
+        <!--<div class="row">-->
+            <!--<div class="col my-2">-->
+                <!--<h5>Events</h5>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<ul class="list-group">-->
+            <!--<li class="list-group-item">-->
+                <!--<div style="color: grey; font-style: italic">-->
+                    <!--14/06/2019 15:39 Anna Haslock-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--(Retrieval: Rider - Ben Kirby) Slightly damaged housing-->
+                <!--</div>-->
+            <!--</li>-->
+            <!--<li class="list-group-item">-->
+                <!--<div style="color: grey; font-style: italic">-->
+                    <!--02/06/2019 10:17: Note (User: Rory Kemper)-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--Dropped it, cracked the casing-->
+                <!--</div>-->
+            <!--</li>-->
+        <!--</ul>-->
+    <!--</div>-->
+
 {% endblock %}
