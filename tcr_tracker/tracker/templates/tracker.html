@@ -1,23 +1,40 @@
 {% extends 'tracker/base.html' %}
 {% block content %}
     <!--todo: reduce gutter size-->
-    <div class="container-fluid" style="font-size: 80%">
+    <div class="container-fluid">
         <div class="row my-2">
             <div class="col my-auto">Status:</div>
             <!--todo: replace with tracker.working_status-->
             <div class="col my-auto"><b>Working</b></div>
             <!--todo: replace with tracker.last_test_date-->
-            <div class="col my-auto" style="color: grey; font-size: 80%">12/06/2019 12:01</div>
+            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
         </div>
         <div class="row my-2">
             <div class="col my-auto">Location:</div>
             <!-- todo: replace with tracker.rider_possess-->
             <div class="col my-auto"><a href="#">Rider: Ben Kirby</a></div>
             <!-- todo: replace with tracker.last_test_date-->
-            <div class="col my-auto" style="color: grey; font-size: 80%">12/06/2019 12:01</div>
+            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
         </div>
     </div>
-    <div class="container-fluid">
-
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <a href="#">
+                    <!--todo: disable or enable based on user permissions-->
+                    <button type="button"
+                            class="btn btn-secondary btn-block" disabled>Record test
+                    </button>
+                </a>
+            </div>
+            <div class="col my-2">
+                <a href="#">
+                    <!--todo: change to assign or retrieve based on tracker.rider_possess (but stick in back end-->
+                    <button type="button"
+                            class="btn btn-secondary btn-block">Retrieve from rider
+                    </button>
+                </a>
+            </div>
+        </div>
     </div>
 {% endblock %}

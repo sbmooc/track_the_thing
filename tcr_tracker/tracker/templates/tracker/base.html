@@ -21,8 +21,8 @@
 <body id="page-top">
 
   <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
-
-    <a class="navbar-brand mr-1" href="/">Start Bootstrap</a>
+    <!--todo: replace with header that matches page-->
+    <a class="navbar-brand mr-1" href="/">Track the thing</a>
 
     <!--Side bar button - commented out for now-->
     <!--<button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">-->
@@ -84,7 +84,7 @@
 
     <div id="content-wrapper">
 
-      <div class="container-fluid">
+      <div class="container-fluid" style="font-size: 80%">
 
         {% block content %}
 
@@ -125,19 +125,20 @@
   <!-- Sticky Footer -->
   <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark nav-justified" style="background-color: #ffffff;">
     <!--Replace with consistent link to trackers_list.html at all points-->
-    <a class="nav-item nav-link active" href="#">
+    <a class="nav-item nav-link active" href="http://127.0.0.1:8000/trackers/">
       <div>
         <i class="fa fa-satellite"></i>
       </div>
       <div>Trackers</div>
     </a>
-    <!--Replace with consistent link to riders_list.html at all points-->
-    <a class="nav-item nav-link" href="#">
+    <!--todo: Replace with consistent link to riders_list.html at all points-->
+    <a class="nav-item nav-link" href="http://127.0.0.1:8000/riders/">
       <div>
         <i class="fa fa-bicycle"></i>
       </div>
       <div>Riders</div>
     </a>
+    <!--todo: add Race to navbar when developed-->
     <!--<a class="nav-item nav-link disabled" href="#">Disabled</a>-->
   </nav>
   <!--/footer-->
