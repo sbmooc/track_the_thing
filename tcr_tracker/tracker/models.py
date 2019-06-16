@@ -2,6 +2,7 @@ import django
 from django.db import models
 from django.db.models import CharField, DateField, FloatField, TextField, \
     DateTimeField, ForeignKey
+from django.urls import reverse
 
 from tcr_tracker.tracker.errors import TrackerStillInPossession, \
     TrackerNotAssigned
@@ -199,8 +200,7 @@ class Riders(models.Model):
         return f'{self.full_name}'
 
     def get_absolute_url(self):
-        # todo!!!
-        pass
+        return reverse('one_rider', kwargs={'pk': self.id})
 
 class RiderEvents(models.Model):
     # user_id = Column(Integer, ForeignKey('users.id'))
