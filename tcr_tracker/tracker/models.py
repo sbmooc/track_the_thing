@@ -1,10 +1,15 @@
-import django
 from django.db import models
-from django.db.models import CharField, DateField, FloatField, TextField, \
-    DateTimeField, ForeignKey
+from django.db.models import (
+    CharField,
+    DateField,
+    FloatField,
+    TextField,
+    DateTimeField,
+    ForeignKey
+)
+from django.urls import reverse
 
-from tcr_tracker.tracker.errors import TrackerStillInPossession, \
-    TrackerNotAssigned
+from tcr_tracker.tracker.errors import TrackerNotAssigned
 
 TRACKER_WORKING_STATUS = (
     ('working', 'Working'),
@@ -69,40 +74,48 @@ TRACKER_EVENT_CATEGORIES = (
 )
 
 
+class TimeStampedModel(models.Model):
+    created = DateTimeField(auto_now_add=True)
+    modified = DateTimeField(auto_now=True)
+
+
 class Riders(models.Model):
 
-    first_name = CharField(max_length=50)
+    first_name = CharField(max_length=50, verbose_name='First Name')
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
     cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES)
     balance = FloatField(null=True, default=0)
-    rider_url = "https://www.bbc.co.uk/"
 
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def url(self):
+        return self.get_absolute_url()
+
     # todo link riders who are in pairs? or does the capnumber do that???
     # todo add checkpoints stuff!
+
+    def get_absolute_url(self):
+        return reverse('one_rider', kwargs={'pk': self.id})
 
     def _record_tracker_rider_notes(
         self,
         tracker,
-        datetime,
         notes,
         rider_event,
         tracker_event
     ):
-
         RiderNotes(
             rider=self,
-            datetime=datetime,
             notes=notes,
             event=rider_event
         ).save()
         TrackerNotes(
             tracker=tracker,
-            datetime=datetime,
             notes=notes,
             event=tracker_event
         ).save()
@@ -111,36 +124,30 @@ class Riders(models.Model):
         self,
         tracker,
         event_type,
-        datetime,
         balance_change
     ):
         rider_event = RiderEvents(
-            datetime=datetime,
             event_type=event_type,
             balance_change=balance_change,
             rider=self
         )
         rider_event.save()
         tracker_event = TrackerEvents(
-            datetime=datetime,
             event_type=event_type,
             tracker=tracker
         )
         tracker_event.save()
         return rider_event, tracker_event
 
-    def tracker_add_assignment(self, tracker, notes, datetime, deposit):
-        # todo add in logging here
-        self.assigned_trackers.add(tracker)
+    def tracker_add_assignment(self, tracker, notes, deposit):
+        self.trackers_assigned.add(tracker)
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
             'add_tracker_assignment',
-            datetime,
             deposit * -1
         )
         if notes:
             self._record_tracker_rider_notes(
-                datetime,
                 tracker,
                 notes,
                 rider_event,
@@ -150,7 +157,7 @@ class Riders(models.Model):
         self.save()
 
     def tracker_remove_assignment(self, tracker, notes, datetime, deposit):
-        self.assigned_trackers.remove(tracker)
+        self.trackers_assigned.remove(tracker)
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
             'add',
@@ -195,16 +202,11 @@ class Riders(models.Model):
         verbose_name_plural = 'Riders'
 
     def __str__(self):
-        # return f'{self.id}: {self.full_name} (Cap: {self.cap_number})'
-        return f'{self.full_name}'
+        return self.full_name
 
-    def get_absolute_url(self):
-        # todo!!!
-        pass
 
-class RiderEvents(models.Model):
+class RiderEvents(TimeStampedModel):
     # user_id = Column(Integer, ForeignKey('users.id'))
-    datetime = DateTimeField()
     event_type = CharField(max_length=50, choices=RIDER_EVENT_CATEGORIES)
     balance_change = FloatField(null=True)
     rider = ForeignKey(Riders,
@@ -212,11 +214,10 @@ class RiderEvents(models.Model):
                        related_name='events')
 
 
-class RiderNotes(models.Model):
+class RiderNotes(TimeStampedModel):
     rider = ForeignKey(Riders,
                        on_delete=models.CASCADE,
                        related_name='notes')
-    datetime = DateTimeField(null=True)
     notes = TextField(null=True)
     event = ForeignKey(
         RiderEvents,
@@ -229,7 +230,10 @@ class RiderNotes(models.Model):
 class Trackers(models.Model):
 
     esn_number = CharField(max_length=50)
-    working_status = CharField(max_length=50, choices=TRACKER_WORKING_STATUS)
+    working_status = CharField(
+        max_length=50,
+        choices=TRACKER_WORKING_STATUS,
+        verbose_name='Working Status')
     loan_status = CharField(max_length=50, choices=TRACKER_LOAN_STATUS)
     last_test_date = DateField(null=True)
     purchase_date = DateField(null=True)
@@ -237,21 +241,29 @@ class Trackers(models.Model):
     owner = CharField(max_length=50, choices=TRACKER_OWNER)
     rider_assigned = ForeignKey(Riders,
                                 on_delete=models.CASCADE,
-                                related_name='assigned_trackers',
+                                related_name='trackers_assigned',
                                 null=True,
                                 blank=True)
     rider_possess = ForeignKey(Riders,
                                on_delete=models.CASCADE,
-                               related_name='current_tracker',
+                               related_name='trackers_possessed',
                                null=True,
                                blank=True)
-    rider_url = "https://www.bbc.co.uk/"
-    #location = relationship('tracker_locations')
 
     @property
     def assignable(self):
-        # todo
-        return 'YES'
+        return self.rider_assigned is None
+
+    @property
+    def url(self):
+        return self.get_absolute_url()
+
+    @property
+    def rider_url(self):
+        return self.rider_assigned.url if self.rider_assigned else None
+
+    def get_absolute_url(self):
+        return reverse('one_tracker', kwargs={'pk': self.id})
 
     @property
     def tracker_loan_status(self):
@@ -269,9 +281,8 @@ class Trackers(models.Model):
     class Meta:
         verbose_name_plural = 'Trackers'
 
-class TrackerEvents(models.Model):
-    # user_id = Column(Integer, ForeignKey('users.id'))
-    datetime = DateTimeField()
+
+class TrackerEvents(TimeStampedModel):
     event_type = CharField(max_length=50,
                            choices=TRACKER_EVENT_CATEGORIES)
     tracker = ForeignKey(Trackers,
@@ -279,56 +290,33 @@ class TrackerEvents(models.Model):
                          related_name='events')
 
 
-class TrackerNotes(models.Model):
+class TrackerNotes(TimeStampedModel):
     tracker = ForeignKey(Trackers,
                          on_delete=models.CASCADE,
                          related_name='notes')
-    datetime = DateTimeField()
     notes = TextField()
-    # user = Column(Integer, ForeignKey('users.id'))
     event = ForeignKey(TrackerEvents,
                        on_delete=models.CASCADE,
                        related_name='notes')
 
 
+class Checkpoints(models.Model):
+    name = CharField(max_length=50)
+    abbriviation = CharField(max_length=50)
+    latitude = CharField(max_length=50)
+    longitude = CharField(max_length=50)
 
 
-
-
-
-# class RiderAssignment(Base):
-#     rider = Column('rider', ForeignKey('riders.id'))
-#     tracker = relationship('Trackers', uselist=False)
-#
-#
-# class RiderPossession(Base):
-#     rider = Column('rider', ForeignKey('riders.id'))
-#     tracker = relationship('Trackers', uselist=False)
-#
-#
-# class TrackerAssignment(Base):
-#     tracker = Column('tracker', ForeignKey('trackers.id'))
-#     rider = relationship('Riders', uselist=False)
-#
-#
-# class TrackerPossession(Base):
-#     tracker = Column('tracker', ForeignKey('trackers.id'))
-#     rider = relationship('Riders', uselist=False)
-
-
-# class TrackerLocations(models.Model):
-#
-#     __tablename__ = 'tracker_locations'
-#     id = Column('id', Integer, primary_key=True)
-#     tracker = Column('tracker_id', ForeignKey('trackers.id'), nullable=False)
-#     rider = Column('rider', ForeignKey('riders.id'))
-#     # location = Column('location', ForeignKey('locations.id'))
-
-
-# class Locations(models.Model):
-#     __tablename__ = 'locations'
-#     id = Column('id', Integer, primary_key=True)
-#     location = Column(String, unique=True)
-#     # trackers = relationship('Trackers')
+class RiderCheckpoints(TimeStampedModel):
+    rider = ForeignKey(
+        Riders,
+        on_delete=models.CASCADE,
+        related_name='checkpoints',
+    )
+    checkpoint = ForeignKey(
+        Riders,
+        on_delete=models.CASCADE,
+        related_name='riders'
+    )
 
 
