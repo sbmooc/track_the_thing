@@ -283,6 +283,9 @@ class Trackers(models.Model):
     class Meta:
         verbose_name_plural = 'Trackers'
 
+    def __str__(self):
+        return str(self.id)
+
 
 class TrackerEvents(TimeStampedModel):
     event_type = CharField(max_length=50,

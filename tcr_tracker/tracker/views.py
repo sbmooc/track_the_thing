@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView, UpdateView, TemplateView
 
-from tcr_tracker.forms import EditTracker, EditRider
+from tcr_tracker.forms import EditTracker, EditRider, TrackerAssignmentForm
 from tcr_tracker.tracker.models import Trackers, Riders
 
 
@@ -38,6 +38,15 @@ class TrackerTest(DetailView):
         self.object.record_test(request.GET['result'])
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
+
+
+class TrackerAssignment(UpdateView):
+    model = Riders
+    form_class = TrackerAssignmentForm
+    template_name = 'tracker/riders_tracker_assignment.html'
+
+    def post(self, request, *args, **kwargs):
+        a='a'
 
 
 class RiderEdit(UpdateView):
