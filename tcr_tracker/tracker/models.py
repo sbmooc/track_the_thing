@@ -71,7 +71,7 @@ TRACKER_EVENT_CATEGORIES = (
 
 class Riders(models.Model):
 
-    first_name = CharField(max_length=50)
+    first_name = CharField(max_length=50, verbose_name='First Name')
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
     cap_number = CharField(max_length=50)
@@ -229,7 +229,10 @@ class RiderNotes(models.Model):
 class Trackers(models.Model):
 
     esn_number = CharField(max_length=50)
-    working_status = CharField(max_length=50, choices=TRACKER_WORKING_STATUS)
+    working_status = CharField(
+        max_length=50,
+        choices=TRACKER_WORKING_STATUS,
+        verbose_name='Working Status')
     loan_status = CharField(max_length=50, choices=TRACKER_LOAN_STATUS)
     last_test_date = DateField(null=True)
     purchase_date = DateField(null=True)
