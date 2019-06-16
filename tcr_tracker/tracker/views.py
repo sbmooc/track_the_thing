@@ -1,4 +1,6 @@
-from django.views.generic import ListView, TemplateView, DetailView
+from django.views.generic import ListView, DetailView, UpdateView
+
+from tcr_tracker.forms import EditTracker
 from tcr_tracker.tracker.models import Trackers, Riders
 
 
@@ -16,8 +18,15 @@ class OneTracker(DetailView):
         return context
 
 
+class TrackerEdit(UpdateView):
+    model = Trackers
+    form_class = EditTracker
+    template_name = 'tracker/tracker_edit.html'
+
+
 class AllRiders(ListView):
     model = Riders
+
 
 class OneRider(DetailView):
     model = Riders

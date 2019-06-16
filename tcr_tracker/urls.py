@@ -5,6 +5,7 @@ from tcr_tracker.tracker.views import (
     AllRiders,
     OneTracker,
     OneRider,
+    TrackerEdit
 )
 
 urlpatterns = [
@@ -12,5 +13,6 @@ urlpatterns = [
     path('trackers/', AllTrackers.as_view()),
     path('riders/', AllRiders.as_view()),
     path('trackers/<int:pk>', OneTracker.as_view()),
+    path('trackers/<int:pk>/edit', TrackerEdit.as_view()),
     path('riders/<int:pk>', OneRider.as_view()),
 ]
