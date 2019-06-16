@@ -34,3 +34,27 @@ class EditRider(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
+
+
+class TrackerAssignmentForm(forms.ModelForm):
+
+    tracker = forms.ModelChoiceField(
+        queryset=Trackers.objects.filter(
+            rider_assigned=None
+        )
+    )
+    class Meta:
+        model = Trackers
+        fields = ('tracker', )
+
+    # class Meta:
+    #     model = Riders
+    #     exclude = ()
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
+
