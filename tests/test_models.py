@@ -1,6 +1,9 @@
 from datetime import datetime
 
 import django
+
+from tcr_tracker.tracker.errors import TrackerAlreadyAssigned
+
 django.setup()
 from django.test import TestCase
 from tcr_tracker.tracker.models import (
@@ -156,15 +159,15 @@ class TestRiders(TestCase):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
             100
         )
-        self.rider_2.tracker_add_assignment(
-            self.tracker_1,
-            None,
-            self.test_datetime,
-            100
-        )
+
+        with self.assertRaises(TrackerAlreadyAssigned):
+            self.rider_2.tracker_add_assignment(
+                self.tracker_1,
+                None,
+                100
+            )
 
 
 class TestTrackers(TestCase):

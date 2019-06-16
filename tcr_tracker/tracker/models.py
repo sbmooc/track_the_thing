@@ -9,7 +9,8 @@ from django.db.models import (
 )
 from django.urls import reverse
 
-from tcr_tracker.tracker.errors import TrackerNotAssigned
+from tcr_tracker.tracker.errors import TrackerNotAssigned, \
+    TrackerAlreadyAssigned
 
 TRACKER_WORKING_STATUS = (
     ('working', 'Working'),
@@ -140,6 +141,8 @@ class Riders(models.Model):
         return rider_event, tracker_event
 
     def tracker_add_assignment(self, tracker, notes, deposit):
+        if tracker.rider_assigned is not None:
+            raise TrackerAlreadyAssigned()
         self.trackers_assigned.add(tracker)
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
