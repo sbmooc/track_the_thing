@@ -1,6 +1,6 @@
 from django.views.generic import ListView, DetailView, UpdateView
 
-from tcr_tracker.forms import EditTracker
+from tcr_tracker.forms import EditTracker, EditRider
 from tcr_tracker.tracker.models import Trackers, Riders
 
 
@@ -21,7 +21,13 @@ class OneTracker(DetailView):
 class TrackerEdit(UpdateView):
     model = Trackers
     form_class = EditTracker
-    template_name = 'tracker/tracker_edit.html'
+    template_name = 'tracker/trackers_edit.html'
+
+
+class RiderEdit(UpdateView):
+    model = Riders
+    form_class = EditRider
+    template_name = 'tracker/riders_edit.html'
 
 
 class AllRiders(ListView):
@@ -30,5 +36,3 @@ class AllRiders(ListView):
 
 class OneRider(DetailView):
     model = Riders
-
-

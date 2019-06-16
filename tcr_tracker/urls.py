@@ -5,14 +5,16 @@ from tcr_tracker.tracker.views import (
     AllRiders,
     OneTracker,
     OneRider,
-    TrackerEdit
+    TrackerEdit,
+    RiderEdit,
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('trackers/', AllTrackers.as_view()),
-    path('riders/', AllRiders.as_view()),
-    path('trackers/<int:pk>', OneTracker.as_view()),
-    path('trackers/<int:pk>/edit', TrackerEdit.as_view()),
-    path('riders/<int:pk>', OneRider.as_view()),
+    path('riders/', AllRiders.as_view(), name='all_riders'),
+    path('riders/<int:pk>', OneRider.as_view(), name='one_rider'),
+    path('riders/<int:pk>/edit', RiderEdit.as_view(), name='rider_edit'),
+    path('trackers/', AllTrackers.as_view(), name='all_trackers'),
+    path('trackers/<int:pk>', OneTracker.as_view(), name='one_tracker'),
+    path('trackers/<int:pk>/edit', TrackerEdit.as_view(), name='tracker_edit'),
 ]
