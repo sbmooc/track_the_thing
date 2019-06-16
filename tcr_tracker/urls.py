@@ -1,14 +1,16 @@
 from django.contrib import admin
 from django.urls import path
-from django.views.generic import TemplateView
-from tcr_tracker.tracker import views
-from tcr_tracker.tracker.views import AllTrackers, AllRiders, OneTracker
-
+from tcr_tracker.tracker.views import (
+    AllTrackers,
+    AllRiders,
+    OneTracker,
+    OneRider,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('trackers/', AllTrackers.as_view()),
     path('riders/', AllRiders.as_view()),
-    path('tracker/<int:pk>', OneTracker.as_view()),
-    # path('riders/<int:rider_id>', views.rider)
+    path('trackers/<int:pk>', OneTracker.as_view()),
+    path('riders/<int:pk>', OneRider.as_view()),
 ]
