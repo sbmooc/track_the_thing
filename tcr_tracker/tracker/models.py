@@ -159,17 +159,15 @@ class Riders(models.Model):
         self.balance -= deposit
         self.save()
 
-    def tracker_remove_assignment(self, tracker, notes, datetime, deposit):
+    def tracker_remove_assignment(self, tracker, notes, deposit):
         self.trackers_assigned.remove(tracker)
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
             'add',
-            datetime,
             deposit * -1
         )
         if notes:
             self._record_tracker_rider_notes(
-                datetime,
                 tracker,
                 notes,
                 rider_event,
@@ -272,8 +270,9 @@ class Trackers(models.Model):
     def tracker_loan_status(self):
         return self.get_loan_status_display()
 
-    def record_test(self):
-        pass
+    def record_test(self, result):
+        self.working_status = 'working' if result == 'working' else 'broken'
+        self.save()
 
     def record_lost(self):
         pass
