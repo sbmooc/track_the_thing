@@ -9,6 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('trackers/', AllTrackers.as_view()),
     path('riders/', AllRiders.as_view()),
-    path('tracker/', OneTracker.as_view()),
+    path('tracker/<int:pk>', OneTracker.as_view()),
     # path('riders/<int:rider_id>', views.rider)
 ]
