@@ -52,8 +52,7 @@
           <tbody>
             {% for tracker in trackers_list %}
                 <tr>
-                    <!--todo: replace hard link with tracker.tracker_url (or equivalent)-->
-                  <td><a href="http://127.0.0.1:8000/tracker/">{{ tracker.esn_number }}</a></td>
+                  <td><a href={{ tracker.url }}>{{ tracker.esn_number }}</a></td>
                   <td>
                       <div>{{ tracker.working_status }}</div>
                       <div style="font-size: 80%">{{ tracker.last_test_date }}</div>
@@ -65,11 +64,10 @@
                       {% endif %}
                   </td>
                   <td class="d-none d-sm-table-cell">
-                      <!--Need to replace with just assignable field when written-->
-                      {% if tracker.rider_assigned %}
-                        NO
+                      {% if tracker.assignable %}
+                        Yes
                       {% else %}
-                        {{ tracker.assignable }}
+                        No
                       {% endif %}
                   </td>
                 </tr>
