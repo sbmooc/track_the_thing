@@ -59,7 +59,7 @@
             {% for rider in riders_list %}
                 <tr>
                   <td>{{ rider.cap_number }}</td>
-                    <td><a href={{ rider.rider_url }}>{{ rider.full_name }}</a></td>
+                    <td><a href={{ rider.url }}>{{ rider.full_name }}</a></td>
                   <td>{{ rider.current_tracker }}</td>
                   <td class="d-none d-sm-table-cell">
                       <!--Need to add logic to models-->
