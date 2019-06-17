@@ -43,13 +43,16 @@ class TrackerAssignmentForm(forms.ModelForm):
             rider_assigned=None
         )
     )
+    deposit = forms.IntegerField()
+    notes = forms.CharField()
+
     class Meta:
         model = Trackers
-        fields = ('tracker', )
-
-    # class Meta:
-    #     model = Riders
-    #     exclude = ()
+        fields = (
+            'tracker',
+            'deposit',
+            'notes'
+        )
 
     def __init__(self, *args, **kwargs):
 

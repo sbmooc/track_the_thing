@@ -1,4 +1,6 @@
-from django.views.generic import ListView, DetailView, UpdateView, TemplateView
+from django.http import HttpResponseRedirect
+from django.views.generic import ListView, DetailView, UpdateView, TemplateView, \
+    FormView
 
 from tcr_tracker.forms import EditTracker, EditRider, TrackerAssignmentForm
 from tcr_tracker.tracker.models import Trackers, Riders
@@ -44,9 +46,15 @@ class TrackerAssignment(UpdateView):
     model = Riders
     form_class = TrackerAssignmentForm
     template_name = 'tracker/riders_tracker_assignment.html'
+    success_url = 'http://www.bbc.co.uk'
 
-    def post(self, request, *args, **kwargs):
-        a='a'
+    def form_valid(self, form):
+        self.object.tracker_add_assignment(
+            form.cleaned_data['tracker'],
+            form.cleaned_data['notes'],
+            form.cleaned_data['deposit']
+        )
+        return super(TrackerAssignment, self).form_valid(form)
 
 
 class RiderEdit(UpdateView):
