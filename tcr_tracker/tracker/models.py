@@ -9,7 +9,8 @@ from django.db.models import (
 )
 from django.urls import reverse
 
-from tcr_tracker.tracker.errors import TrackerNotAssigned
+from tcr_tracker.tracker.errors import TrackerNotAssigned, \
+    TrackerAlreadyAssigned, TrackerNotPossessed
 
 TRACKER_WORKING_STATUS = (
     ('working', 'Working'),
@@ -102,6 +103,14 @@ class Riders(models.Model):
     def get_absolute_url(self):
         return reverse('one_rider', kwargs={'pk': self.id})
 
+    @property
+    def url_assign_tracker(self):
+        return reverse('rider_tracker_assignment', kwargs={'pk': self.id})
+
+    @property
+    def url_possess_tracker(self):
+        return reverse('rider_tracker_possession', kwargs={'pk': self.id})
+
     def _record_tracker_rider_notes(
         self,
         tracker,
@@ -140,6 +149,8 @@ class Riders(models.Model):
         return rider_event, tracker_event
 
     def tracker_add_assignment(self, tracker, notes, deposit):
+        if tracker.rider_assigned is not None:
+            raise TrackerAlreadyAssigned()
         self.trackers_assigned.add(tracker)
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
@@ -156,17 +167,17 @@ class Riders(models.Model):
         self.balance -= deposit
         self.save()
 
-    def tracker_remove_assignment(self, tracker, notes, datetime, deposit):
+    def tracker_remove_assignment(self, tracker, notes, deposit):
+        if tracker not in self.trackers_assigned:
+            raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
-            'add',
-            datetime,
-            deposit * -1
+            'remove_tracker_assignment',
+            deposit
         )
         if notes:
             self._record_tracker_rider_notes(
-                datetime,
                 tracker,
                 notes,
                 rider_event,
@@ -175,12 +186,11 @@ class Riders(models.Model):
         self.balance += deposit
         self.save()
 
-    def tracker_possession_add(self, tracker, notes, datetime):
-        if tracker not in self.assigned_trackers:
+    def tracker_add_possession(self, tracker, notes):
+        if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
-        self.current_tracker.add(tracker)
+        self.trackers_possessed.add(tracker)
         event = RiderEvents(
-            datetime=datetime,
             event_type='tracker_add_possession',
             rider=self
         )
@@ -188,15 +198,27 @@ class Riders(models.Model):
         if notes:
             RiderNotes(
                 rider=self,
-                datetime=datetime,
                 notes=notes,
-                events=event
+                event=event
             ).save()
         self.save()
 
-    def tracker_possession_remove(self, tracker, notes, datetime):
-        if tracker not in self.current_tracker:
-            raise
+    def tracker_remove_possession(self, tracker, notes):
+        if tracker not in self.trackers_possesed.all():
+            raise TrackerNotPossessed()
+        self.trackers_possessed.remove(tracker)
+        event = RiderEvents(
+            event_type='tracker_remove_possession',
+            rider=self
+        )
+        event.save()
+        if notes:
+            RiderNotes(
+                rider=self,
+                notes=notes,
+                event=event
+            ).save()
+        self.save()
 
     class Meta:
         verbose_name_plural = 'Riders'
@@ -266,11 +288,24 @@ class Trackers(models.Model):
         return reverse('one_tracker', kwargs={'pk': self.id})
 
     @property
+    def url_assign_tracker(self):
+        return reverse('tracker_rider_assignment', kwargs={'pk': self.id})
+
+    @property
+    def url_possess_tracker(self):
+        return reverse('tracker_rider_possession', kwargs={'pk': self.id})
+
+    @property
+    def url_add_notes(self):
+        return reverse('tracker_add_notes', kwargs={'pk': self.id})
+
+    @property
     def tracker_loan_status(self):
         return self.get_loan_status_display()
 
-    def record_test(self):
-        pass
+    def record_test(self, result):
+        self.working_status = 'working' if result == 'working' else 'broken'
+        self.save()
 
     def record_lost(self):
         pass
@@ -280,6 +315,9 @@ class Trackers(models.Model):
 
     class Meta:
         verbose_name_plural = 'Trackers'
+
+    def __str__(self):
+        return str(self.id)
 
 
 class TrackerEvents(TimeStampedModel):
@@ -294,10 +332,13 @@ class TrackerNotes(TimeStampedModel):
     tracker = ForeignKey(Trackers,
                          on_delete=models.CASCADE,
                          related_name='notes')
-    notes = TextField()
-    event = ForeignKey(TrackerEvents,
-                       on_delete=models.CASCADE,
-                       related_name='notes')
+    notes = TextField(null=True)
+    event = ForeignKey(
+        TrackerEvents,
+        on_delete=models.CASCADE,
+        related_name='notes',
+        null=True
+    )
 
 
 class Checkpoints(models.Model):

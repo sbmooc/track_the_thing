@@ -1,46 +1,65 @@
 {% extends 'tracker/base.html' %}
 {% block content %}
 
-<!--status headers-->
+    <!--status headers-->
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
             <div class="col my-auto">Status:</div>
+            <!--todo: replace with tracker.working_status-->
             <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
+            <!--todo: replace with tracker.last_test_date-->
+            <div class="col my-auto"
+                 style="color: grey; font-size: 80%; text-align: right">
+                12/06/2019 12:01
+            </div>
         </div>
         <div class="row my-2">
             <div class="col my-auto">Location:</div>
-            <!-- todo: ask Oli about why rider_possess doesn't work-->
-            <div class="col my-auto"><a href="#">{{ trackers.rider_possess }}</a></div>
+            <!-- todo: replace with tracker.rider_possess-->
+            <div class="col my-auto"><a href="#">Rider: Ben Kirby</a></div>
             <!-- todo: replace with tracker.last_test_date-->
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
+            <div class="col my-auto"
+                 style="color: grey; font-size: 80%; text-align: right">
+                12/06/2019 12:01
+            </div>
         </div>
     </div>
 
-<!--Event buttons-->
+    <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            <div class="col my-2">
+            <div class="col-2 my-2">
                 <a href="#">
                     <!--todo: disable or enable based on user permissions-->
                     <button type="button"
-                            class="btn btn-secondary btn-block text-nowrap" disabled>Record test
+                            class="btn btn-secondary btn-block text-nowrap"
+                            disabled>Successful test
                     </button>
                 </a>
             </div>
-            <div class="col my-2">
-                <a href="#">
-                    <!--todo: change to assign or retrieve based on tracker.rider_possess (but stick in back end-->
-                    <button type="button"
-                            class="btn btn-secondary btn-block text-nowrap">Retrieve from rider
-                    </button>
-                </a>
+            <div class="col-2 my-2">
+            <a href="#">
+                <!--todo: disable or enable based on user permissions-->
+                <button type="button"
+                        class="btn btn-secondary btn-block text-nowrap"
+                        disabled>Unsuccessful test
+                </button>
+            </a>
             </div>
+{#            <div class="col-6 my-2">#}
+{#                <a href="#">#}
+{#                    <!--todo: change to assign or retrieve based on tracker.rider_possess (but stick in back end-->#}
+{#                    <button type="button"#}
+{#                            class="btn btn-secondary btn-block text-nowrap">#}
+{#                        Change Tracker Location#}
+{#                    </button>#}
+{#                </a>#}
+{#            </div>#}
         </div>
     </div>
 
-<!--Notes list-->
+    <!--Notes list-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
@@ -70,84 +89,81 @@
         </ul>
     </div>
 
-<!--Events log-->
-<div class="container-fluid my-2">
-    <div class="row">
-        <div class="col my-2">
-            <h5>Events</h5>
+    <!--Events log-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h5>Events</h5>
+            </div>
         </div>
+        <table class="table table-hover table-responsive-sm">
+            <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Event</th>
+                <th scope="col">User</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!--todo: replace with for-loop-->
+            <tr>
+                <td>
+                    14/06/2019 15:39
+                </td>
+                <td>
+                    Retrieval: Rider - Ben Kirby
+                </td>
+                <td>
+                    Anna Haslock
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    10/06/2019 12:22
+                </td>
+                <td>
+                    Assigned: Rider - Ben Kirby
+                </td>
+                <td>
+                    Rory Kemper
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    01/06/2019 19:41
+                </td>
+                <td>
+                    Tested: Working
+                </td>
+                <td>
+                    Rory Kemper
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-    <table class="table table-hover table-responsive-sm">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Event</th>
-          <th scope="col">User</th>
-        </tr>
-      </thead>
-      <tbody>
-      <!--todo: replace with for-loop-->
-            <tr>
-              <td>
-                  14/06/2019 15:39
-              </td>
-              <td>
-                  Retrieval: Rider - Ben Kirby
-              </td>
-              <td>
-                  Anna Haslock
-              </td>
-            </tr>
-            <tr>
-              <td>
-                  10/06/2019 12:22
-              </td>
-              <td>
-                  Assigned: Rider - Ben Kirby
-              </td>
-              <td>
-                  Rory Kemper
-              </td>
-            </tr>
-            <tr>
-              <td>
-                  01/06/2019 19:41
-              </td>
-              <td>
-                  Tested: Working
-              </td>
-              <td>
-                  Rory Kemper
-              </td>
-            </tr>
-      </tbody>
-    </table>
-</div>
 
-<!--Tracker info table-->
-<div class="container-fluid my-2">
-    <div class="row">
-        <div class="col my-2">
-            <h5>Tracker info</h5>
+    <!--Tracker info table-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h5>Tracker info <i class="fa fa-pen"></i></h5>
+            </div>
         </div>
-        <div class="col my-2 mr-2" style="text-align: right; font-size: 120%">
-            <i class="fa fa-pen"></i>
-        </div>
-    </div>
-    <table class="table table-hover">
-      <tbody>
-        {% for field, value in tracker_dict.items %}
+        <table class="table table-hover">
+            <tbody>
             <tr>
-              <td>
-                  {{ field }}
-              </td>
-              <td style="font-style: italic">
-                  {{ value }}
-              </td>
-            </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-</div>
+                {% for field, value in tracker_dict.items %}
+                    <td>
+                        {{ field }}
+                    </td>
+                    <td style="font-style: italic">
+                        {{ value }}
+                    </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}
