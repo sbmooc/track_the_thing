@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, UpdateView, TemplateView, \
     FormView
 
-from tcr_tracker.forms import EditTracker, EditRider, TrackerAssignmentForm
+from tcr_tracker.forms import EditTracker, EditRider, TrackerAssignmentForm, TrackerPossessionForm
 from tcr_tracker.tracker.models import Trackers, Riders
 
 
@@ -46,6 +46,7 @@ class TrackerAssignment(UpdateView):
     model = Riders
     form_class = TrackerAssignmentForm
     template_name = 'tracker/riders_tracker_assignment.html'
+    # todo update success_url
     success_url = 'http://www.bbc.co.uk'
 
     def form_valid(self, form):
@@ -55,6 +56,20 @@ class TrackerAssignment(UpdateView):
             form.cleaned_data['deposit']
         )
         return super(TrackerAssignment, self).form_valid(form)
+
+
+class TrackerPossession(UpdateView):
+    model = Riders
+    form_class = TrackerPossessionForm
+    template_name = 'tracker/riders_tracker_assignment.html'
+    success_url = 'http://www.bbc.co.uk'
+
+    def form_valid(self, form):
+        self.object.tracker_possession_add(
+            form.cleaned_data['tracker'],
+            form.cleaned_data['notes'],
+        )
+        return super(TrackerPossession, self).form_valid(form)
 
 
 class RiderEdit(UpdateView):
