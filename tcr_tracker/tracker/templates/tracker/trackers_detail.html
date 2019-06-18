@@ -6,13 +6,13 @@
     <div class="container-fluid">
         <div class="row my-2">
             <div class="col my-auto">Status:</div>
-            <div class="col my-auto"><b>{{ tracker_dict.working_status }}</b></div>
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ tracker_dict.last_test_date }}</div>
+            <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
+            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
         </div>
         <div class="row my-2">
             <div class="col my-auto">Location:</div>
             <!-- todo: ask Oli about why rider_possess doesn't work-->
-            <div class="col my-auto"><a href="#">{{ tracker_dict.rider_possess }}</a></div>
+            <div class="col my-auto"><a href="#">{{ trackers.rider_possess }}</a></div>
             <!-- todo: replace with tracker.last_test_date-->
             <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
         </div>
