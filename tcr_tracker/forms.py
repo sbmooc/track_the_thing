@@ -2,8 +2,24 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from tcr_tracker.tracker.models import Trackers, Riders
+from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes
 
+
+class TrackerAddNotesForm(forms.ModelForm):
+    notes = forms.CharField()
+
+    class Meta:
+        model = TrackerNotes
+        fields = (
+            'notes',
+        )
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
 
 class EditTracker(forms.ModelForm):
 

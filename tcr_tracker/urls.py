@@ -10,7 +10,7 @@ from tcr_tracker.tracker.views import (
     TrackerTest,
     RiderTrackerAssignment,
     RiderTrackerPossession,
-    TrackerRiderPossession, TrackerRiderAssignment)
+    TrackerRiderPossession, TrackerRiderAssignment, TrackerAddNotes)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,6 @@ urlpatterns = [
          name='tracker_rider_possession'),
     path('trackers/<int:pk>/assignment', TrackerRiderAssignment.as_view(),
          name='tracker_rider_possession'),
+    path('trackers/<int:pk>/notes', TrackerAddNotes.as_view(),
+         name='tracker_add_notes'),
 ]
