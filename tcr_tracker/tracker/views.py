@@ -14,7 +14,6 @@ class OneTracker(DetailView):
     def get_context_data(self, **kwargs):
         context = super(OneTracker, self).get_context_data(**kwargs)
         context['tracker_dict'] = context['trackers'].__dict__
-        context['tracker_dict'].pop('_state')
         return context
 
 
