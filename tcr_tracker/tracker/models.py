@@ -295,6 +295,8 @@ class Trackers(models.Model):
     def url_possess_tracker(self):
         return reverse('tracker_rider_possession', kwargs={'pk': self.id})
 
+    # todo: add url_de-possess_tracker?
+
     @property
     def url_add_notes(self):
         return reverse('tracker_add_notes', kwargs={'pk': self.id})

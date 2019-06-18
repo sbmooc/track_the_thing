@@ -6,56 +6,37 @@
     <div class="container-fluid">
         <div class="row my-2">
             <div class="col my-auto">Status:</div>
-            <!--todo: replace with tracker.working_status-->
             <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
-            <!--todo: replace with tracker.last_test_date-->
-            <div class="col my-auto"
-                 style="color: grey; font-size: 80%; text-align: right">
-                12/06/2019 12:01
-            </div>
+            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
         </div>
         <div class="row my-2">
             <div class="col my-auto">Location:</div>
-            <!-- todo: replace with tracker.rider_possess-->
-            <div class="col my-auto"><a href="#">Rider: Ben Kirby</a></div>
-            <!-- todo: replace with tracker.last_test_date-->
-            <div class="col my-auto"
-                 style="color: grey; font-size: 80%; text-align: right">
-                12/06/2019 12:01
-            </div>
+            <div class="col my-auto"><a href="#">{{ trackers.rider_possess }}</a></div>
+            <!-- todo: replace with event date-->
+            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
         </div>
     </div>
 
     <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            <div class="col-2 my-2">
+            <div class="col my-2">
                 <a href="#">
                     <!--todo: disable or enable based on user permissions-->
-                    <button type="button"
-                            class="btn btn-secondary btn-block text-nowrap"
-                            disabled>Successful test
-                    </button>
+                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Record test</button>
                 </a>
             </div>
-            <div class="col-2 my-2">
-            <a href="#">
-                <!--todo: disable or enable based on user permissions-->
-                <button type="button"
-                        class="btn btn-secondary btn-block text-nowrap"
-                        disabled>Unsuccessful test
-                </button>
-            </a>
+            <div class="col my-2">
+                <a href="#">
+                    <!--todo: disable or enable based on user permissions-->
+                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Assign</button>
+                </a>
             </div>
-{#            <div class="col-6 my-2">#}
-{#                <a href="#">#}
-{#                    <!--todo: change to assign or retrieve based on tracker.rider_possess (but stick in back end-->#}
-{#                    <button type="button"#}
-{#                            class="btn btn-secondary btn-block text-nowrap">#}
-{#                        Change Tracker Location#}
-{#                    </button>#}
-{#                </a>#}
-{#            </div>#}
+            <div class="col my-2">
+                <a href="#">
+                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Retrieve</button>
+                </a>
+           </div>
         </div>
     </div>
 
@@ -96,7 +77,7 @@
                 <h5>Events</h5>
             </div>
         </div>
-        <table class="table table-hover table-responsive-sm">
+        <table class="table table-hover table-responsive-xs">
             <thead>
             <tr>
                 <th scope="col">Date</th>
@@ -106,6 +87,16 @@
             </thead>
             <tbody>
             <!--todo: replace with for-loop-->
+            {% for event in tracker.events %}
+                <tr>
+                    <td>
+                        event.date
+                    </td>
+                    <td>
+                        event.type
+                    </td>
+                </tr>
+            {% endfor %}
             <tr>
                 <td>
                     14/06/2019 15:39
