@@ -343,7 +343,7 @@ class TrackerNotes(TimeStampedModel):
 
 class Checkpoints(models.Model):
     name = CharField(max_length=50)
-    abbriviation = CharField(max_length=50)
+    abbreviation = CharField(max_length=50)
     latitude = CharField(max_length=50)
     longitude = CharField(max_length=50)
 
