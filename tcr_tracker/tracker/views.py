@@ -6,16 +6,29 @@ from tcr_tracker.forms import (
     RiderTrackerAssignmentForm,
     RiderTrackerPossessionForm,
     TrackerRiderAssignmentForm,
-    TrackerRiderPossessionForm
-)
+    TrackerRiderPossessionForm,
+    TrackerAddNotesForm)
 
-from tcr_tracker.tracker.models import Trackers, Riders
+from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes
+
+
+class TrackerAddNotes(UpdateView):
+    form_class = TrackerAddNotesForm
+    model = Trackers
+    template_name = 'tracker/basic_form.html'
+
+    def form_valid(self, form):
+        TrackerNotes(
+            tracker=self.object,
+            notes=form.cleaned_data['notes']
+        ).save()
+        return super(TrackerAddNotes, self).form_valid(form)
 
 
 class TrackerRiderPossession(UpdateView):
     model = Trackers
     form_class = TrackerRiderPossessionForm
-    template_name = 'tracker/riders_tracker_assignment.html'
+    template_name = 'tracker/basic_form.html'
 
     def form_valid(self, form):
         rider = form.cleaned_data['rider']
@@ -35,7 +48,7 @@ class TrackerRiderPossession(UpdateView):
 class TrackerRiderAssignment(UpdateView):
     model = Trackers
     form_class = TrackerRiderAssignmentForm
-    template_name = 'tracker/riders_tracker_assignment.html'
+    template_name = 'tracker/basic_form.html'
 
     def form_valid(self, form):
         rider = form.cleaned_data['rider']
@@ -93,7 +106,7 @@ class TrackerTest(DetailView):
 class RiderTrackerAssignment(UpdateView):
     model = Riders
     form_class = RiderTrackerAssignmentForm
-    template_name = 'tracker/riders_tracker_assignment.html'
+    template_name = 'tracker/basic_form.html'
     # todo update success_url
 
     def form_valid(self, form):
@@ -115,7 +128,7 @@ class RiderTrackerAssignment(UpdateView):
 class RiderTrackerPossession(UpdateView):
     model = Riders
     form_class = RiderTrackerPossessionForm
-    template_name = 'tracker/riders_tracker_assignment.html'
+    template_name = 'tracker/basic_form.html'
 
     def form_valid(self, form):
         if form.cleaned_data['add_or_remove']:

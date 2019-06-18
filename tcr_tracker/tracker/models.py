@@ -288,6 +288,18 @@ class Trackers(models.Model):
         return reverse('one_tracker', kwargs={'pk': self.id})
 
     @property
+    def url_assign_tracker(self):
+        return reverse('tracker_rider_assignment', kwargs={'pk': self.id})
+
+    @property
+    def url_possess_tracker(self):
+        return reverse('tracker_rider_possession', kwargs={'pk': self.id})
+
+    @property
+    def url_add_notes(self):
+        return reverse('tracker_add_notes', kwargs={'pk': self.id})
+
+    @property
     def tracker_loan_status(self):
         return self.get_loan_status_display()
 
@@ -320,10 +332,13 @@ class TrackerNotes(TimeStampedModel):
     tracker = ForeignKey(Trackers,
                          on_delete=models.CASCADE,
                          related_name='notes')
-    notes = TextField()
-    event = ForeignKey(TrackerEvents,
-                       on_delete=models.CASCADE,
-                       related_name='notes')
+    notes = TextField(null=True)
+    event = ForeignKey(
+        TrackerEvents,
+        on_delete=models.CASCADE,
+        related_name='notes',
+        null=True
+    )
 
 
 class Checkpoints(models.Model):
