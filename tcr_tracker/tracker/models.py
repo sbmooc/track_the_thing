@@ -10,7 +10,7 @@ from django.db.models import (
 from django.urls import reverse
 
 from tcr_tracker.tracker.errors import TrackerNotAssigned, \
-    TrackerAlreadyAssigned
+    TrackerAlreadyAssigned, TrackerNotPossessed
 
 TRACKER_WORKING_STATUS = (
     ('working', 'Working'),
@@ -103,6 +103,14 @@ class Riders(models.Model):
     def get_absolute_url(self):
         return reverse('one_rider', kwargs={'pk': self.id})
 
+    @property
+    def url_assign_tracker(self):
+        return reverse('rider_tracker_assignment', kwargs={'pk': self.id})
+
+    @property
+    def url_possess_tracker(self):
+        return reverse('rider_tracker_possession', kwargs={'pk': self.id})
+
     def _record_tracker_rider_notes(
         self,
         tracker,
@@ -160,11 +168,13 @@ class Riders(models.Model):
         self.save()
 
     def tracker_remove_assignment(self, tracker, notes, deposit):
+        if tracker not in self.trackers_assigned:
+            raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
-            'add',
-            deposit * -1
+            'remove_tracker_assignment',
+            deposit
         )
         if notes:
             self._record_tracker_rider_notes(
@@ -176,7 +186,7 @@ class Riders(models.Model):
         self.balance += deposit
         self.save()
 
-    def tracker_possession_add(self, tracker, notes):
+    def tracker_add_possession(self, tracker, notes):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_possessed.add(tracker)
@@ -193,9 +203,22 @@ class Riders(models.Model):
             ).save()
         self.save()
 
-    def tracker_possession_remove(self, tracker, notes, datetime):
-        if tracker not in self.current_tracker:
-            raise
+    def tracker_remove_possession(self, tracker, notes):
+        if tracker not in self.trackers_possesed.all():
+            raise TrackerNotPossessed()
+        self.trackers_possessed.remove(tracker)
+        event = RiderEvents(
+            event_type='tracker_remove_possession',
+            rider=self
+        )
+        event.save()
+        if notes:
+            RiderNotes(
+                rider=self,
+                notes=notes,
+                event=event
+            ).save()
+        self.save()
 
     class Meta:
         verbose_name_plural = 'Riders'
