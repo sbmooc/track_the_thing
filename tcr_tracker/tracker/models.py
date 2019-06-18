@@ -176,12 +176,11 @@ class Riders(models.Model):
         self.balance += deposit
         self.save()
 
-    def tracker_possession_add(self, tracker, notes, datetime):
-        if tracker not in self.assigned_trackers:
+    def tracker_possession_add(self, tracker, notes):
+        if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
-        self.current_tracker.add(tracker)
+        self.trackers_possessed.add(tracker)
         event = RiderEvents(
-            datetime=datetime,
             event_type='tracker_add_possession',
             rider=self
         )
@@ -189,9 +188,8 @@ class Riders(models.Model):
         if notes:
             RiderNotes(
                 rider=self,
-                datetime=datetime,
                 notes=notes,
-                events=event
+                event=event
             ).save()
         self.save()
 

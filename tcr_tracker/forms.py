@@ -47,7 +47,7 @@ class TrackerAssignmentForm(forms.ModelForm):
     notes = forms.CharField()
 
     class Meta:
-        model = Trackers
+        model = Riders
         fields = (
             'tracker',
             'deposit',
@@ -61,3 +61,21 @@ class TrackerAssignmentForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
 
+
+class TrackerPossessionForm(forms.ModelForm):
+
+    class Meta:
+        model = Riders
+        fields = ()
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
+        self.rider = kwargs.get('instance')
+        self.fields['tracker'] = forms.ModelChoiceField(
+            queryset=self.rider.trackers_assigned.all()
+        )
+        self.fields['notes'] = forms.CharField()
