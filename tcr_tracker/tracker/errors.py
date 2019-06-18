@@ -8,3 +8,6 @@ class TrackerNotAssigned(BaseException):
 
 class TrackerAlreadyAssigned(BaseException):
     pass
+
+class TrackerNotPossessed(BaseException):
+    pass

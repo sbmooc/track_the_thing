@@ -1,9 +1,57 @@
-from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, UpdateView, TemplateView, \
-    FormView
+from django.views.generic import ListView, DetailView, UpdateView
 
-from tcr_tracker.forms import EditTracker, EditRider, TrackerAssignmentForm, TrackerPossessionForm
+from tcr_tracker.forms import (
+    EditTracker,
+    EditRider,
+    RiderTrackerAssignmentForm,
+    RiderTrackerPossessionForm,
+    TrackerRiderAssignmentForm,
+    TrackerRiderPossessionForm
+)
+
 from tcr_tracker.tracker.models import Trackers, Riders
+
+
+class TrackerRiderPossession(UpdateView):
+    model = Trackers
+    form_class = TrackerRiderPossessionForm
+    template_name = 'tracker/riders_tracker_assignment.html'
+
+    def form_valid(self, form):
+        rider = form.cleaned_data['rider']
+        if form.cleaned_data['add_or_remove']:
+            rider.tracker_add_possession(
+                self.object,
+                form.cleaned_data['notes'],
+            )
+        else:
+            rider.tracker_add_possession(
+                self.object,
+                form.cleaned_data['notes']
+            )
+        return super(TrackerRiderPossession, self).form_valid(form)
+
+
+class TrackerRiderAssignment(UpdateView):
+    model = Trackers
+    form_class = TrackerRiderAssignmentForm
+    template_name = 'tracker/riders_tracker_assignment.html'
+
+    def form_valid(self, form):
+        rider = form.cleaned_data['rider']
+        if form.cleaned_data['add_or_remove']:
+            rider.tracker_add_assignment(
+                self.object,
+                form.cleaned_data['notes'],
+                form.cleaned_data['deposit']
+            )
+        else:
+            rider.tracker_remove_assignment(
+                self.object,
+                form.cleaned_data['notes'],
+                form.cleaned_data['deposit']
+            )
+        return super(TrackerRiderAssignment, self).form_valid(form)
 
 
 class AllTrackers(ListView):
@@ -42,34 +90,45 @@ class TrackerTest(DetailView):
         return self.render_to_response(context)
 
 
-class TrackerAssignment(UpdateView):
+class RiderTrackerAssignment(UpdateView):
     model = Riders
-    form_class = TrackerAssignmentForm
+    form_class = RiderTrackerAssignmentForm
     template_name = 'tracker/riders_tracker_assignment.html'
     # todo update success_url
-    success_url = 'http://www.bbc.co.uk'
 
     def form_valid(self, form):
-        self.object.tracker_add_assignment(
-            form.cleaned_data['tracker'],
-            form.cleaned_data['notes'],
-            form.cleaned_data['deposit']
-        )
-        return super(TrackerAssignment, self).form_valid(form)
+        if form.cleaned_data['add_or_remove']:
+            self.object.tracker_add_assignment(
+                form.cleaned_data['tracker'],
+                form.cleaned_data['notes'],
+                form.cleaned_data['deposit']
+            )
+        else:
+            self.object.tracker_remove_assignment(
+                form.cleaned_data['tracker'],
+                form.cleaned_data['notes'],
+                form.cleaned_data['deposit']
+            )
+        return super(RiderTrackerAssignment, self).form_valid(form)
 
 
-class TrackerPossession(UpdateView):
+class RiderTrackerPossession(UpdateView):
     model = Riders
-    form_class = TrackerPossessionForm
+    form_class = RiderTrackerPossessionForm
     template_name = 'tracker/riders_tracker_assignment.html'
-    success_url = 'http://www.bbc.co.uk'
 
     def form_valid(self, form):
-        self.object.tracker_possession_add(
-            form.cleaned_data['tracker'],
-            form.cleaned_data['notes'],
-        )
-        return super(TrackerPossession, self).form_valid(form)
+        if form.cleaned_data['add_or_remove']:
+            self.object.tracker_add_possession(
+                form.cleaned_data['tracker'],
+                form.cleaned_data['notes'],
+            )
+        else:
+            self.object.tracker_remove_possession(
+                form.cleaned_data['tracker'],
+                form.cleaned_data['notes']
+            )
+        return super(RiderTrackerPossession, self).form_valid(form)
 
 
 class RiderEdit(UpdateView):
