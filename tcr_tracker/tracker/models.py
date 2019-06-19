@@ -90,6 +90,10 @@ class Riders(models.Model):
     balance = FloatField(null=True, default=0)
 
     @property
+    def current_tracker(self):
+        return self.trackers_possessed.all().last() or None
+
+    @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
@@ -204,7 +208,7 @@ class Riders(models.Model):
         self.save()
 
     def tracker_remove_possession(self, tracker, notes):
-        if tracker not in self.trackers_possesed.all():
+        if tracker not in self.trackers_possessed.all():
             raise TrackerNotPossessed()
         self.trackers_possessed.remove(tracker)
         event = RiderEvents(
@@ -271,6 +275,10 @@ class Trackers(models.Model):
                                related_name='trackers_possessed',
                                null=True,
                                blank=True)
+
+    @property
+    def all_events(self):
+        return self.events.all()
 
     @property
     def assignable(self):
