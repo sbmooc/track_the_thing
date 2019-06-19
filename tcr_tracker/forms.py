@@ -5,11 +5,10 @@ from django import forms
 from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes
 
 
-class TrackerAddNotesForm(forms.ModelForm):
+class AddNotesForm(forms.ModelForm):
     notes = forms.CharField()
 
     class Meta:
-        model = TrackerNotes
         fields = (
             'notes',
         )
@@ -21,14 +20,30 @@ class TrackerAddNotesForm(forms.ModelForm):
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
 
+
+class AddRiderNotes(AddNotesForm):
+
+    class Meta:
+        fields = (
+            'notes',
+        )
+        model = Riders
+
+
+class AddTrackerNotes(AddNotesForm):
+
+    class Meta:
+        fields = (
+            'notes',
+        )
+        model = Trackers
+
+
 class EditTracker(forms.ModelForm):
 
     class Meta:
         model = Trackers
-        fields = (
-            'esn_number',
-            'owner',
-        )
+        exclude = ()
 
     def __init__(self, *args, **kwargs):
 
@@ -76,8 +91,9 @@ class TrackerRiderPossessionForm(forms.ModelForm):
                 (True, 'Add Tracker'),
                 (False, 'Remove Tracker')
             ),
-            coerce=bool
+            coerce=lambda x: x and (x.lower() != 'false')
         )
+
 
 class TrackerRiderAssignmentForm(forms.ModelForm):
 
@@ -86,11 +102,12 @@ class TrackerRiderAssignmentForm(forms.ModelForm):
     )
     deposit = forms.IntegerField()
     notes = forms.CharField(required=False)
-    add_or_remove = forms.ChoiceField(
+    add_or_remove = forms.TypedChoiceField(
         choices=(
             (True, 'Add Tracker'),
             (False, 'Remove Tracker')
-        )
+        ),
+        coerce=lambda x: x and (x.lower() != 'false')
     )
 
     class Meta:
@@ -123,7 +140,7 @@ class RiderTrackerAssignmentForm(forms.ModelForm):
             (True, 'Add Tracker'),
             (False, 'Remove Tracker')
         ),
-        coerce=bool
+        coerce=lambda x: x and (x.lower() != 'false')
     )
     class Meta:
         model = Riders
@@ -142,8 +159,6 @@ class RiderTrackerAssignmentForm(forms.ModelForm):
 
 
 class RiderTrackerPossessionForm(forms.ModelForm):
-
-
 
     class Meta:
         model = Riders

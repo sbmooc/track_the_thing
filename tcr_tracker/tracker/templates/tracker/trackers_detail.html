@@ -7,13 +7,40 @@
         <div class="row my-2">
             <div class="col my-auto">Status:</div>
             <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
+            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">Last test: {{ trackers.last_test_date }}</div>
+        </div>
+        <div class="row my-2">
+            <div class="col my-auto">Assignment:</div>
+            <div class="col my-auto">
+                {% if trackers.rider_assigned %}
+                    <a href="{{ trackers.rider_assigned.url }}">
+                        {{ trackers.rider_assigned }}
+                    </a>
+                {% else %}
+                    No rider assigned to this tracker
+                {% endif %}
+            </div>
+            <div class="col my-auto"
+                 style="color: grey; font-size: 80%; text-align: right">
+                12/06/2019 12:01
+            </div>
         </div>
         <div class="row my-2">
             <div class="col my-auto">Location:</div>
-            <div class="col my-auto"><a href="#">{{ trackers.rider_possess }}</a></div>
+            <div class="col my-auto">
+                {% if trackers.rider_assigned %}
+                    <a href="{{ trackers.rider_possess.url }}">
+                        {{ trackers.rider_possess }}
+                    </a>
+                {% else %}
+                    No rider in possession of this tracker
+                {% endif %}
+            </div>
             <!-- todo: replace with event date-->
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
+            <div class="col my-auto"
+                 style="color: grey; font-size: 80%; text-align: right">
+                12/06/2019 12:01
+            </div>
         </div>
     </div>
 
@@ -27,14 +54,14 @@
                 </a>
             </div>
             <div class="col my-2">
-                <a href="#">
+                <a href="{{ trackers.url_assign_tracker }}">
                     <!--todo: disable or enable based on user permissions-->
-                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Assign</button>
+                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Assignment</button>
                 </a>
             </div>
             <div class="col my-2">
-                <a href="#">
-                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Retrieve</button>
+                <a href="{{ trackers.url_possess_tracker }}">
+                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Possession</button>
                 </a>
            </div>
         </div>
@@ -48,25 +75,22 @@
             </div>
         </div>
         <ul class="list-group">
-            <!--todo: replace with for-loop-->
+            {% for note in trackers.all_notes %}
             <li class="list-group-item">
                 <div style="color: grey; font-style: italic">
                     <!--todo: replace with date and user-->
-                    14/06/2019 15:39 - Anna Haslock
+                     {{ note.created }}
                 </div>
                 <div>
-                    <!--todo: replace with event info and notes-->
-                    (Retrieval: Rider - Ben Kirby) Slightly damaged housing
+                    {% if note.event %}
+                        {{ note.event }}
+                    {% else %}
+                        n/a
+                    {% endif %}
+                    {{ note.notes }}
                 </div>
             </li>
-            <li class="list-group-item">
-                <div style="color: grey; font-style: italic">
-                    02/06/2019 10:17 - Rory Kemper
-                </div>
-                <div>
-                    (Note) Dropped it, cracked the casing
-                </div>
-            </li>
+            {% endfor %}
         </ul>
     </div>
 
@@ -105,7 +129,11 @@
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
-                <h5>Tracker info <i class="fa fa-pen"></i></h5>
+                <h5>Tracker info
+                    <a href="{{ trackers.url_edit }}">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                </h5>
             </div>
         </div>
         <table class="table table-hover">

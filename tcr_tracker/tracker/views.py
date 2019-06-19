@@ -1,4 +1,5 @@
-from django.views.generic import ListView, DetailView, UpdateView
+from django.http import HttpResponseRedirect
+from django.views.generic import ListView, DetailView, UpdateView, FormView
 
 from tcr_tracker.forms import (
     EditTracker,
@@ -7,13 +8,29 @@ from tcr_tracker.forms import (
     RiderTrackerPossessionForm,
     TrackerRiderAssignmentForm,
     TrackerRiderPossessionForm,
-    TrackerAddNotesForm)
+    AddRiderNotes,
+    AddTrackerNotes
+)
 
-from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes
+from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes, \
+    RiderNotes
+
+
+class RiderAddNotes(FormView):
+    form_class = AddRiderNotes
+    model = Riders
+    template_name = 'tracker/basic_form.html'
+
+    def form_valid(self, form):
+        RiderNotes(
+            rider=self.object,
+            notes=form.cleaned_data['notes']
+        ).save()
+        return super(RiderAddNotes, self).form_valid(form)
 
 
 class TrackerAddNotes(UpdateView):
-    form_class = TrackerAddNotesForm
+    form_class = AddTrackerNotes
     model = Trackers
     template_name = 'tracker/basic_form.html'
 
@@ -64,7 +81,8 @@ class TrackerRiderAssignment(UpdateView):
                 form.cleaned_data['notes'],
                 form.cleaned_data['deposit']
             )
-        return super(TrackerRiderAssignment, self).form_valid(form)
+        a='a'
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class AllTrackers(ListView):
