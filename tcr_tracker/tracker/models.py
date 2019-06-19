@@ -101,6 +101,14 @@ class Riders(models.Model):
     def url(self):
         return self.get_absolute_url()
 
+    @property
+    def all_events(self):
+        return self.events.all()
+
+    @property
+    def all_notes(self):
+        return self.notes.all()
+
     # todo link riders who are in pairs? or does the capnumber do that???
     # todo add checkpoints stuff!
 
@@ -114,6 +122,10 @@ class Riders(models.Model):
     @property
     def url_possess_tracker(self):
         return reverse('rider_tracker_possession', kwargs={'pk': self.id})
+
+    @property
+    def url_add_notes(self):
+        return reverse('rider_add_notes', kwargs={'pk': self.id})
 
     def _record_tracker_rider_notes(
         self,
@@ -156,6 +168,7 @@ class Riders(models.Model):
         if tracker.rider_assigned is not None:
             raise TrackerAlreadyAssigned()
         self.trackers_assigned.add(tracker)
+        self.save()
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
             'add_tracker_assignment',
@@ -172,9 +185,10 @@ class Riders(models.Model):
         self.save()
 
     def tracker_remove_assignment(self, tracker, notes, deposit):
-        if tracker not in self.trackers_assigned:
+        if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
+        self.save()
         rider_event, tracker_event = self._record_tracker_rider_events(
             tracker,
             'remove_tracker_assignment',
@@ -281,6 +295,10 @@ class Trackers(models.Model):
         return self.events.all()
 
     @property
+    def all_notes(self):
+        return self.notes.all()
+
+    @property
     def assignable(self):
         return self.rider_assigned is None
 
@@ -303,11 +321,14 @@ class Trackers(models.Model):
     def url_possess_tracker(self):
         return reverse('tracker_rider_possession', kwargs={'pk': self.id})
 
-    # todo: add url_de-possess_tracker?
-
     @property
     def url_add_notes(self):
         return reverse('tracker_add_notes', kwargs={'pk': self.id})
+
+    @property
+    def url_edit(self):
+        return reverse('tracker_edit', kwargs={'pk': self.id})
+
 
     @property
     def tracker_loan_status(self):
@@ -316,12 +337,6 @@ class Trackers(models.Model):
     def record_test(self, result):
         self.working_status = 'working' if result == 'working' else 'broken'
         self.save()
-
-    def record_lost(self):
-        pass
-
-    def record_location(self):
-        pass
 
     class Meta:
         verbose_name_plural = 'Trackers'
