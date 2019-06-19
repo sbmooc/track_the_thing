@@ -208,34 +208,36 @@ class Riders(models.Model):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_possessed.add(tracker)
-        event = RiderEvents(
-            event_type='tracker_add_possession',
-            rider=self
+        rider_event, tracker_event = self._record_tracker_rider_events(
+            tracker,
+            'add_tracker_possession',
+            0
         )
-        event.save()
         if notes:
-            RiderNotes(
-                rider=self,
-                notes=notes,
-                event=event
-            ).save()
+            self._record_tracker_rider_notes(
+                tracker,
+                notes,
+                rider_event,
+                tracker_event
+            )
         self.save()
 
     def tracker_remove_possession(self, tracker, notes):
         if tracker not in self.trackers_possessed.all():
             raise TrackerNotPossessed()
         self.trackers_possessed.remove(tracker)
-        event = RiderEvents(
-            event_type='tracker_remove_possession',
-            rider=self
+        rider_event, tracker_event = self._record_tracker_rider_events(
+            tracker,
+            'remove_tracker_possession',
+            0
         )
-        event.save()
         if notes:
-            RiderNotes(
-                rider=self,
-                notes=notes,
-                event=event
-            ).save()
+            self._record_tracker_rider_notes(
+                tracker,
+                notes,
+                rider_event,
+                tracker_event
+            )
         self.save()
 
     class Meta:

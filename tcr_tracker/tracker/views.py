@@ -55,12 +55,11 @@ class TrackerRiderPossession(UpdateView):
                 form.cleaned_data['notes'],
             )
         else:
-            rider.tracker_add_possession(
+            rider.tracker_remove_possession(
                 self.object,
                 form.cleaned_data['notes']
             )
-        return super(TrackerRiderPossession, self).form_valid(form)
-
+        return HttpResponseRedirect(self.get_success_url())
 
 class TrackerRiderAssignment(UpdateView):
     model = Trackers
