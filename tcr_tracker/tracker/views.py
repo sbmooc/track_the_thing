@@ -130,7 +130,7 @@ class RiderTrackerPossession(UpdateView):
     template_name = 'tracker/basic_form.html'
 
     def form_valid(self, form):
-        if form.cleaned_data['add_or_remove'] == 'True':
+        if form.cleaned_data['add_or_remove']:
             self.object.tracker_add_possession(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],

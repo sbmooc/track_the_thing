@@ -143,6 +143,8 @@ class RiderTrackerAssignmentForm(forms.ModelForm):
 
 class RiderTrackerPossessionForm(forms.ModelForm):
 
+
+
     class Meta:
         model = Riders
         fields = ()
@@ -158,6 +160,7 @@ class RiderTrackerPossessionForm(forms.ModelForm):
             queryset=self.rider.trackers_assigned.all()
         )
         self.fields['notes'] = forms.CharField(required=False)
-        self.fields['add_or_remove'] = forms.ChoiceField(
+        self.fields['add_or_remove'] = forms.TypedChoiceField(
             choices=[(True, 'Add Tracker'), (False, 'Remove Tracker')],
+            coerce=lambda x: x and (x.lower() != 'false')
         )
