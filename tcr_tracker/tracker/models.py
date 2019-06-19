@@ -295,6 +295,8 @@ class Trackers(models.Model):
     def url_possess_tracker(self):
         return reverse('tracker_rider_possession', kwargs={'pk': self.id})
 
+    # todo: add url_de-possess_tracker?
+
     @property
     def url_add_notes(self):
         return reverse('tracker_add_notes', kwargs={'pk': self.id})
@@ -343,7 +345,7 @@ class TrackerNotes(TimeStampedModel):
 
 class Checkpoints(models.Model):
     name = CharField(max_length=50)
-    abbriviation = CharField(max_length=50)
+    abbreviation = CharField(max_length=50)
     latitude = CharField(max_length=50)
     longitude = CharField(max_length=50)
 
