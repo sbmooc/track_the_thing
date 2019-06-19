@@ -87,7 +87,7 @@
             </thead>
             <tbody>
             <!--todo: replace with for-loop-->
-            {% for event in tracker.events %}
+            {% for event in trackers.all_events %}
                 <tr>
                     <td>
 			    {{event.created}}

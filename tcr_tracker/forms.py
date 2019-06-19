@@ -71,11 +71,12 @@ class TrackerRiderPossessionForm(forms.ModelForm):
             )
         )
         self.fields['notes'] = forms.CharField(required=False)
-        self.fields['add_or_remove'] = forms.ChoiceField(
+        self.fields['add_or_remove'] = forms.TypedChoiceField(
             choices=(
                 (True, 'Add Tracker'),
                 (False, 'Remove Tracker')
-            )
+            ),
+            coerce=bool
         )
 
 class TrackerRiderAssignmentForm(forms.ModelForm):
@@ -117,11 +118,12 @@ class RiderTrackerAssignmentForm(forms.ModelForm):
     )
     deposit = forms.IntegerField()
     notes = forms.CharField(required=False)
-    add_or_remove = forms.ChoiceField(
+    add_or_remove = forms.TypedChoiceField(
         choices=(
             (True, 'Add Tracker'),
             (False, 'Remove Tracker')
-        )
+        ),
+        coerce=bool
     )
     class Meta:
         model = Riders
@@ -157,8 +159,5 @@ class RiderTrackerPossessionForm(forms.ModelForm):
         )
         self.fields['notes'] = forms.CharField(required=False)
         self.fields['add_or_remove'] = forms.ChoiceField(
-            choices=(
-                (True, 'Add Tracker'),
-                (False, 'Remove Tracker')
-            )
+            choices=[(True, 'Add Tracker'), (False, 'Remove Tracker')],
         )
