@@ -1,46 +1,62 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!--status headers-->
+    <!--status headers-->
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
-            <div class="col my-auto">Status:</div>
-            <div class="col my-auto"><b>{{ tracker_dict.working_status }}</b></div>
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ tracker_dict.last_test_date }}</div>
+            <div class="col-4 my-auto">Status:</div>
+            <div class="col my-auto"><b>{{ riders.race_status }}</b></div>
         </div>
         <div class="row my-2">
-            <div class="col my-auto">Location:</div>
-            <!-- todo: ask Oli about why rider_possess doesn't work-->
-            <div class="col my-auto"><a href="#">{{ tracker_dict.rider_possess }}</a></div>
-            <!-- todo: replace with tracker.last_test_date-->
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">12/06/2019 12:01</div>
+            <div class="col-4 my-auto">Current tracker:</div>
+            {% if riders.current_tracker %}
+                <div class="col my-auto">
+                    <a href="{{ riders.current_tracker.url }}">
+                        {{ riders.current_tracker }}
+                    </a>
+                </div>
+                <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
+                    <!--todo: replace with assignment/possession event date-->
+                    June 20, 2019
+                </div>
+            {% else %}
+                <div class="col my-auto">
+                    None
+                </div>
+            {% endif %}
         </div>
     </div>
 
-<!--Event buttons-->
+    <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
+                <!--todo: add race status / checkpoint form and url-->
                 <a href="#">
-                    <!--todo: disable or enable based on user permissions-->
-                    <button type="button"
-                            class="btn btn-secondary btn-block text-nowrap" disabled>Record test
-                    </button>
+                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Add race event</button>
                 </a>
             </div>
             <div class="col my-2">
-                <a href="#">
-                    <!--todo: change to assign or retrieve based on tracker.rider_possess (but stick in back end-->
-                    <button type="button"
-                            class="btn btn-secondary btn-block text-nowrap">Retrieve from rider
-                    </button>
+                <a href="{{ riders.url_add_notes }}">
+                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Add note</button>
+                </a>
+            </div>
+            <div class="col my-2">
+                <a href="{{ riders.url_assign_tracker }}">
+                    <!--todo: show only buttons for actions that are relevant to the context-->
+                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Assign/Deassign</button>
+                </a>
+            </div>
+            <div class="col my-2">
+                <a href="{{ riders.url_possess_tracker }}">
+                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Give/Retrieve</button>
                 </a>
             </div>
         </div>
     </div>
 
-<!--Notes list-->
+    <!--Notes list-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
@@ -48,106 +64,102 @@
             </div>
         </div>
         <ul class="list-group">
-            <!--todo: replace with for-loop-->
-            <li class="list-group-item">
-                <div style="color: grey; font-style: italic">
-                    <!--todo: replace with date and user-->
-                    14/06/2019 15:39 - Anna Haslock
-                </div>
-                <div>
-                    <!--todo: replace with event info and notes-->
-                    (Retrieval: Rider - Ben Kirby) Slightly damaged housing
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div style="color: grey; font-style: italic">
-                    02/06/2019 10:17 - Rory Kemper
-                </div>
-                <div>
-                    (Note) Dropped it, cracked the casing
-                </div>
-            </li>
+            {% if not riders.all_notes %}
+                <li class="list-group-item">
+                    <div>
+                        There are no notes for this rider.
+                    </div>
+                </li>
+            {% else %}
+                {% for note in riders.all_notes reversed %}
+                    <li class="list-group-item">
+                        <div style="color: grey; font-style: italic">
+                             {{ note.created }}
+                        </div>
+                        <div>
+                            {% if note.event %}
+                                <b>(Event: {{ note.event.event_type }})</b>
+                            {% endif %}
+                            {{ note.notes }}
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
         </ul>
     </div>
 
-<!--Events log-->
-<div class="container-fluid my-2">
-    <div class="row">
-        <div class="col my-2">
-            <h5>Events</h5>
+    <!--Events log-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h5>Events</h5>
+            </div>
         </div>
+        {% if not riders.all_events %}
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <div>
+                        There are no events for this rider.
+                    </div>
+                </li>
+            </ul>
+        {% else %}
+            <table class="table table-hover table-responsive-xs">
+                <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">User</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!--todo: replace with for-loop-->
+                {% for event in riders.all_events reversed %}
+                    <tr>
+                        <td>
+                            {{event.created}}
+                        </td>
+                        <td>
+                            {{event.event_type}}
+                        </td>
+                        <td>
+                            {{event.user}}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
-    <table class="table table-hover table-responsive-sm">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Event</th>
-          <th scope="col">User</th>
-        </tr>
-      </thead>
-      <tbody>
-      <!--todo: replace with for-loop-->
-            <tr>
-              <td>
-                  14/06/2019 15:39
-              </td>
-              <td>
-                  Retrieval: Rider - Ben Kirby
-              </td>
-              <td>
-                  Anna Haslock
-              </td>
-            </tr>
-            <tr>
-              <td>
-                  10/06/2019 12:22
-              </td>
-              <td>
-                  Assigned: Rider - Ben Kirby
-              </td>
-              <td>
-                  Rory Kemper
-              </td>
-            </tr>
-            <tr>
-              <td>
-                  01/06/2019 19:41
-              </td>
-              <td>
-                  Tested: Working
-              </td>
-              <td>
-                  Rory Kemper
-              </td>
-            </tr>
-      </tbody>
-    </table>
-</div>
 
-<!--Tracker info table-->
-<div class="container-fluid my-2">
-    <div class="row">
-        <div class="col my-2">
-            <h5>Tracker info</h5>
+    <!--Rider info table-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h5>Rider info</h5>
+            </div>
+            <div class="col my-2 mr-1" style="text-align: right">
+                <a href="{{ riders.url_edit }}"  style="font-size: 120%">
+                    <i class="fa fa-pen"></i>
+                </a>
+            </div>
         </div>
-        <div class="col my-2 mr-2" style="text-align: right; font-size: 120%">
-            <i class="fa fa-pen"></i>
-        </div>
-    </div>
-    <table class="table table-hover">
-      <tbody>
-        {% for field, value in tracker_dict.items %}
+        <table class="table table-hover">
+            <tbody>
             <tr>
-              <td>
-                  {{ field }}
-              </td>
-              <td style="font-style: italic">
-                  {{ value }}
-              </td>
-            </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-</div>
+                {% for field, value in rider_dict.items %}
+                    {% if field != "_state" %}
+                        <td>
+                            {{ field }}
+                        </td>
+                        <td style="font-style: italic">
+                            {{ value }}
+                        </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}
