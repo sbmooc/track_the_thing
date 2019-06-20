@@ -88,6 +88,8 @@ class Riders(models.Model):
     cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES)
     balance = FloatField(null=True, default=0)
+    # todo: do race_status properly
+    race_status = "In progress"
 
     @property
     def current_tracker(self):
@@ -126,6 +128,8 @@ class Riders(models.Model):
     @property
     def url_add_notes(self):
         return reverse('rider_add_notes', kwargs={'pk': self.id})
+
+    # todo: add url_edit method for riders
 
     def _record_tracker_rider_notes(
         self,
