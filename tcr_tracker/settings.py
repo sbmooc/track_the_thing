@@ -78,11 +78,24 @@ WSGI_APPLICATION = 'tcr_tracker.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': os.environ.get('DB_NAME', 'tracker'),
+                'USER': os.environ.get('DB_USER', 'track_thing'),
+                'PASSWORD': os.environ.get('DB_PW', 'tr4ack3r'),
+                'HOST': os.environ.get('DB_HOST', 'localhost'),
+                'PORT': os.environ.get('DB_PORT', ''),
     }
 }
-
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'tracker',
+        'USER': 'track_thing',
+        'PASSWORD': 'tr4ack3r',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
