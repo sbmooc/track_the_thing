@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, UpdateView, FormView
 
@@ -61,7 +62,8 @@ class TrackerRiderPossession(UpdateView):
             )
         return HttpResponseRedirect(self.get_success_url())
 
-class TrackerRiderAssignment(UpdateView):
+
+class TrackerRiderAssignment(LoginRequiredMixin, UpdateView):
     model = Trackers
     form_class = TrackerRiderAssignmentForm
     template_name = 'tracker/basic_form.html'

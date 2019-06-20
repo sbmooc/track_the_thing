@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from tcr_tracker.tracker.views import (
     AllTrackers,
     AllRiders,
@@ -34,4 +34,5 @@ urlpatterns = [
          name='tracker_rider_assignment'),
     path('trackers/<int:pk>/notes', TrackerAddNotes.as_view(),
          name='tracker_add_notes'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
