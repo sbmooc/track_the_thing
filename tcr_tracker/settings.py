@@ -86,16 +86,6 @@ DATABASES = {
                 'PORT': os.environ.get('DB_PORT', ''),
     }
 }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'tracker',
-        'USER': 'track_thing',
-        'PASSWORD': 'tr4ack3r',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators

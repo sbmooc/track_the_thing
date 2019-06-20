@@ -5,8 +5,9 @@ from django.db.models import (
     FloatField,
     TextField,
     DateTimeField,
-    ForeignKey
-)
+    ForeignKey,
+    BooleanField,
+    IntegerField)
 from django.urls import reverse
 
 from tcr_tracker.tracker.errors import TrackerNotAssigned, \
@@ -26,10 +27,15 @@ TRACKER_LOAN_STATUS = (
 )
 
 RIDER_CATEGORIES = (
-    ('male', 'Male'),
-    ('female', 'Female'),
-    ('pair', 'Pair')
+    ('pairs', 'Pairs'),
+    ('solo', 'Solo')
 )
+
+RIDER_GENDERS = (
+('male', 'M'),
+('female', 'F')
+)
+
 
 RIDER_STATUS = (
     ('not_yet_started', 'Not Yet Started'),
@@ -86,8 +92,14 @@ class Riders(models.Model):
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
     cap_number = CharField(max_length=50)
-    category = CharField(max_length=50, choices=RIDER_CATEGORIES)
-    balance = FloatField(null=True, default=0)
+    category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
+    gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
+    # todo put balance in pence
+    balance = IntegerField(null=True, default=0)
+    tcr_id = CharField(max_length=10, null=True)
+    country_code = CharField(max_length=5, null=True)
+    hire_tracker = BooleanField(null=True)
+    tracker_url = CharField(null=True, max_length=200)
 
     @property
     def current_tracker(self):
@@ -274,13 +286,12 @@ class Trackers(models.Model):
     esn_number = CharField(max_length=50)
     working_status = CharField(
         max_length=50,
-        choices=TRACKER_WORKING_STATUS,
         verbose_name='Working Status')
-    loan_status = CharField(max_length=50, choices=TRACKER_LOAN_STATUS)
+    loan_status = CharField(max_length=50, choices=TRACKER_LOAN_STATUS, null=True)
     last_test_date = DateField(null=True)
     purchase_date = DateField(null=True)
     warranty_expiry = DateField(null=True)
-    owner = CharField(max_length=50, choices=TRACKER_OWNER)
+    owner = CharField(max_length=50)
     rider_assigned = ForeignKey(Riders,
                                 on_delete=models.CASCADE,
                                 related_name='trackers_assigned',
@@ -291,6 +302,10 @@ class Trackers(models.Model):
                                related_name='trackers_possessed',
                                null=True,
                                blank=True)
+    tcr_id = CharField(max_length=20, null=True)
+    # todo add relationship to user!
+    test_by = CharField(max_length=20, null=True)
+    clip = BooleanField(null=True)
 
     @property
     def all_events(self):
