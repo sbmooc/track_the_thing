@@ -5,42 +5,45 @@
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
-            <div class="col my-auto">Status:</div>
+            <div class="col-4 my-auto">Status:</div>
             <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">Last test: {{ trackers.last_test_date }}</div>
+            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
         </div>
         <div class="row my-2">
-            <div class="col my-auto">Assignment:</div>
-            <div class="col my-auto">
-                {% if trackers.rider_assigned %}
+            <div class="col-4 my-auto">Assignment:</div>
+            {% if trackers.rider_assigned %}
+                <div class="col my-auto">
                     <a href="{{ trackers.rider_assigned.url }}">
                         {{ trackers.rider_assigned }}
                     </a>
-                {% else %}
-                    No rider assigned to this tracker
-                {% endif %}
-            </div>
-            <div class="col my-auto"
-                 style="color: grey; font-size: 80%; text-align: right">
-                12/06/2019 12:01
-            </div>
+                </div>
+                <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
+                    <!--todo: replace with assignment event date-->
+                    June 20, 2019
+                </div>
+            {% else %}
+                <div class="col my-auto">
+                    No assigned rider
+                </div>
+            {% endif %}
         </div>
         <div class="row my-2">
-            <div class="col my-auto">Location:</div>
-            <div class="col my-auto">
-                {% if trackers.rider_assigned %}
+            <div class="col-4 my-auto">Possession:</div>
+            {% if trackers.rider_possess %}
+                <div class="col my-auto">
                     <a href="{{ trackers.rider_possess.url }}">
                         {{ trackers.rider_possess }}
                     </a>
-                {% else %}
-                    No rider in possession of this tracker
-                {% endif %}
-            </div>
-            <!-- todo: replace with event date-->
-            <div class="col my-auto"
-                 style="color: grey; font-size: 80%; text-align: right">
-                12/06/2019 12:01
-            </div>
+                </div>
+                <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
+                    <!--todo: replace with possession event date-->
+                    June 20, 2019
+                </div>
+            {% else %}
+                <div class="col my-auto">
+                    Not in rider possession
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -48,22 +51,27 @@
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
-                <a href="#">
+                <a href="{{ trackers.record_test }}">
                     <!--todo: disable or enable based on user permissions-->
                     <button type="button" class="btn btn-secondary btn-block text-nowrap">Record test</button>
                 </a>
             </div>
             <div class="col my-2">
+                <a href="{{ trackers.url_add_notes }}">
+                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Add note</button>
+                </a>
+            </div>
+            <div class="col my-2">
                 <a href="{{ trackers.url_assign_tracker }}">
-                    <!--todo: disable or enable based on user permissions-->
-                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Assignment</button>
+                    <!--todo: show only buttons for actions that are relevant to the context-->
+                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Assign/Deassign</button>
                 </a>
             </div>
             <div class="col my-2">
                 <a href="{{ trackers.url_possess_tracker }}">
-                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Possession</button>
+                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Give/Retrieve</button>
                 </a>
-           </div>
+            </div>
         </div>
     </div>
 
@@ -75,21 +83,27 @@
             </div>
         </div>
         <ul class="list-group">
-            {% for note in trackers.all_notes %}
-            <li class="list-group-item">
-                <div style="color: grey; font-style: italic">
-                     {{ note.created }}
-                </div>
-                <div>
-                    {% if note.event %}
-                        {{ note.event }}
-                    {% else %}
-                        n/a
-                    {% endif %}
-                    {{ note.notes }}
-                </div>
-            </li>
-            {% endfor %}
+            {% if not trackers.all_notes %}
+                <li class="list-group-item">
+                    <div>
+                        There are no notes for this tracker.
+                    </div>
+                </li>
+            {% else %}
+                {% for note in trackers.all_notes reversed %}
+                    <li class="list-group-item">
+                        <div style="color: grey; font-style: italic">
+                             {{ note.created }}
+                        </div>
+                        <div>
+                            {% if note.event %}
+                                <b>(Event: {{ note.event.event_type }})</b>
+                            {% endif %}
+                            {{ note.notes }}
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
         </ul>
     </div>
 
@@ -100,52 +114,68 @@
                 <h5>Events</h5>
             </div>
         </div>
-        <table class="table table-hover table-responsive-xs">
-            <thead>
-            <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Event</th>
-                <th scope="col">User</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!--todo: replace with for-loop-->
-            {% for event in trackers.all_events %}
+        {% if not trackers.all_events %}
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <div>
+                        There are no events for this tracker.
+                    </div>
+                </li>
+            </ul>
+        {% else %}
+            <table class="table table-hover table-responsive-xs">
+                <thead>
                 <tr>
-                    <td>
-			    {{event.created}}
-                    </td>
-                    <td>
-			    {{event.event_type}}
-                    </td>
+                    <th scope="col">Date</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">User</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                <!--todo: replace with for-loop-->
+                {% for event in trackers.all_events reversed %}
+                    <tr>
+                        <td>
+                            {{event.created}}
+                        </td>
+                        <td>
+                            {{event.event_type}}
+                        </td>
+                        <td>
+                            {{event.user}}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 
     <!--Tracker info table-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
-                <h5>Tracker info
-                    <a href="{{ trackers.url_edit }}">
-                        <i class="fa fa-pen"></i>
-                    </a>
-                </h5>
+                <h5>Tracker info</h5>
+            </div>
+            <div class="col my-2 mr-1" style="text-align: right">
+                <a href="{{ trackers.url_edit }}"  style="font-size: 120%">
+                    <i class="fa fa-pen"></i>
+                </a>
             </div>
         </div>
         <table class="table table-hover">
             <tbody>
             <tr>
                 {% for field, value in tracker_dict.items %}
-                    <td>
-                        {{ field }}
-                    </td>
-                    <td style="font-style: italic">
-                        {{ value }}
-                    </td>
-                    </tr>
+                    {% if field != "_state" %}
+                        <td>
+                            {{ field }}
+                        </td>
+                        <td style="font-style: italic">
+                            {{ value }}
+                        </td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

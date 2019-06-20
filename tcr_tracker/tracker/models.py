@@ -92,6 +92,7 @@ class Riders(models.Model):
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
     cap_number = CharField(max_length=50)
+    race_status = "In progress"
     category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
     gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
     # todo put balance in pence
@@ -138,6 +139,8 @@ class Riders(models.Model):
     @property
     def url_add_notes(self):
         return reverse('rider_add_notes', kwargs={'pk': self.id})
+
+    # todo: add url_edit method for riders
 
     def _record_tracker_rider_notes(
         self,
@@ -262,6 +265,7 @@ class Riders(models.Model):
 class RiderEvents(TimeStampedModel):
     # user_id = Column(Integer, ForeignKey('users.id'))
     event_type = CharField(max_length=50, choices=RIDER_EVENT_CATEGORIES)
+    user = "Anna Haslock"
     balance_change = FloatField(null=True)
     rider = ForeignKey(Riders,
                        on_delete=models.CASCADE,
@@ -272,6 +276,7 @@ class RiderNotes(TimeStampedModel):
     rider = ForeignKey(Riders,
                        on_delete=models.CASCADE,
                        related_name='notes')
+    user = "Anna Haslock"
     notes = TextField(null=True)
     event = ForeignKey(
         RiderEvents,
@@ -365,6 +370,7 @@ class Trackers(models.Model):
 class TrackerEvents(TimeStampedModel):
     event_type = CharField(max_length=50,
                            choices=TRACKER_EVENT_CATEGORIES)
+    user = "Rory Kemper"
     tracker = ForeignKey(Trackers,
                          on_delete=models.CASCADE,
                          related_name='events')
@@ -375,11 +381,13 @@ class TrackerNotes(TimeStampedModel):
                          on_delete=models.CASCADE,
                          related_name='notes')
     notes = TextField(null=True)
+    user = "Rory Kemper"
     event = ForeignKey(
         TrackerEvents,
         on_delete=models.CASCADE,
         related_name='notes',
-        null=True
+        null=True,
+        blank=True
     )
 
 

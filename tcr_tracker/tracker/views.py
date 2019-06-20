@@ -17,7 +17,8 @@ from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes, \
     RiderNotes
 
 
-class RiderAddNotes(LoginRequiredMixin, FormView):
+    # todo: double check that UpdateView is right (previously FormView which wasn't working)
+class RiderAddNotes(LoginRequiredMixin, UpdateView):
     form_class = AddRiderNotes
     model = Riders
     template_name = 'tracker/basic_form.html'
@@ -174,3 +175,8 @@ class AllRiders(LoginRequiredMixin, ListView):
 
 class OneRider(LoginRequiredMixin, DetailView):
     model = Riders
+
+    def get_context_data(self, **kwargs):
+        context = super(OneRider, self).get_context_data(**kwargs)
+        context['rider_dict'] = context['riders'].__dict__
+        return context
