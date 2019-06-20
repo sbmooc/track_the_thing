@@ -17,8 +17,8 @@ from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes, \
     RiderNotes
 
 
-class RiderAddNotes(UpdateView):
     # todo: double check that UpdateView is right (previously FormView which wasn't working)
+class RiderAddNotes(LoginRequiredMixin, UpdateView):
     form_class = AddRiderNotes
     model = Riders
     template_name = 'tracker/basic_form.html'
@@ -31,7 +31,7 @@ class RiderAddNotes(UpdateView):
         return super(RiderAddNotes, self).form_valid(form)
 
 
-class TrackerAddNotes(UpdateView):
+class TrackerAddNotes(LoginRequiredMixin, UpdateView):
     form_class = AddTrackerNotes
     model = Trackers
     template_name = 'tracker/basic_form.html'
@@ -44,7 +44,7 @@ class TrackerAddNotes(UpdateView):
         return super(TrackerAddNotes, self).form_valid(form)
 
 
-class TrackerRiderPossession(UpdateView):
+class TrackerRiderPossession(LoginRequiredMixin, UpdateView):
     model = Trackers
     form_class = TrackerRiderPossessionForm
     template_name = 'tracker/basic_form.html'
@@ -87,11 +87,11 @@ class TrackerRiderAssignment(LoginRequiredMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class AllTrackers(ListView):
+class AllTrackers(LoginRequiredMixin, ListView):
     model = Trackers
 
 
-class OneTracker(DetailView):
+class OneTracker(LoginRequiredMixin, DetailView):
     model = Trackers
 
     def get_context_data(self, **kwargs):
@@ -100,13 +100,13 @@ class OneTracker(DetailView):
         return context
 
 
-class TrackerEdit(UpdateView):
+class TrackerEdit(LoginRequiredMixin, UpdateView):
     model = Trackers
     form_class = EditTracker
     template_name = 'tracker/trackers_edit.html'
 
 
-class TrackerTest(DetailView):
+class TrackerTest(LoginRequiredMixin, DetailView):
     model = Trackers
     template_name = 'tracker/trackers_detail.html'
 
@@ -122,7 +122,7 @@ class TrackerTest(DetailView):
         return self.render_to_response(context)
 
 
-class RiderTrackerAssignment(UpdateView):
+class RiderTrackerAssignment(LoginRequiredMixin, UpdateView):
     model = Riders
     form_class = RiderTrackerAssignmentForm
     template_name = 'tracker/basic_form.html'
@@ -144,7 +144,7 @@ class RiderTrackerAssignment(UpdateView):
         return super(RiderTrackerAssignment, self).form_valid(form)
 
 
-class RiderTrackerPossession(UpdateView):
+class RiderTrackerPossession(LoginRequiredMixin, UpdateView):
     model = Riders
     form_class = RiderTrackerPossessionForm
     template_name = 'tracker/basic_form.html'
@@ -163,17 +163,17 @@ class RiderTrackerPossession(UpdateView):
         return super(RiderTrackerPossession, self).form_valid(form)
 
 
-class RiderEdit(UpdateView):
+class RiderEdit(LoginRequiredMixin, UpdateView):
     model = Riders
     form_class = EditRider
     template_name = 'tracker/riders_edit.html'
 
 
-class AllRiders(ListView):
+class AllRiders(LoginRequiredMixin, ListView):
     model = Riders
 
 
-class OneRider(DetailView):
+class OneRider(LoginRequiredMixin, DetailView):
     model = Riders
 
     def get_context_data(self, **kwargs):
