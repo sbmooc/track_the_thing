@@ -1,5 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse
+from django.views.generic import RedirectView
+
 from tcr_tracker.tracker.views import (
     AllTrackers,
     AllRiders,
@@ -14,6 +16,7 @@ from tcr_tracker.tracker.views import (
     RiderAddNotes)
 
 urlpatterns = [
+    path(r'', RedirectView.as_view(url='/accounts/login', permanent=False), name='index'),
     path('admin/', admin.site.urls),
     path('riders/', AllRiders.as_view(), name='all_riders'),
     path('riders/<int:pk>', OneRider.as_view(), name='one_rider'),

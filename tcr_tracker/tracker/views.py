@@ -17,7 +17,6 @@ from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes, \
     RiderNotes
 
 
-    # todo: double check that UpdateView is right (previously FormView which wasn't working)
 class RiderAddNotes(LoginRequiredMixin, UpdateView):
     form_class = AddRiderNotes
     model = Riders
@@ -26,7 +25,8 @@ class RiderAddNotes(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         RiderNotes(
             rider=self.object,
-            notes=form.cleaned_data['notes']
+            notes=form.cleaned_data['notes'],
+            user=self.request.user.profile
         ).save()
         return super(RiderAddNotes, self).form_valid(form)
 
@@ -39,7 +39,8 @@ class TrackerAddNotes(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         TrackerNotes(
             tracker=self.object,
-            notes=form.cleaned_data['notes']
+            notes=form.cleaned_data['notes'],
+            user=self.request.user.profile
         ).save()
         return super(TrackerAddNotes, self).form_valid(form)
 
@@ -55,11 +56,13 @@ class TrackerRiderPossession(LoginRequiredMixin, UpdateView):
             rider.tracker_add_possession(
                 self.object,
                 form.cleaned_data['notes'],
+                self.request.user.profile
             )
         else:
             rider.tracker_remove_possession(
                 self.object,
-                form.cleaned_data['notes']
+                form.cleaned_data['notes'],
+                self.request.user.profile
             )
         return HttpResponseRedirect(self.get_success_url())
 
@@ -75,15 +78,16 @@ class TrackerRiderAssignment(LoginRequiredMixin, UpdateView):
             rider.tracker_add_assignment(
                 self.object,
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit']
+                form.cleaned_data['deposit'],
+                self.request.user.profile
             )
         else:
             rider.tracker_remove_assignment(
                 self.object,
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit']
+                form.cleaned_data['deposit'],
+                self.request.user.profile
             )
-        a='a'
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -133,13 +137,15 @@ class RiderTrackerAssignment(LoginRequiredMixin, UpdateView):
             self.object.tracker_add_assignment(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit']
+                form.cleaned_data['deposit'],
+                self.request.user.profile
             )
         else:
             self.object.tracker_remove_assignment(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit']
+                form.cleaned_data['deposit'],
+                self.request.user.profile
             )
         return super(RiderTrackerAssignment, self).form_valid(form)
 
@@ -154,11 +160,13 @@ class RiderTrackerPossession(LoginRequiredMixin, UpdateView):
             self.object.tracker_add_possession(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
+                self.request.user.profile
             )
         else:
             self.object.tracker_remove_possession(
                 form.cleaned_data['tracker'],
-                form.cleaned_data['notes']
+                form.cleaned_data['notes'],
+                self.request.user.profile
             )
         return super(RiderTrackerPossession, self).form_valid(form)
 
