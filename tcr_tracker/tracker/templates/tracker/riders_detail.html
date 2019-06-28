@@ -13,7 +13,7 @@
             {% if riders.current_tracker %}
                 <div class="col my-auto">
                     <a href="{{ riders.current_tracker.url }}">
-                        {{ riders.current_tracker }}
+                        {{ riders.current_tracker.tcr_id }}
                     </a>
                 </div>
                 <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
@@ -148,7 +148,7 @@
             <tbody>
             <tr>
                 {% for field, value in rider_dict.items %}
-                    {% if field != "_state" %}
+                    {% if field != "_state" and field != "id" %}
                         <td>
                             {{ field }}
                         </td>
