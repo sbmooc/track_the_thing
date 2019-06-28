@@ -20,61 +20,24 @@
 <body id="page-top">
 
 <!--Header bar-->
-  <div class="container-fluid">
-    <div class="row">
-      <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top shadow-sm">
-        {% block headertitle %}<a class="navbar-brand mr-1" href="#">Track the thing</a>{% endblock %}
-        <ul class="navbar-nav ml-auto ml-md-0">
-          <li class="nav-item dropdown no-arrow">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fas fa-user-circle fa-fw"></i>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-              <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
-            </div>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
+    <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top shadow-sm">
+      <!-- Navbar -->
+      <ul class="navbar-nav container-fluid">
+        <!--blank div same size as user icon on the right, to properly centre the title-->
+        <li class="nav-item" style="width: 36px"></li>
+        <li class="navbar-brand mr-0 justify-content-center">{{ page_title }}</li>
+        <li class="nav-item dropdown no-arrow  justify-content-end">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-user-circle fa-fw"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
 <!--Main content-->
   <div id="wrapper" style="padding-top: 60px;">
-    <!-- Sidebar - commented out for now -->
-
-    <!--<ul class="sidebar navbar-nav">-->
-      <!--<li class="nav-item">-->
-        <!--<a class="nav-link" href="index.html">-->
-          <!--<i class="fas fa-fw fa-tachometer-alt"></i>-->
-          <!--<span>Dashboard</span>-->
-        <!--</a>-->
-      <!--</li>-->
-      <!--<li class="nav-item dropdown">-->
-        <!--<a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-          <!--<i class="fas fa-fw fa-folder"></i>-->
-          <!--<span>Pages</span>-->
-        <!--</a>-->
-        <!--<div class="dropdown-menu" aria-labelledby="pagesDropdown">-->
-          <!--<h6 class="dropdown-header">Login Screens:</h6>-->
-          <!--<a class="dropdown-item" href="login.html">Login</a>-->
-          <!--<a class="dropdown-item" href="register.html">Register</a>-->
-          <!--<a class="dropdown-item" href="forgot-password.html">Forgot Password</a>-->
-          <!--<div class="dropdown-divider"></div>-->
-          <!--<h6 class="dropdown-header">Other Pages:</h6>-->
-          <!--<a class="dropdown-item" href="404.html">404 Page</a>-->
-          <!--<a class="dropdown-item active" href="blank.html">Blank Page</a>-->
-        <!--</div>-->
-      <!--</li>-->
-      <!--<li class="nav-item">-->
-        <!--<a class="nav-link" href="charts.html">-->
-          <!--<i class="fas fa-fw fa-chart-area"></i>-->
-          <!--<span>Charts</span></a>-->
-      <!--</li>-->
-      <!--<li class="nav-item">-->
-        <!--<a class="nav-link" href="tables.html">-->
-          <!--<i class="fas fa-fw fa-table"></i>-->
-          <!--<span>Tables</span></a>-->
-      <!--</li>-->
-    <!--</ul>-->
 
     <div id="content-wrapper">
 
@@ -119,19 +82,27 @@
   <!-- Sticky Footer -->
   <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded">
     <!--Replace with consistent link to trackers_list.html at all points-->
-    <a class="nav-item nav-link active" href="http://127.0.0.1:8000/trackers/">
-      <div>
-        <i class="fa fa-satellite"></i>
-      </div>
-      <div>Trackers</div>
-    </a>
-    <!--todo: Replace with consistent link to riders_list.html at all points-->
-    <a class="nav-item nav-link" href="http://127.0.0.1:8000/riders/">
-      <div>
-        <i class="fa fa-bicycle"></i>
-      </div>
-      <div>Riders</div>
-    </a>
+    <!--todo: change to proper urls-->
+    {% if active_tab == "trackers" %}
+      <a class="nav-item nav-link" href="http://127.0.0.1:8000/trackers/">
+    {% else %}
+      <a class="nav-item nav-link" style="color: grey" href="http://127.0.0.1:8000/trackers/">
+    {% endif %}
+        <div>
+          <i class="fa fa-satellite"></i>
+        </div>
+        <div>Trackers</div>
+      </a>
+    {% if active_tab == "riders" %}
+      <a class="nav-item nav-link" href="http://127.0.0.1:8000/riders/">
+    {% else %}
+      <a class="nav-item nav-link" style="color: grey" href="http://127.0.0.1:8000/riders/">
+    {% endif %}
+        <div>
+          <i class="fa fa-bicycle"></i>
+        </div>
+        <div>Riders</div>
+      </a>
     <!--todo: add Race to navbar when developed-->
     <!--<a class="nav-item nav-link disabled" href="#">Disabled</a>-->
   </nav>

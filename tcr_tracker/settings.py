@@ -76,6 +76,17 @@ WSGI_APPLICATION = 'tcr_tracker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#                 'NAME': os.environ.get('DB_NAME', 'tracker'),
+#                 'USER': os.environ.get('DB_USER', 'track_thing'),
+#                 'PASSWORD': os.environ.get('DB_PW', 'tr4ack3r'),
+#                 'HOST': os.environ.get('DB_HOST', 'localhost'),
+#                 'PORT': os.environ.get('DB_PORT', ''),
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -86,6 +97,7 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
