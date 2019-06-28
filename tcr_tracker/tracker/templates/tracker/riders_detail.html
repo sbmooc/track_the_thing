@@ -1,4 +1,11 @@
 {% extends 'base.html' %}
+{% block headertitle %}
+<div class="text-light">
+    Rider: {{ riders.first_name}} {{ riders.last_name }}
+    <br>
+    Cap: {{riders.cap_number}}
+</div>
+{% endblock %}
 {% block content %}
 
     <!--status headers-->
