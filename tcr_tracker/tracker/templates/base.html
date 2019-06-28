@@ -83,19 +83,27 @@
   <!-- Sticky Footer -->
   <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded">
     <!--Replace with consistent link to trackers_list.html at all points-->
-    <a class="nav-item nav-link active" href="http://127.0.0.1:8000/trackers/">
-      <div>
-        <i class="fa fa-satellite"></i>
-      </div>
-      <div>Trackers</div>
-    </a>
-    <!--todo: Replace with consistent link to riders_list.html at all points-->
-    <a class="nav-item nav-link" href="http://127.0.0.1:8000/riders/">
-      <div>
-        <i class="fa fa-bicycle"></i>
-      </div>
-      <div>Riders</div>
-    </a>
+    <!--todo: change to proper urls-->
+    {% if active_tab == "trackers" %}
+      <a class="nav-item nav-link" href="http://127.0.0.1:8000/trackers/">
+    {% else %}
+      <a class="nav-item nav-link" style="color: grey" href="http://127.0.0.1:8000/trackers/">
+    {% endif %}
+        <div>
+          <i class="fa fa-satellite"></i>
+        </div>
+        <div>Trackers</div>
+      </a>
+    {% if active_tab == "riders" %}
+      <a class="nav-item nav-link" href="http://127.0.0.1:8000/riders/">
+    {% else %}
+      <a class="nav-item nav-link" style="color: grey" href="http://127.0.0.1:8000/riders/">
+    {% endif %}
+        <div>
+          <i class="fa fa-bicycle"></i>
+        </div>
+        <div>Riders</div>
+      </a>
     <!--todo: add Race to navbar when developed-->
     <!--<a class="nav-item nav-link disabled" href="#">Disabled</a>-->
   </nav>
