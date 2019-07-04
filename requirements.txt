@@ -16,4 +16,3 @@ wcwidth==0.1.7
 zipp==0.5.1
 django-crispy-forms==1.7.2
 
-
