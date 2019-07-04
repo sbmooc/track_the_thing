@@ -94,6 +94,12 @@ class TrackerRiderAssignment(LoginRequiredMixin, UpdateView):
 class AllTrackers(LoginRequiredMixin, ListView):
     model = Trackers
 
+    def get_context_data(self, **kwargs):
+        context = super(AllTrackers, self).get_context_data(**kwargs)
+        context['page_title'] = 'Trackers'
+        context['active_tab'] = 'trackers'
+        return context
+
 
 class OneTracker(LoginRequiredMixin, DetailView):
     model = Trackers
@@ -101,6 +107,8 @@ class OneTracker(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(OneTracker, self).get_context_data(**kwargs)
         context['tracker_dict'] = context['trackers'].__dict__
+        context['page_title'] = 'Tracker %s' % context['trackers'].tcr_id
+        context['active_tab'] = 'trackers'
         return context
 
 
@@ -180,6 +188,12 @@ class RiderEdit(LoginRequiredMixin, UpdateView):
 class AllRiders(LoginRequiredMixin, ListView):
     model = Riders
 
+    def get_context_data(self, **kwargs):
+        context = super(AllRiders, self).get_context_data(**kwargs)
+        context['page_title'] = 'Riders'
+        context['active_tab'] = 'riders'
+        return context
+
 
 class OneRider(LoginRequiredMixin, DetailView):
     model = Riders
@@ -187,4 +201,7 @@ class OneRider(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(OneRider, self).get_context_data(**kwargs)
         context['rider_dict'] = context['riders'].__dict__
+        context['page_title'] = 'Rider: %s' % context['riders'].full_name
+        context['active_tab'] = 'riders'
         return context
+

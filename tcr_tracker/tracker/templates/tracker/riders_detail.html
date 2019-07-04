@@ -20,7 +20,7 @@
             {% if riders.current_tracker %}
                 <div class="col my-auto">
                     <a href="{{ riders.current_tracker.url }}">
-                        {{ riders.current_tracker }}
+                        {{ riders.current_tracker.tcr_id }}
                     </a>
                 </div>
                 <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
@@ -71,23 +71,29 @@
             </div>
         </div>
         <ul class="list-group">
-            {% if not riders.all_notes %}
+            {% if not riders.all_notes_and_events %}
                 <li class="list-group-item">
                     <div>
-                        There are no notes for this rider.
+                        There are no notes or events for this rider.
                     </div>
                 </li>
             {% else %}
-                {% for note in riders.all_notes reversed %}
+                {% for item in riders.all_notes_and_events %}
                     <li class="list-group-item">
                         <div style="color: grey; font-style: italic">
-                             {{ note.created }}
+                             {{ item.created }}   {{ item.user }}
                         </div>
                         <div>
-                            {% if note.event %}
-                                <b>(Event: {{ note.event.event_type }})</b>
+                            {% if item.event %}
+                                <b>(Event: {{ item.event.event_type }})</b>
+                            {% elif item.event_type %}
+                                <b>(Event: {{ item.event_type }})</b>
                             {% endif %}
-                            {{ note.notes }}
+                        </div>
+                        <div>
+                            {% if item.notes %}
+                                {{ item.notes }}
+                            {% endif %}
                         </div>
                     </li>
                 {% endfor %}
@@ -95,49 +101,49 @@
         </ul>
     </div>
 
-    <!--Events log-->
-    <div class="container-fluid my-2">
-        <div class="row">
-            <div class="col my-2">
-                <h5>Events</h5>
-            </div>
-        </div>
-        {% if not riders.all_events %}
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <div>
-                        There are no events for this rider.
-                    </div>
-                </li>
-            </ul>
-        {% else %}
-            <table class="table table-hover table-responsive-xs">
-                <thead>
-                <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Event</th>
-                    <th scope="col">User</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!--todo: replace with for-loop-->
-                {% for event in riders.all_events reversed %}
-                    <tr>
-                        <td>
-                            {{event.created}}
-                        </td>
-                        <td>
-                            {{event.event_type}}
-                        </td>
-                        <td>
-                            {{event.user}}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-    </div>
+    <!--&lt;!&ndash;Events log&ndash;&gt;-->
+    <!--<div class="container-fluid my-2">-->
+        <!--<div class="row">-->
+            <!--<div class="col my-2">-->
+                <!--<h5>Events</h5>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--{% if not riders.all_events %}-->
+            <!--<ul class="list-group">-->
+                <!--<li class="list-group-item">-->
+                    <!--<div>-->
+                        <!--There are no events for this rider.-->
+                    <!--</div>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--{% else %}-->
+            <!--<table class="table table-hover table-responsive-xs">-->
+                <!--<thead>-->
+                <!--<tr>-->
+                    <!--<th scope="col">Date</th>-->
+                    <!--<th scope="col">Event</th>-->
+                    <!--<th scope="col">User</th>-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                <!--&lt;!&ndash;todo: replace with for-loop&ndash;&gt;-->
+                <!--{% for event in riders.all_events reversed %}-->
+                    <!--<tr>-->
+                        <!--<td>-->
+                            <!--{{event.created}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--{{event.event_type}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--{{event.user}}-->
+                        <!--</td>-->
+                    <!--</tr>-->
+                <!--{% endfor %}-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--{% endif %}-->
+    <!--</div>-->
 
     <!--Rider info table-->
     <div class="container-fluid my-2">
@@ -155,7 +161,7 @@
             <tbody>
             <tr>
                 {% for field, value in rider_dict.items %}
-                    {% if field != "_state" %}
+                    {% if field != "_state" and field != "id" %}
                         <td>
                             {{ field }}
                         </td>

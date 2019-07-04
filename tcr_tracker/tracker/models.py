@@ -129,7 +129,7 @@ class Riders(models.Model):
     tcr_id = CharField(max_length=10, null=True)
     country_code = CharField(max_length=5, null=True)
     hire_tracker = BooleanField(null=True)
-    tracker_url = CharField(null=True, max_length=200)
+    tracker_url = CharField(null=True, max_length=200, blank=True)
 
     @property
     def current_tracker(self):
@@ -150,6 +150,13 @@ class Riders(models.Model):
     @property
     def all_notes(self):
         return self.notes.all()
+
+    @property
+    def all_notes_and_events(self):
+        all_items = list(self.all_events) + list(self.all_notes)
+        all_items.sort(key=lambda x: x.created, reverse=True)
+        return all_items
+
 
     # todo link riders who are in pairs? or does the capnumber do that???
     # todo add checkpoints stuff!
@@ -337,12 +344,13 @@ class Trackers(models.Model):
     esn_number = CharField(max_length=50)
     working_status = CharField(
         max_length=50,
+        choices=TRACKER_WORKING_STATUS,
         verbose_name='Working Status')
     loan_status = CharField(max_length=50, choices=TRACKER_LOAN_STATUS, null=True)
     last_test_date = DateField(null=True)
     purchase_date = DateField(null=True)
     warranty_expiry = DateField(null=True)
-    owner = CharField(max_length=50)
+    owner = CharField(max_length=50, choices=TRACKER_OWNER)
     rider_assigned = ForeignKey(Riders,
                                 on_delete=models.SET_NULL, null=True,
                                 related_name='trackers_assigned',
@@ -353,7 +361,7 @@ class Trackers(models.Model):
                                blank=True)
     tcr_id = CharField(max_length=20, null=True)
     # todo add relationship to user!
-    test_by = CharField(max_length=20, null=True)
+    test_by = CharField(max_length=20, null=True, blank=True)
     clip = BooleanField(null=True)
 
     @property

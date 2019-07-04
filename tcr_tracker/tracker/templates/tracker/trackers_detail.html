@@ -17,13 +17,9 @@
                         {{ trackers.rider_assigned }}
                     </a>
                 </div>
-                <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
-                    <!--todo: replace with assignment event date-->
-                    June 20, 2019
-                </div>
             {% else %}
                 <div class="col my-auto">
-                    No assigned rider
+                    N/A
                 </div>
             {% endif %}
         </div>
@@ -35,13 +31,9 @@
                         {{ trackers.rider_possess }}
                     </a>
                 </div>
-                <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
-                    <!--todo: replace with possession event date-->
-                    June 20, 2019
-                </div>
             {% else %}
                 <div class="col my-auto">
-                    Not in rider possession
+                    N/A
                 </div>
             {% endif %}
         </div>
@@ -167,7 +159,7 @@
             <tbody>
             <tr>
                 {% for field, value in tracker_dict.items %}
-                    {% if field != "_state" %}
+                    {% if field != "_state" and field != "id" %}
                         <td>
                             {{ field }}
                         </td>

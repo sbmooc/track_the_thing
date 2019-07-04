@@ -3,5 +3,5 @@ __pycache__
 *.sqlite3
 .DS_Store
 local.py
-riders.csv
-trackers.csv
+*.csv
+*.csv
