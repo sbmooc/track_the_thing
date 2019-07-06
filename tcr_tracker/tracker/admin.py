@@ -13,9 +13,9 @@ class TrackerAdmin(admin.ModelAdmin):
 
 
 @admin.register(Events)
-class TrackerNotesAdmin(admin.ModelAdmin):
+class EventsAdmin(admin.ModelAdmin):
     pass
 
 @admin.register(RaceStatus)
-class TrackerNotesAdmin(admin.ModelAdmin):
+class RaceStatusAdmin(admin.ModelAdmin):
     pass

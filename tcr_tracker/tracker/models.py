@@ -24,6 +24,7 @@ TRACKER_WORKING_STATUS = (
     ('working', 'Working'),
     ('broken', 'Broken'),
     ('to_be_tested', 'To Be Tested'),
+    ('lost', 'Lost'),
     ('unknown', 'Unknown')
 )
 
@@ -39,8 +40,8 @@ RIDER_CATEGORIES = (
 )
 
 RIDER_GENDERS = (
-('male', 'M'),
-('female', 'F')
+    ('male', 'M'),
+    ('female', 'F')
 )
 
 
@@ -201,8 +202,8 @@ class Riders(models.Model):
             rider=self,
             tracker=tracker,
             notes=notes,
-            event_type='add_tracker_assignment',
-            deposit_change=deposit * -1
+            event_type='remove_tracker_assignment',
+            deposit_change=deposit
         )
         self.balance += deposit
         self.save()
@@ -273,7 +274,7 @@ class Trackers(models.Model):
 
     @property
     def assignable(self):
-        return self.rider_assigned is None
+        return self.rider_assigned is None and self.working_status == 'working'
 
     @property
     def url(self):
@@ -327,16 +328,18 @@ class Events(TimeStampedModel):
         Trackers,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='events',
     )
     rider = ForeignKey(
         Riders,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='events',
     )
-    notes = TextField(null=True)
-    deposit_change=IntegerField(null=True)
+    notes = TextField(null=True, blank=True)
+    deposit_change = IntegerField(null=True, blank=True)
 
 
 class RaceStatus(TimeStampedModel):
@@ -374,7 +377,6 @@ class RaceStatus(TimeStampedModel):
             return self.days_hours_minutes(
                 arrow.now().datetime - self.created
             )
-
 
 
 class Checkpoints(models.Model):
