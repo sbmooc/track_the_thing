@@ -17,7 +17,7 @@ class Command(BaseCommand):
             print('No csv!')
             return
         count = 0
-        with open(rider_csv, 'r') as csv_file:
+        with open(rider_csv, 'r', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
                 row['hire_tracker'] = True if row['hire_tracker'] == 'Hire TCR' else False

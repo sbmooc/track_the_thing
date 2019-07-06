@@ -15,7 +15,7 @@ class Command(BaseCommand):
         tracker_csv = options['tracker_csv']
 
         count = 0
-        with open(tracker_csv, 'r') as csv_file:
+        with open(tracker_csv, 'r', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
                 row['last_test_date'] = datetime.strptime(row['last_test_date'].strip(), '%d/%m/%y')
