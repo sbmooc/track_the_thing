@@ -346,7 +346,8 @@ class RaceStatus(TimeStampedModel):
             ('pre_race', 'Pre_Race'),
             ('started', 'Started'),
             ('finished', 'Finished')
-        )
+        ),
+        unique=True
     )
 
     @property
@@ -371,9 +372,10 @@ class RaceStatus(TimeStampedModel):
         if self.pre_race:
             return 'Race Not Started'
         elif self.status == 'started':
-            return self.days_hours_minutes(
-                arrow.now().date - self.created
+            days, hours, minutes = self.days_hours_minutes(
+                arrow.now().datetime - self.created
             )
+            return f'{days} Days {hours} Hours {minutes} Minutes'
 
 
 

@@ -1,3 +1,6 @@
+from unittest import mock
+
+import arrow
 from django.contrib.auth.models import User
 
 from tcr_tracker.tracker.errors import TrackerAlreadyAssigned
@@ -5,16 +8,21 @@ from django.test import TestCase
 from tcr_tracker.tracker.models import (
     Riders,
     Trackers,
-)
+    RaceStatus)
+from django.db.utils import IntegrityError
 
 
-class TestRiders(TestCase):
+class TrackerRiderTests(TestCase):
+
     def setUp(self):
         self.rider_1 = Riders.objects.create()
         self.rider_2 = Riders.objects.create()
         self.tracker_1 = Trackers.objects.create()
         self.tracker_2 = Trackers.objects.create()
         self.user = User.objects.create()
+
+
+class TestRiders(TrackerRiderTests):
 
     def test_add_tracker_assignment(self):
         self.rider_1.tracker_add_assignment(
@@ -104,22 +112,68 @@ class TestRiders(TestCase):
             )
 
 
-class TestTrackers(TestCase):
-
-    def setUp(self):
-        Trackers().save()
-        Riders().save()
-        self.tracker = Trackers.objects.all()[0]
-        self.rider = Riders.objects.all()[0]
-
-    def tearDown(self):
-        Trackers.objects.all().delete()
-        Riders.objects.all().delete()
+class TestTrackers(TrackerRiderTests):
 
     def test_is_assignable_not_assignable(self):
-        self.assertTrue(self.tracker.assignable)
+        self.assertTrue(self.tracker_1.assignable)
 
     def test_is_assignable_assignable(self):
-        self.tracker.rider_assigned = self.rider
-        self.assertFalse(self.tracker.assignable)
+        self.tracker_1.rider_assigned = self.rider_1
+        self.assertFalse(self.tracker_1.assignable)
 
+
+class TestRaceStatus(TestCase):
+
+    def setUp(self):
+        self.mock_time = arrow.Arrow(2019, 1, 1).datetime
+        self.pr = RaceStatus.objects.create(
+            status='pre_race',
+        )
+
+    def test_status_is_pre_race(self):
+        self.assertTrue(self.pr.pre_race)
+
+    def test_uniqueness(self):
+
+        with self.assertRaises(IntegrityError):
+            RaceStatus.objects.create(status='pre_race')
+
+    def test_race_seconds(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = self.mock_time
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 1, 1, 10, 10, 10)):
+            self.assertEquals(started.race_seconds, 36610)
+
+    def test_elapsed_string_0_days(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = self.mock_time
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 1, 1, 10, 10, 10)):
+            self.assertEquals(started.elapsed_time_string, '0 Days 10 Hours 10 Minutes')
+
+    def test_elapsed_string_multiple_days(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = self.mock_time
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 1, 4, 10, 10, 10)):
+            self.assertEquals(started.elapsed_time_string, '3 Days 10 Hours 10 Minutes')
+
+    def test_elapsed_string_over_month_boundary(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = arrow.Arrow(2019, 7, 28)
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 8, 1, 10, 10, 10)):
+            self.assertEquals(started.elapsed_time_string, '4 Days 10 Hours 10 Minutes')
