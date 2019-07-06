@@ -1,8 +1,8 @@
 import csv
 from datetime import datetime
 
-from django.core.management.base import BaseCommand, CommandError
-from tcr_tracker.tracker.models import Riders, Trackers
+from django.core.management.base import BaseCommand
+from tcr_tracker.tracker.models import Trackers
 
 class Command(BaseCommand):
     help = 'Add trackers to application'

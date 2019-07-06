@@ -29,7 +29,7 @@ ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'local')
 DEBUG = False if ENVIRONMENT == 'prod' else True
 
 
-ALLOWED_HOSTS = ['134.209.26.237']
+ALLOWED_HOSTS = ['134.209.26.237', '127.0.0.1']
 
 
 # Application definition

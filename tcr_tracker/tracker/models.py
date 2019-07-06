@@ -372,7 +372,7 @@ class RaceStatus(TimeStampedModel):
             return 'Race Not Started'
         elif self.status == 'started':
             return self.days_hours_minutes(
-                arrow.now().datetime - self.created
+                arrow.now().date - self.created
             )
 
 
