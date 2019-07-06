@@ -1,43 +1,29 @@
-from datetime import datetime
-
-import django
-# django.setup()
 from django.contrib.auth.models import User
 
 from tcr_tracker.tracker.errors import TrackerAlreadyAssigned
-from django.test import TransactionTestCase
+from django.test import TestCase
 from tcr_tracker.tracker.models import (
     Riders,
     Trackers,
-    Profile)
+)
 
 
-class TestRiders(TransactionTestCase):
-    # def setUp(self):
-    #     Riders().save()
-    #     Riders().save()
-    #     Trackers().save()
-    #     Trackers().save()
-    #     self.rider_1 = Riders.objects.all()[0]
-    #     self.rider_2 = Riders.objects.all()[1]
-    #     self.tracker_1 = Trackers.objects.all().first()
-    #     self.tracker_2 = Trackers.objects.all()[1]
-    #     self.test_datetime = datetime(2018, 1, 1)
-    #     self.user = User.objects.create()
-    #
-    # def tearDown(self) -> None:
-    #     Riders.objects.all().delete()
-    #     Trackers.objects.all().delete()
+class TestRiders(TestCase):
+    def setUp(self):
+        self.rider_1 = Riders.objects.create()
+        self.rider_2 = Riders.objects.create()
+        self.tracker_1 = Trackers.objects.create()
+        self.tracker_2 = Trackers.objects.create()
+        self.user = User.objects.create()
 
     def test_add_tracker_assignment(self):
-        a='a'
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
             100,
             self.user.profile
         )
-        rider_from_db = Riders.objects.all()[0]
+        rider_from_db = Riders.objects.get(id=self.rider_1.id)
         assigned_trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(assigned_trackers), 1
@@ -53,50 +39,47 @@ class TestRiders(TransactionTestCase):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
         self.rider_1.tracker_add_assignment(
             self.tracker_2,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
-        rider_from_db = Riders.objects.get(id=1)
-        trackers = rider_from_db.assigned_trackers.all()
+        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(trackers), 2
         )
         self.assertEqual(
             rider_from_db.balance, -200
         )
-        self.assertEqual(
-            trackers[0], self.tracker_1
-        )
-        self.assertEqual(
-            trackers[1], self.tracker_2
+        self.assertCountEqual(
+            trackers, [self.tracker_1, self.tracker_2]
         )
 
     def test_remove_tracker_assignment(self):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
-        rider_from_db = Riders.objects.get(id=1)
-        trackers = rider_from_db.assigned_trackers.all()
+        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             trackers[0], self.tracker_1
         )
         self.rider_1.tracker_remove_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
         rider_from_db.refresh_from_db()
-        trackers = rider_from_db.assigned_trackers.all()
+        trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(trackers), 0
         )
@@ -108,18 +91,20 @@ class TestRiders(TransactionTestCase):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            100
+            100,
+            self.user.profile
         )
 
         with self.assertRaises(TrackerAlreadyAssigned):
             self.rider_2.tracker_add_assignment(
                 self.tracker_1,
                 None,
-                100
+                100,
+                self.user.profile
             )
 
 
-class TestTrackers(TransactionTestCase):
+class TestTrackers(TestCase):
 
     def setUp(self):
         Trackers().save()
