@@ -58,7 +58,13 @@ DEPOSIT_STATUS = (
     ('refunded', 'Refunded')
 )
 
-RIDER_EVENT_CATEGORIES = (
+TRACKER_OWNER = (
+    ('lost_dot', 'Lost Dot'),
+    ('rider_owned', 'Rider Owned'),
+    ('third_party', 'Third Party')
+)
+
+EVENT_CATEGORIES = (
     ('payment_in', 'Payment In'),
     ('payment_out', 'Payment Out'),
     ('start_race', 'Start Race'),
@@ -68,22 +74,14 @@ RIDER_EVENT_CATEGORIES = (
     ('add_tracker_assignment', 'Tracker Assigned'),
     ('remove_tracker_assignment', 'Tracker remove assignment'),
     ('add_tracker_possession', 'Tracker Possession Add'),
-    ('remove_tracker_possession', 'Tracker Possession Remove')
-)
-
-TRACKER_OWNER = (
-    ('lost_dot', 'Lost Dot'),
-    ('rider_owned', 'Rider Owned'),
-    ('third_party', 'Third Party')
-)
-
-TRACKER_EVENT_CATEGORIES = (
+    ('remove_tracker_possession', 'Tracker Possession Remove'),
     ('tested_OK', 'Tested OK'),
     ('tested_broken', 'Tested Broken'),
     ('add_tracker_assignment', 'Tracker add assignment'),
     ('remove_tracker_assignment', 'Tracker remove assignment'),
     ('add_tracker_possession', 'Tracker add possession'),
     ('remove_tracker_possession', 'Tracker remove possession'),
+    ('add_note', 'Add_note')
 )
 
 
@@ -178,67 +176,18 @@ class Riders(models.Model):
 
     # todo: add url_edit method for riders
 
-    def _record_tracker_rider_notes(
-        self,
-        tracker,
-        notes,
-        rider_event,
-        tracker_event,
-        user
-    ):
-        RiderNotes(
-            rider=self,
-            notes=notes,
-            event=rider_event,
-            user=user
-        ).save()
-        TrackerNotes(
-            tracker=tracker,
-            notes=notes,
-            event=tracker_event,
-            user=user
-        ).save()
-
-    def _record_tracker_rider_events(
-        self,
-        tracker,
-        event_type,
-        balance_change,
-        user
-    ):
-        rider_event = RiderEvents(
-            event_type=event_type,
-            balance_change=balance_change,
-            rider=self,
-            user=user
-        )
-        rider_event.save()
-        tracker_event = TrackerEvents(
-            event_type=event_type,
-            tracker=tracker
-        )
-        tracker_event.save()
-        return rider_event, tracker_event
-
     def tracker_add_assignment(self, tracker, notes, deposit, user):
         if tracker.rider_assigned is not None:
             raise TrackerAlreadyAssigned()
         self.trackers_assigned.add(tracker)
         self.save()
-        rider_event, tracker_event = self._record_tracker_rider_events(
-            tracker,
-            'add_tracker_assignment',
-            deposit * -1,
-            user
+        Events.objects.create(
+            rider=self,
+            tracker=tracker,
+            notes=notes,
+            event_type='add_tracker_assignment',
+            deposit_change=deposit * -1
         )
-        if notes:
-            self._record_tracker_rider_notes(
-                tracker,
-                notes,
-                rider_event,
-                tracker_event,
-                user
-            )
         self.balance -= deposit
         self.save()
 
@@ -247,20 +196,13 @@ class Riders(models.Model):
             raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
         self.save()
-        rider_event, tracker_event = self._record_tracker_rider_events(
-            tracker,
-            'remove_tracker_assignment',
-            deposit,
-            user
+        Events.objects.create(
+            rider=self,
+            tracker=tracker,
+            notes=notes,
+            event_type='add_tracker_assignment',
+            deposit_change=deposit * -1
         )
-        if notes:
-            self._record_tracker_rider_notes(
-                tracker,
-                notes,
-                rider_event,
-                tracker_event,
-                user
-            )
         self.balance += deposit
         self.save()
 
@@ -268,40 +210,24 @@ class Riders(models.Model):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_possessed.add(tracker)
-        rider_event, tracker_event = self._record_tracker_rider_events(
-            tracker,
-            'add_tracker_possession',
-            0,
-            user
+        Events.objects.create(
+            rider=self,
+            tracker=tracker,
+            notes=notes,
+            event_type='add_tracker_possession',
         )
-        if notes:
-            self._record_tracker_rider_notes(
-                tracker,
-                notes,
-                rider_event,
-                tracker_event,
-                user
-            )
         self.save()
 
     def tracker_remove_possession(self, tracker, notes, user):
         if tracker not in self.trackers_possessed.all():
             raise TrackerNotPossessed()
         self.trackers_possessed.remove(tracker)
-        rider_event, tracker_event = self._record_tracker_rider_events(
-            tracker,
-            'remove_tracker_possession',
-            0,
-            user
+        Events.objects.create(
+            rider=self,
+            tracker=tracker,
+            notes=notes,
+            event_type='remove_tracker_possession',
         )
-        if notes:
-            self._record_tracker_rider_notes(
-                tracker,
-                notes,
-                rider_event,
-                tracker_event,
-                user
-            )
         self.save()
 
     class Meta:
@@ -309,34 +235,6 @@ class Riders(models.Model):
 
     def __str__(self):
         return self.full_name
-
-
-class RiderEvents(TimeStampedModel):
-    # user_id = Column(Integer, ForeignKey('users.id'))
-    event_type = CharField(max_length=50, choices=RIDER_EVENT_CATEGORIES)
-    balance_change = FloatField(null=True)
-    rider = ForeignKey(
-        Riders,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='events'
-    )
-
-
-class RiderNotes(TimeStampedModel):
-    rider = ForeignKey(
-        Riders,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='notes'
-    )
-    notes = TextField(null=True)
-    event = ForeignKey(
-        RiderEvents,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='notes',
-    )
 
 
 class Trackers(models.Model):
@@ -419,24 +317,35 @@ class Trackers(models.Model):
         return str(self.id)
 
 
-class TrackerEvents(TimeStampedModel):
-    event_type = CharField(max_length=50,
-                           choices=TRACKER_EVENT_CATEGORIES)
-    tracker = ForeignKey(Trackers,
-                         on_delete=models.SET_NULL, null=True,
-                         related_name='events')
-
-
-class TrackerNotes(TimeStampedModel):
-    tracker = ForeignKey(Trackers,
-                         on_delete=models.SET_NULL, null=True,
-                         related_name='notes')
+class Events(TimeStampedModel):
+    event_type = CharField(
+        max_length=50,
+        choices=EVENT_CATEGORIES,
+    )
+    tracker = ForeignKey(
+        Trackers,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='events',
+    )
+    rider = ForeignKey(
+        Riders,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='events',
+    )
     notes = TextField(null=True)
-    event = ForeignKey(
-        TrackerEvents,
-        on_delete=models.SET_NULL, null=True,
-        related_name='notes',
-        blank=True
+    deposit_change=IntegerField(null=True)
+
+
+class RaceStatus(TimeStampedModel):
+    status = CharField(
+        max_length=20,
+        choices=(
+            ('pre_race', 'Pre_Race'),
+            ('started', 'Started'),
+            ('finished', 'Finished')
+        )
     )
 
 
