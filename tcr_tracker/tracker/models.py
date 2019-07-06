@@ -303,11 +303,24 @@ class Trackers(models.Model):
     def url_edit(self):
         return reverse('tracker_edit', kwargs={'pk': self.id})
 
-
     @property
     def tracker_loan_status(self):
         return self.get_loan_status_display()
 
+    @property
+    def get_buttons(self):
+        pre_race = RaceStatus.objects.last().pre_race
+        buttons = {
+            'record_status': {'label': 'Record status', 'url': self.record_test, 'display': True},
+            'give': {'label': 'Give to rider', 'url': self.url_possess_tracker, 'display': True},
+            'retrieve': {'label': 'Retrieve', 'url': self.url_possess_tracker, 'display': True}
+        }
+        if pre_race:
+            if self.rider_assigned is None:
+                buttons['give'] = buttons['retrieve'] = False
+            
+
+    @property
     def record_test(self, result):
         self.working_status = 'working' if result == 'working' else 'broken'
         self.save()
