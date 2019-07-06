@@ -267,9 +267,9 @@ class Trackers(models.Model):
     def all_events(self):
         return self.events.all()
 
-    @property
-    def all_notes(self):
-        return self.notes.all()
+    # @property
+    # def all_notes(self):
+    #     return self.notes.all()
 
     @property
     def assignable(self):

@@ -75,23 +75,20 @@
             </div>
         </div>
         <ul class="list-group">
-            {% if not trackers.all_notes %}
+            {% if not trackers.events %}
                 <li class="list-group-item">
                     <div>
-                        There are no notes for this tracker.
+                        There are no events or notes for this tracker.
                     </div>
                 </li>
             {% else %}
-                {% for note in trackers.all_notes reversed %}
+                {% for event in trackers.events reversed %}
                     <li class="list-group-item">
                         <div style="color: grey; font-style: italic">
-                             {{ note.created }}
+                             {{ event.created }}
                         </div>
                         <div>
-                            {% if note.event %}
-                                <b>(Event: {{ note.event.event_type }})</b>
-                            {% endif %}
-                            {{ note.notes }}
+                            {{ event.notes }}
                         </div>
                     </li>
                 {% endfor %}
@@ -99,49 +96,49 @@
         </ul>
     </div>
 
-    <!--Events log-->
-    <div class="container-fluid my-2">
-        <div class="row">
-            <div class="col my-2">
-                <h5>Events</h5>
-            </div>
-        </div>
-        {% if not trackers.all_events %}
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <div>
-                        There are no events for this tracker.
-                    </div>
-                </li>
-            </ul>
-        {% else %}
-            <table class="table table-hover table-responsive-xs">
-                <thead>
-                <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Event</th>
-                    <th scope="col">User</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!--todo: replace with for-loop-->
-                {% for event in trackers.all_events reversed %}
-                    <tr>
-                        <td>
-                            {{event.created}}
-                        </td>
-                        <td>
-                            {{event.event_type}}
-                        </td>
-                        <td>
-                            {{event.user}}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
-    </div>
+<!--    &lt;!&ndash;Events log&ndash;&gt;-->
+<!--    <div class="container-fluid my-2">-->
+<!--        <div class="row">-->
+<!--            <div class="col my-2">-->
+<!--                <h5>Events</h5>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        {% if not trackers.all_events %}-->
+<!--            <ul class="list-group">-->
+<!--                <li class="list-group-item">-->
+<!--                    <div>-->
+<!--                        There are no events for this tracker.-->
+<!--                    </div>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        {% else %}-->
+<!--            <table class="table table-hover table-responsive-xs">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th scope="col">Date</th>-->
+<!--                    <th scope="col">Event</th>-->
+<!--                    <th scope="col">User</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                &lt;!&ndash;todo: replace with for-loop&ndash;&gt;-->
+<!--                {% for event in trackers.all_events reversed %}-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            {{event.created}}-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            {{event.event_type}}-->
+<!--                        </td>-->
+<!--                        <td>-->
+<!--                            {{event.user}}-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                {% endfor %}-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        {% endif %}-->
+<!--    </div>-->
 
     <!--Tracker info table-->
     <div class="container-fluid my-2">
