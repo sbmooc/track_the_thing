@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, UpdateView, FormView
+from django.views.generic import ListView, DetailView, UpdateView
+from tcr_tracker.tracker.views_mixins import RaceStatusMixin
 
 from tcr_tracker.forms import (
     EditTracker,
@@ -13,8 +14,7 @@ from tcr_tracker.forms import (
     AddTrackerNotes
 )
 
-from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes, \
-    RiderNotes
+from tcr_tracker.tracker.models import Trackers, Riders, Events
 
 
 class RiderAddNotes(LoginRequiredMixin, UpdateView):
@@ -23,11 +23,11 @@ class RiderAddNotes(LoginRequiredMixin, UpdateView):
     template_name = 'tracker/basic_form.html'
 
     def form_valid(self, form):
-        RiderNotes(
+        Events.objects.create(
             rider=self.object,
             notes=form.cleaned_data['notes'],
             user=self.request.user.profile
-        ).save()
+        )
         return super(RiderAddNotes, self).form_valid(form)
 
 
@@ -37,11 +37,11 @@ class TrackerAddNotes(LoginRequiredMixin, UpdateView):
     template_name = 'tracker/basic_form.html'
 
     def form_valid(self, form):
-        TrackerNotes(
+        Events.objects.create(
             tracker=self.object,
             notes=form.cleaned_data['notes'],
             user=self.request.user.profile
-        ).save()
+        )
         return super(TrackerAddNotes, self).form_valid(form)
 
 

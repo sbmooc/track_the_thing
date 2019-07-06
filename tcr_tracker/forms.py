@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from tcr_tracker.tracker.models import Trackers, Riders, TrackerNotes
+from tcr_tracker.tracker.models import Trackers, Riders
 
 
 class AddNotesForm(forms.ModelForm):

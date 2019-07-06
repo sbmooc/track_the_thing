@@ -1,3 +1,4 @@
+import arrow as arrow
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import (
@@ -347,6 +348,33 @@ class RaceStatus(TimeStampedModel):
             ('finished', 'Finished')
         )
     )
+
+    @property
+    def pre_race(self):
+        return self.status == 'pre_race'
+
+    @property
+    def race_seconds(self):
+        if self.pre_race:
+            return 0
+        elif self.status == 'started':
+            return arrow.now().timestamp - self.created.timestamp()
+        else:
+            return 0
+
+    @staticmethod
+    def days_hours_minutes(td):
+        return td.days, td.seconds // 3600, (td.seconds // 60) % 60
+
+    @property
+    def elapsed_time_string(self):
+        if self.pre_race:
+            return 'Race Not Started'
+        elif self.status == 'started':
+            return self.days_hours_minutes(
+                arrow.now().datetime - self.created
+            )
+
 
 
 class Checkpoints(models.Model):
