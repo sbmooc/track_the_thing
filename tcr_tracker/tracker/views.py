@@ -101,7 +101,7 @@ class AllTrackers(LoginRequiredMixin, ListView):
         return context
 
 
-class OneTracker(LoginRequiredMixin, DetailView):
+class OneTracker(RaceStatusMixin, LoginRequiredMixin, DetailView):
     model = Trackers
 
     def get_context_data(self, **kwargs):
