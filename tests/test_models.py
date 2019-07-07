@@ -115,11 +115,22 @@ class TestRiders(TrackerRiderTests):
 class TestTrackers(TrackerRiderTests):
 
     def test_is_assignable_not_assignable(self):
+        self.tracker_1.working_status = 'working'
         self.assertTrue(self.tracker_1.assignable)
 
     def test_is_assignable_assignable(self):
         self.tracker_1.rider_assigned = self.rider_1
         self.assertFalse(self.tracker_1.assignable)
+
+    def test_buttons_pre_race_tracker_not_assigned(self):
+        RaceStatus.objects.create(status='pre_race')
+
+    def test_buttons_pre_race_tracker_assigned(self):
+        RaceStatus.objects.create(status='pre_race')
+
+    def test_buttons_during_race_tracker_assigned(self):
+        RaceStatus.objects.create(status='pre_race')
+        RaceStatus.objects.create(status='started')
 
 
 class TestRaceStatus(TestCase):

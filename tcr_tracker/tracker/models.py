@@ -4,14 +4,12 @@ from django.db import models
 from django.db.models import (
     CharField,
     DateField,
-    FloatField,
     TextField,
     DateTimeField,
     ForeignKey,
     BooleanField,
-    IntegerField)
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+    IntegerField
+)
 from django.urls import reverse
 
 from tcr_tracker.tracker.errors import (
@@ -95,15 +93,6 @@ class Profile(models.Model):
     is_tcr_staff = BooleanField(null=True)
 
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
 
 
 class TimeStampedModel(models.Model):
@@ -294,19 +283,52 @@ class Trackers(models.Model):
         return self.get_loan_status_display()
 
     @property
-    def get_buttons(self):
-        pre_race = RaceStatus.objects.last().pre_race
-        buttons = {
-            'record_status': {'label': 'Record status', 'url': self.record_test, 'display': True},
-            'give': {'label': 'Give to rider', 'url': self.url_possess_tracker, 'display': True},
-            'retrieve': {'label': 'Retrieve', 'url': self.url_possess_tracker, 'display': True}
-        }
-        if pre_race:
-            if self.rider_assigned is None:
-                buttons['give'] = buttons['retrieve'] = False
-            
+    def pre_race(self):
+        return RaceStatus.objects.last().pre_race
 
     @property
+    def give_button_display_state(self):
+        return True if self.pre_race and self.rider_assigned is None else False
+
+    @property
+    def retrive_button_display_state(self):
+        return True if self.rider_assigned is not None else False
+
+    @property
+    def record_status_button_display_state(self):
+        # todo - fill in logic here
+        return True
+
+    @property
+    def pre_assign_button_display_state(self):
+        return True if self.pre_race and self.rider_assigned is not None else False
+
+    @property
+    def get_buttons(self):
+        return {
+            'record_status': {
+                'label': 'Record status',
+                #todo update url
+                'url': self.record_test,
+                'display': self.record_status_button_display_state
+            },
+            'give': {
+                'label': 'Give to rider',
+                'url': self.url_possess_tracker,
+                'display': self.give_button_display_state
+            },
+            'retrieve': {
+                'label': 'Retrieve',
+                'url': self.url_possess_tracker,
+                'display': self.retrive_button_display_state
+            },
+            'pre_assign': {
+                'label': 'Pre Assign',
+                'url': self.url_assign_tracker,
+                'display': self.pre_assign_button_display_state
+            }
+        }
+
     def record_test(self, result):
         self.working_status = 'working' if result == 'working' else 'broken'
         self.save()
