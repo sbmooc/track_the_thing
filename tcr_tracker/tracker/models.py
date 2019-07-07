@@ -147,16 +147,6 @@ class Riders(models.Model):
     def all_events(self):
         return self.events.all()
 
-    @property
-    def all_notes(self):
-        return self.notes.all()
-
-    @property
-    def all_notes_and_events(self):
-        all_items = list(self.all_events) + list(self.all_notes)
-        all_items.sort(key=lambda x: x.created, reverse=True)
-        return all_items
-
 
     # todo link riders who are in pairs? or does the capnumber do that???
     # todo add checkpoints stuff!
@@ -267,10 +257,6 @@ class Trackers(models.Model):
     @property
     def all_events(self):
         return self.events.all()
-
-    # @property
-    # def all_notes(self):
-    #     return self.notes.all()
 
     @property
     def assignable(self):
