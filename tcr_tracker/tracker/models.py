@@ -93,8 +93,6 @@ class Profile(models.Model):
     is_tcr_staff = BooleanField(null=True)
 
 
-
-
 class TimeStampedModel(models.Model):
     created = DateTimeField(auto_now_add=True)
     modified = DateTimeField(auto_now=True)
@@ -104,7 +102,21 @@ class TimeStampedModel(models.Model):
     )
 
 
-class Riders(models.Model):
+class AbstractModel(models.Model):
+
+    @property
+    def pre_race(self):
+        last_race_status_object = RaceStatus.objects.last()
+        return False if last_race_status_object is None else last_race_status_object.pre_race
+
+    @property
+    def url(self):
+        return self.get_absolute_url()
+
+    class Meta:
+        abstract = True
+
+class Riders(AbstractModel):
 
     first_name = CharField(max_length=50, verbose_name='First Name')
     last_name = CharField(max_length=50)
@@ -128,9 +140,6 @@ class Riders(models.Model):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
-    @property
-    def url(self):
-        return self.get_absolute_url()
 
     @property
     def all_events(self):
@@ -218,7 +227,7 @@ class Riders(models.Model):
         return self.full_name
 
 
-class Trackers(models.Model):
+class Trackers(AbstractModel):
 
     esn_number = CharField(max_length=50)
     working_status = CharField(
@@ -252,10 +261,6 @@ class Trackers(models.Model):
         return self.rider_assigned is None and self.working_status == 'working'
 
     @property
-    def url(self):
-        return self.get_absolute_url()
-
-    @property
     def rider_url(self):
         return self.rider_assigned.url if self.rider_assigned else None
 
@@ -281,10 +286,6 @@ class Trackers(models.Model):
     @property
     def tracker_loan_status(self):
         return self.get_loan_status_display()
-
-    @property
-    def pre_race(self):
-        return RaceStatus.objects.last().pre_race
 
     @property
     def give_button_display_state(self):

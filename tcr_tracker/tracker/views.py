@@ -1,7 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, UpdateView
-from tcr_tracker.tracker.views_mixins import RaceStatusMixin
+from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin
 
 from tcr_tracker.forms import (
     EditTracker,
@@ -17,7 +17,12 @@ from tcr_tracker.forms import (
 from tcr_tracker.tracker.models import Trackers, Riders, Events
 
 
-class RiderAddNotes(LoginRequiredMixin, UpdateView):
+class RiderAddNotes(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     form_class = AddRiderNotes
     model = Riders
     template_name = 'tracker/basic_form.html'
@@ -31,7 +36,12 @@ class RiderAddNotes(LoginRequiredMixin, UpdateView):
         return super(RiderAddNotes, self).form_valid(form)
 
 
-class TrackerAddNotes(LoginRequiredMixin, UpdateView):
+class TrackerAddNotes(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     form_class = AddTrackerNotes
     model = Trackers
     template_name = 'tracker/basic_form.html'
@@ -45,7 +55,12 @@ class TrackerAddNotes(LoginRequiredMixin, UpdateView):
         return super(TrackerAddNotes, self).form_valid(form)
 
 
-class TrackerRiderPossession(LoginRequiredMixin, UpdateView):
+class TrackerRiderPossession(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     model = Trackers
     form_class = TrackerRiderPossessionForm
     template_name = 'tracker/basic_form.html'
@@ -67,7 +82,12 @@ class TrackerRiderPossession(LoginRequiredMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class TrackerRiderAssignment(LoginRequiredMixin, UpdateView):
+class TrackerRiderAssignment(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     model = Trackers
     form_class = TrackerRiderAssignmentForm
     template_name = 'tracker/basic_form.html'
@@ -91,7 +111,12 @@ class TrackerRiderAssignment(LoginRequiredMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class AllTrackers(LoginRequiredMixin, ListView):
+class AllTrackers(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    ListView
+):
     model = Trackers
 
     def get_context_data(self, **kwargs):
@@ -112,13 +137,23 @@ class OneTracker(RaceStatusMixin, LoginRequiredMixin, DetailView):
         return context
 
 
-class TrackerEdit(LoginRequiredMixin, UpdateView):
+class TrackerEdit(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     model = Trackers
     form_class = EditTracker
     template_name = 'tracker/trackers_edit.html'
 
 
-class TrackerTest(LoginRequiredMixin, DetailView):
+class TrackerTest(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    DetailView
+):
     model = Trackers
     template_name = 'tracker/trackers_detail.html'
 
@@ -134,7 +169,12 @@ class TrackerTest(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
 
-class RiderTrackerAssignment(LoginRequiredMixin, UpdateView):
+class RiderTrackerAssignment(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     model = Riders
     form_class = RiderTrackerAssignmentForm
     template_name = 'tracker/basic_form.html'
@@ -158,7 +198,12 @@ class RiderTrackerAssignment(LoginRequiredMixin, UpdateView):
         return super(RiderTrackerAssignment, self).form_valid(form)
 
 
-class RiderTrackerPossession(LoginRequiredMixin, UpdateView):
+class RiderTrackerPossession(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     model = Riders
     form_class = RiderTrackerPossessionForm
     template_name = 'tracker/basic_form.html'
@@ -185,7 +230,12 @@ class RiderEdit(LoginRequiredMixin, UpdateView):
     template_name = 'tracker/riders_edit.html'
 
 
-class AllRiders(LoginRequiredMixin, ListView):
+class AllRiders(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    ListView
+):
     model = Riders
 
     def get_context_data(self, **kwargs):
@@ -195,7 +245,12 @@ class AllRiders(LoginRequiredMixin, ListView):
         return context
 
 
-class OneRider(LoginRequiredMixin, DetailView):
+class OneRider(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    DetailView
+):
     model = Riders
 
     def get_context_data(self, **kwargs):
