@@ -1,95 +1,38 @@
-from datetime import datetime
+from unittest import mock
 
-import django
+import arrow
+from django.contrib.auth.models import User
 
 from tcr_tracker.tracker.errors import TrackerAlreadyAssigned
-
-django.setup()
 from django.test import TestCase
 from tcr_tracker.tracker.models import (
     Riders,
     Trackers,
-    RiderEvents,
-    TrackerEvents,
-    TrackerNotes,
-    RiderNotes
-)
+    RaceStatus)
+from django.db.utils import IntegrityError
 
 
-class TestRiders(TestCase):
+class TrackerRiderTests(TestCase):
+
     def setUp(self):
-        Riders().save()
-        Riders().save()
-        Trackers().save()
-        Trackers().save()
-        self.rider_1 = Riders.objects.all()[0]
-        self.rider_2 = Riders.objects.all()[1]
-        self.tracker_1 = Trackers.objects.all().first()
-        self.tracker_2 = Trackers.objects.all()[1]
-        self.test_datetime = datetime(2018, 1, 1)
+        self.rider_1 = Riders.objects.create()
+        self.rider_2 = Riders.objects.create()
+        self.tracker_1 = Trackers.objects.create()
+        self.tracker_2 = Trackers.objects.create()
+        self.user = User.objects.create()
 
-    def tearDown(self) -> None:
-        Riders.objects.all().delete()
-        Trackers.objects.all().delete()
-        RiderEvents.objects.all().delete()
-        TrackerEvents.objects.all().delete()
 
-    def test__record_tracker_rider_events(self):
-        returned_rider_event, returned_tracker_event = (
-            self.rider_1._record_tracker_rider_events(
-                    self.tracker_1,
-                    'add_tracker_assignment',
-                    self.test_datetime,
-                    100
-                )
-            )
-        all_rider_events = RiderEvents.objects.all()
-        all_tracker_events = TrackerEvents.objects.all()
-        self.assertEqual(len(all_rider_events), 1)
-        self.assertEqual(len(all_tracker_events), 1)
-        self.assertEqual(all_rider_events[0].event_type, 'add_tracker_assignment')
-        self.assertEqual(all_rider_events[0].balance_change, 100)
-        self.assertEqual(all_tracker_events[0].event_type, 'add_tracker_assignment')
-        self.assertEqual(
-            returned_rider_event, all_rider_events[0]
-        )
-        self.assertEqual(
-            returned_tracker_event, all_tracker_events[0]
-        )
-
-    def test__add_rider_and_tracker_notes(self):
-        returned_rider_event, returned_tracker_event = \
-            self.rider_1._record_tracker_rider_events(
-                self.tracker_1,
-                'add_tracker_assignment',
-                self.test_datetime,
-                100
-        )
-        self.rider_1._record_tracker_rider_notes(
-            self.tracker_1,
-            self.test_datetime,
-            'TEST NOTES',
-            returned_rider_event,
-            returned_tracker_event
-        )
-        rider_notes = RiderNotes.objects.all()
-        tracker_notes = TrackerNotes.objects.all()
-        self.assertEqual(len(rider_notes), 1)
-        self.assertEqual(len(tracker_notes), 1)
-        self.assertEqual(rider_notes[0].notes, 'TEST NOTES')
-        self.assertEqual(rider_notes[0].event, returned_rider_event)
-        self.assertEqual(tracker_notes[0].notes, 'TEST NOTES')
-        self.assertEqual(tracker_notes[0].event, returned_tracker_event)
+class TestRiders(TrackerRiderTests):
 
     def test_add_tracker_assignment(self):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
-        rider_from_db = Riders.objects.all()[0]
-        assigned_trackers = rider_from_db.assigned_trackers.all()
+        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        assigned_trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(assigned_trackers), 1
         )
@@ -104,50 +47,47 @@ class TestRiders(TestCase):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
         self.rider_1.tracker_add_assignment(
             self.tracker_2,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
-        rider_from_db = Riders.objects.get(id=1)
-        trackers = rider_from_db.assigned_trackers.all()
+        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(trackers), 2
         )
         self.assertEqual(
             rider_from_db.balance, -200
         )
-        self.assertEqual(
-            trackers[0], self.tracker_1
-        )
-        self.assertEqual(
-            trackers[1], self.tracker_2
+        self.assertCountEqual(
+            trackers, [self.tracker_1, self.tracker_2]
         )
 
     def test_remove_tracker_assignment(self):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
-        rider_from_db = Riders.objects.get(id=1)
-        trackers = rider_from_db.assigned_trackers.all()
+        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             trackers[0], self.tracker_1
         )
         self.rider_1.tracker_remove_assignment(
             self.tracker_1,
             None,
-            self.test_datetime,
-            100
+            100,
+            self.user.profile
         )
         rider_from_db.refresh_from_db()
-        trackers = rider_from_db.assigned_trackers.all()
+        trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(trackers), 0
         )
@@ -159,33 +99,81 @@ class TestRiders(TestCase):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            100
+            100,
+            self.user.profile
         )
 
         with self.assertRaises(TrackerAlreadyAssigned):
             self.rider_2.tracker_add_assignment(
                 self.tracker_1,
                 None,
-                100
+                100,
+                self.user.profile
             )
 
 
-class TestTrackers(TestCase):
-
-    def setUp(self):
-        Trackers().save()
-        Riders().save()
-        self.tracker = Trackers.objects.all()[0]
-        self.rider = Riders.objects.all()[0]
-
-    def tearDown(self):
-        Trackers.objects.all().delete()
-        Riders.objects.all().delete()
+class TestTrackers(TrackerRiderTests):
 
     def test_is_assignable_not_assignable(self):
-        self.assertTrue(self.tracker.assignable)
+        self.assertTrue(self.tracker_1.assignable)
 
     def test_is_assignable_assignable(self):
-        self.tracker.rider_assigned = self.rider
-        self.assertFalse(self.tracker.assignable)
+        self.tracker_1.rider_assigned = self.rider_1
+        self.assertFalse(self.tracker_1.assignable)
 
+
+class TestRaceStatus(TestCase):
+
+    def setUp(self):
+        self.mock_time = arrow.Arrow(2019, 1, 1).datetime
+        self.pr = RaceStatus.objects.create(
+            status='pre_race',
+        )
+
+    def test_status_is_pre_race(self):
+        self.assertTrue(self.pr.pre_race)
+
+    def test_uniqueness(self):
+
+        with self.assertRaises(IntegrityError):
+            RaceStatus.objects.create(status='pre_race')
+
+    def test_race_seconds(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = self.mock_time
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 1, 1, 10, 10, 10)):
+            self.assertEquals(started.race_seconds, 36610)
+
+    def test_elapsed_string_0_days(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = self.mock_time
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 1, 1, 10, 10, 10)):
+            self.assertEquals(started.elapsed_time_string, '0 Days 10 Hours 10 Minutes')
+
+    def test_elapsed_string_multiple_days(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = self.mock_time
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 1, 4, 10, 10, 10)):
+            self.assertEquals(started.elapsed_time_string, '3 Days 10 Hours 10 Minutes')
+
+    def test_elapsed_string_over_month_boundary(self):
+        started = RaceStatus.objects.create(
+            status='started',
+        )
+        started.created = arrow.Arrow(2019, 7, 28)
+        # number of seconds in ten hours, ten minutes, ten seconds = 36000 + 600 + 10 = 36610
+        with mock.patch('tcr_tracker.tracker.models.arrow.now', return_value=arrow.Arrow(
+                2019, 8, 1, 10, 10, 10)):
+            self.assertEquals(started.elapsed_time_string, '4 Days 10 Hours 10 Minutes')
