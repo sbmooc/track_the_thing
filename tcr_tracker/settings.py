@@ -132,3 +132,5 @@ STATIC_URL = '/static/'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = '/trackers'
+
+SENTRY_API_KEY = os.environ.get('SENTRY_API', None)
