@@ -41,6 +41,7 @@
 
     <div id="content-wrapper">
     <div class="container-fluid">
+    {{ environment }}
         {% if not environment == 'prod' %}
             <div class="row bg-danger justify-content-center h-100">***</div>
             <div class="row bg-danger justify-content-center h-100">
