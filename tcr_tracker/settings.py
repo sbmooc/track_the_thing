@@ -20,12 +20,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'kg_fftds@&uk4tc&368z1*91j^hf#uuti#n^7b%sbh1f%q@!_#'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
+                            'kg_fftds@&uk4tc&368z1*91j^hf#uuti#n^7b%sbh1f%q@!_#')
+
+ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'local')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if ENVIRONMENT == 'prod' else True
+
 
 ALLOWED_HOSTS = ['134.209.26.237', '127.0.0.1']
+
 
 # Application definition
 
@@ -76,12 +81,15 @@ WSGI_APPLICATION = 'tcr_tracker.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
+     'default': {
+                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                 'NAME': os.environ.get('DB_NAME', 'tracker'),
+                 'USER': os.environ.get('DB_USER', 'track_thing'),
+                 'PASSWORD': os.environ.get('DB_PW', ''),
+                 'HOST': os.environ.get('DB_HOST', 'localhost'),
+                 'PORT': os.environ.get('DB_PORT', '5432'),
+     }
+ }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -122,3 +130,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOGIN_REDIRECT_URL = '/trackers'
