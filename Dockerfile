@@ -1,8 +1,9 @@
-FROM tiangolo/uwsgi-nginx:python3.7
+FROM matthieugouel/python-gunicorn-nginx:latest
+MAINTAINER Matthieu Gouel <matthieu.gouel@gmail.com>
 
-RUN apt update
-RUN apt install -y postgresql postgresql-contrib
-ENV UWSGI_INI tcr_tracker/uwsgi.ini
-COPY . /tracker
-WORKDIR /tracker
-RUN pip install -r requirements.txt
+# Copy the application
+COPY . /app
+
+# Install application requirements
+RUN pip install -U pip
+RUN pip install -r /app/requirements.txt
