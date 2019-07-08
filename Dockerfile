@@ -1,9 +1,9 @@
-FROM python:3.7-stretch
+FROM tiangolo/uwsgi-nginx:python3.7
 
-RUN mkdir /src
-WORKDIR /src
+RUN mkdir /app
+WORKDIR /app
 RUN apt update
 RUN apt install -y postgresql postgresql-contrib
-COPY . /src
+COPY . /app
 RUN pip install -r requirements.txt
 
