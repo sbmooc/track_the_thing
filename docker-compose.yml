@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    container_name: django-gunicorn
+    restart: always
+    environment:
+      - DB_NAME
+      - DB_USER
+      - DJANGO_SECRET_KEY
+      - DB_HOST
+      - DB_PORT
+      - DB_PW
+      - SENTRY_API
+      - DJANGO_ENVIRONMENT
+    ports:
+      - "8000:8000"
+    command:
+      "gunicorn --workers=2 --bind=0.0.0.0:8000 tcr_tracker.wsgi:application"
+
+  nginx:
+    image: nginx:1.17
+    container_name: ngx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
