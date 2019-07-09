@@ -38,28 +38,15 @@
     <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            <div class="col my-2">
-                <!--todo: add race status / checkpoint form and url-->
-                <a href="#">
-                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Add race event</button>
-                </a>
-            </div>
-            <div class="col my-2">
-                <a href="{{ riders.url_add_notes }}">
-                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Add note</button>
-                </a>
-            </div>
-            <div class="col my-2">
-                <a href="{{ riders.url_assign_tracker }}">
-                    <!--todo: show only buttons for actions that are relevant to the context-->
-                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Assign/Deassign</button>
-                </a>
-            </div>
-            <div class="col my-2">
-                <a href="{{ riders.url_possess_tracker }}">
-                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Give/Retrieve</button>
-                </a>
-            </div>
+            {% for button in riders.get_buttons.values %}
+                {% if button.display %}
+                    <div class="col my-2">
+                        <a href={{ button.url }}>
+                            <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 
@@ -67,34 +54,35 @@
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
-                <h5>Notes</h5>
+                <h5>Events and notes</h5>
             </div>
         </div>
         <ul class="list-group">
-            {% if not riders.all_notes_and_events %}
+            {% if not riders.all_events %}
                 <li class="list-group-item">
                     <div>
-                        There are no notes or events for this rider.
+                        There are no events or notes for this rider.
                     </div>
                 </li>
             {% else %}
-                {% for item in riders.all_notes_and_events %}
+                {% for event in riders.all_events reversed %}
                     <li class="list-group-item">
                         <div style="color: grey; font-style: italic">
-                             {{ item.created }}   {{ item.user }}
+                             {{ event.created }}
                         </div>
-                        <div>
-                            {% if item.event %}
-                                <b>(Event: {{ item.event.event_type }})</b>
-                            {% elif item.event_type %}
-                                <b>(Event: {{ item.event_type }})</b>
-                            {% endif %}
-                        </div>
-                        <div>
-                            {% if item.notes %}
-                                {{ item.notes }}
-                            {% endif %}
-                        </div>
+                        {% if event.event_type != "add_note" %}
+                            <div>
+                                <b>Event:</b> {{ event.event_type }}
+                                {% if event.rider %}
+                                    (Tracker: <a href={{ event.tracker.url }}>{{ event.tracker.tcr_id }}</a>)
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        {% if event.notes %}
+                            <div>
+                                <b>Note:</b> {{ event.notes }}
+                            </div>
+                        {% endif %}
                     </li>
                 {% endfor %}
             {% endif %}
