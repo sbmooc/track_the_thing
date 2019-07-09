@@ -16,9 +16,8 @@ services:
       - DJANGO_ENVIRONMENT
     ports:
       - "8000:8000"
-#    command:
-#      "gunicorn --workers=2 --bind=0.0.0.0:8000 tcr_tracker.wsgi:application"
-
+      command:
+        "gunicorn --workers=2 --bind=0.0.0.0:8000 tcr_tracker.run:app"
   nginx:
     image: nginx:1.17
     container_name: ngx
@@ -28,3 +27,6 @@ services:
       - ./nginx:/etc/nginx/conf.d
     depends_on:
       - app
+
+
+
