@@ -1,1 +1,1 @@
-web: gunicorn tcr_tracker.run:app
+web: gunicorn tcr_tracker.wsgi:application
