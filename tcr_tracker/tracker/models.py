@@ -96,10 +96,11 @@ class Profile(models.Model):
 class TimeStampedModel(models.Model):
     created = DateTimeField(auto_now_add=True)
     modified = DateTimeField(auto_now=True)
-    user = ForeignKey(
-        Profile,
-        on_delete=models.SET_NULL, null=True
-    )
+    # todo: uncomment before merge
+    # user = ForeignKey(
+    #     Profile,
+    #     on_delete=models.SET_NULL, null=True
+    # )
 
 
 class AbstractModel(models.Model):
@@ -350,6 +351,11 @@ class Trackers(AbstractModel):
                 'label': 'Retrieve',
                 'url': self.url_possess_tracker,
                 'display': self.retrieve_button_display_state
+            },
+            'notes': {
+                'label': 'Add note',
+                'url': self.url_add_notes,
+                'display': True
             }
             # 'pre_assign': {
             #     'label': 'Pre Assign',

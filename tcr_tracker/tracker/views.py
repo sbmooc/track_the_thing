@@ -31,7 +31,8 @@ class RiderAddNotes(
         Events.objects.create(
             rider=self.object,
             notes=form.cleaned_data['notes'],
-            user=self.request.user.profile
+            # todo: uncomment before merge
+            # user=self.request.user.profile
         )
         return super(RiderAddNotes, self).form_valid(form)
 
@@ -50,7 +51,8 @@ class TrackerAddNotes(
         Events.objects.create(
             tracker=self.object,
             notes=form.cleaned_data['notes'],
-            user=self.request.user.profile
+            # todo: uncomment before merge
+            # user=self.request.user.profile
         )
         return super(TrackerAddNotes, self).form_valid(form)
 
