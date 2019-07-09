@@ -31,7 +31,6 @@ class RiderAddNotes(
         Events.objects.create(
             rider=self.object,
             notes=form.cleaned_data['notes'],
-            # todo: uncomment before merge
             user=self.request.user.profile
         )
         return super(RiderAddNotes, self).form_valid(form)
@@ -51,7 +50,6 @@ class TrackerAddNotes(
         Events.objects.create(
             tracker=self.object,
             notes=form.cleaned_data['notes'],
-            # todo: uncomment before merge
             user=self.request.user.profile
         )
         return super(TrackerAddNotes, self).form_valid(form)
@@ -73,14 +71,12 @@ class TrackerRiderPossession(
             rider.tracker_add_possession(
                 self.object,
                 form.cleaned_data['notes'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         else:
             rider.tracker_remove_possession(
                 self.object,
                 form.cleaned_data['notes'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         return HttpResponseRedirect(self.get_success_url())
@@ -103,7 +99,6 @@ class TrackerRiderAssignment(
                 self.object,
                 form.cleaned_data['notes'],
                 form.cleaned_data['deposit'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         else:
@@ -111,7 +106,6 @@ class TrackerRiderAssignment(
                 self.object,
                 form.cleaned_data['notes'],
                 form.cleaned_data['deposit'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         return HttpResponseRedirect(self.get_success_url())
@@ -192,7 +186,6 @@ class RiderTrackerAssignment(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
                 form.cleaned_data['deposit'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         else:
@@ -200,7 +193,6 @@ class RiderTrackerAssignment(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
                 form.cleaned_data['deposit'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         return super(RiderTrackerAssignment, self).form_valid(form)
@@ -221,14 +213,12 @@ class RiderTrackerPossession(
             self.object.tracker_add_possession(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         else:
             self.object.tracker_remove_possession(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
-                # todo: uncomment before merge
                 self.request.user.profile
             )
         return super(RiderTrackerPossession, self).form_valid(form)
