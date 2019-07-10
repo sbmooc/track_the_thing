@@ -23,13 +23,13 @@
   <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded">
   <!--<nav class="navbar fixed-top navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded" style="padding-top: 60px;">-->
     <!--Replace with consistent link to trackers_list.html at all points-->
-      <a class="nav-item nav-link" style="{% if active_tab != 'trackers' %} color: DeepSkyBlue {% endif %}" href="{% url 'all_trackers' %}">
+      <a class="nav-item nav-link" style="{% if active_tab != 'trackers' %} color: slategray {% endif %}" href="{% url 'all_trackers' %}">
         <div>
           <i class="fa fa-satellite"></i>
         </div>
         <div>Trackers</div>
       </a>
-    <a class="nav-item nav-link" style="{% if active_tab != 'riders' %} color: DeepSkyBlue {% endif %}" href="{% url 'all_riders' %}">
+    <a class="nav-item nav-link" style="{% if active_tab != 'riders' %} color: slategray {% endif %}" href="{% url 'all_riders' %}">
         <div>
           <i class="fa fa-bicycle"></i>
         </div>

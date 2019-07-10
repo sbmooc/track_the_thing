@@ -172,6 +172,11 @@ class Riders(AbstractModel):
     def url_refund(self):
         pass
 
+    # todo: add url for deposits
+    @property
+    def url_add_deposit(self):
+        pass
+
     @property
     def assign_button_display_state(self):
         return True
@@ -193,12 +198,16 @@ class Riders(AbstractModel):
         return True
 
     @property
+    def scratch_button_display_state(self):
+        return True if self.status == 'active' else False
+
+    @property
     def refund_button_display_state(self):
         return True if self.status != 'active' else False
 
     @property
-    def scratch_button_display_state(self):
-        return True if self.status == 'active' else False
+    def deposit_button_display_state(self):
+        return True
 
     @property
     def get_buttons(self):
@@ -234,17 +243,23 @@ class Riders(AbstractModel):
                 'staff_only': True,
                 'display': self.de_assign_button_display_state
             },
+            'scratch': {
+                'label': 'Scratch Rider',
+                'url': reverse('scratch_rider', kwargs={'pk': self.id}),
+                'staff_only': True,
+                'display': self.scratch_button_display_state
+            },
             'refund': {
                 'label': 'Refund',
                 'url': self.url_refund,
                 'staff_only': True,
                 'display': self.refund_button_display_state
             },
-            'scratch': {
-                'label': 'Scratch Rider',
-                'url': reverse('scratch_rider', kwargs={'pk': self.id}),
+            'add_deposit': {
+                'label': 'Add deposit',
+                'url': self.url_add_deposit,
                 'staff_only': True,
-                'display': self.scratch_button_display_state
+                'display': self.deposit_button_display_state
             },
             'notes': {
                 'label': 'Add note',

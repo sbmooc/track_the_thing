@@ -5,26 +5,12 @@
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
-            <div class="col-4 my-auto">Status:</div>
+            <div class="col-5 my-auto">Status:</div>
             <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
             <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
         </div>
         <div class="row my-2">
-            <div class="col-4 my-auto">Assignment:</div>
-            {% if trackers.rider_assigned %}
-                <div class="col my-auto">
-                    <a href="{{ trackers.rider_assigned.url }}">
-                        {{ trackers.rider_assigned }}
-                    </a>
-                </div>
-            {% else %}
-                <div class="col my-auto">
-                    N/A
-                </div>
-            {% endif %}
-        </div>
-        <div class="row my-2">
-            <div class="col-4 my-auto">Possession:</div>
+            <div class="col-5 my-auto">Possession:</div>
             {% if trackers.rider_possesed %}
                 <div class="col my-auto">
                     <a href="{{ trackers.rider_possesed.url }}">
@@ -37,6 +23,22 @@
                 </div>
             {% endif %}
         </div>
+        {% if user.profile.is_tcr_staff %}
+            <div class="row my-2">
+                <div class="col-5 my-auto">Assignment:</div>
+                {% if trackers.rider_assigned %}
+                    <div class="col my-auto">
+                        <a href="{{ trackers.rider_assigned.url }}">
+                            {{ trackers.rider_assigned }}
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="col my-auto">
+                        N/A
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 
     <!--Event buttons-->
