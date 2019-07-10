@@ -114,6 +114,10 @@ class AbstractModel(models.Model):
     def url(self):
         return self.get_absolute_url()
 
+    @property
+    def race_status(self):
+        return RaceStatus.objects.last().status
+
     class Meta:
         abstract = True
 
@@ -134,9 +138,6 @@ class Riders(AbstractModel):
     tracker_url = CharField(null=True, max_length=200, blank=True)
     status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
 
-    @property
-    def race_status(self):
-        return RaceStatus.objects.last().status
 
     @property
     def current_tracker(self):
@@ -145,7 +146,6 @@ class Riders(AbstractModel):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
-
 
     @property
     def all_events(self):
