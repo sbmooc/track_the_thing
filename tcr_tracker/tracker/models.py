@@ -510,6 +510,10 @@ class Events(TimeStampedModel):
     )
     notes = TextField(null=True, blank=True)
     deposit_change = IntegerField(null=True, blank=True)
+    input_by = CharField(
+        max_length=50,
+        null=True
+    )
 
 
 class RaceStatus(TimeStampedModel):

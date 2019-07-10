@@ -5,38 +5,21 @@ from django import forms
 from tcr_tracker.tracker.models import Trackers, Riders
 
 
-class AddNotesForm(forms.ModelForm):
+class AddNotesForm(forms.Form):
     notes = forms.CharField()
+    input_by = forms.CharField()
 
     class Meta:
         fields = (
             'notes',
+            'input_by'
         )
 
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
-
-
-class AddRiderNotes(AddNotesForm):
-
-    class Meta:
-        fields = (
-            'notes',
-        )
-        model = Riders
-
-
-class AddTrackerNotes(AddNotesForm):
-
-    class Meta:
-        fields = (
-            'notes',
-        )
-        model = Trackers
 
 
 class EditTracker(forms.ModelForm):

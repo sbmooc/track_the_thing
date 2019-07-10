@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, UpdateView
+from django.views.generic import ListView, DetailView, UpdateView, FormView
 from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin
 
 from tcr_tracker.forms import (
@@ -10,49 +10,81 @@ from tcr_tracker.forms import (
     RiderTrackerPossessionForm,
     TrackerRiderAssignmentForm,
     TrackerRiderPossessionForm,
-    AddRiderNotes,
-    AddTrackerNotes
+    AddNotesForm
 )
 
 from tcr_tracker.tracker.models import Trackers, Riders, Events
 
 
-class RiderAddNotes(
+class AddNotes(
     RaceStatusMixin,
     EnvironmentMixin,
     LoginRequiredMixin,
-    UpdateView
+    FormView
 ):
-    form_class = AddRiderNotes
-    model = Riders
+    form_class = AddNotesForm
     template_name = 'tracker/basic_form.html'
+    object = None
+
+    def get_object(self):
+        path_string = self.request.path
+        model_names = {
+            'trackers': Trackers,
+            'riders': Riders
+        }
+        model, pk, _ = path_string[1:].split('/')
+        self.object = model_names[model].objects.get(id=pk)
 
     def form_valid(self, form):
+        self.get_object()
         Events.objects.create(
-            rider=self.object,
+            event_type='add_note',
             notes=form.cleaned_data['notes'],
-            user=self.request.user.profile
+            user=self.request.user.profile,
+            input_by=form.cleaned_data['input_by'],
+            tracker=self.object if type(self.object) is Trackers else None,
+            rider=self.object if type(self.object) is Riders else None
         )
-        return super(RiderAddNotes, self).form_valid(form)
+        return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class TrackerAddNotes(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    UpdateView
-):
-    form_class = AddTrackerNotes
-    model = Trackers
-    template_name = 'tracker/basic_form.html'
 
-    def form_valid(self, form):
-        Events.objects.create(
-            tracker=self.object,
-            notes=form.cleaned_data['notes'],
-            user=self.request.user.profile
-        )
-        return super(TrackerAddNotes, self).form_valid(form)
+# class RiderAddNotes(
+#     RaceStatusMixin,
+#     EnvironmentMixin,
+#     LoginRequiredMixin,
+#     UpdateView
+# ):
+#     form_class = AddRiderNotes
+#     model = Riders
+#     template_name = 'tracker/basic_form.html'
+#
+#     def form_valid(self, form):
+#         Events.objects.create(
+#             rider=self.object,
+#             notes=form.cleaned_data['notes'],
+#             user=self.request.user.profile
+#         )
+#         return super(RiderAddNotes, self).form_valid(form)
+#
+#
+# class TrackerAddNotes(
+#     RaceStatusMixin,
+#     EnvironmentMixin,
+#     LoginRequiredMixin,
+#     UpdateView
+# ):
+#     form_class = AddTrackerNotes
+#     model = Trackers
+#     template_name = 'tracker/basic_form.html'
+#
+#     def form_valid(self, form):
+#         Events.objects.create(
+#             tracker=self.object,
+#             notes=form.cleaned_data['notes'],
+#             user=self.request.user.profile
+#         )
+#         return super(TrackerAddNotes, self).form_valid(form)
 
 
 class TrackerRiderPossession(
