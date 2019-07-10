@@ -39,15 +39,15 @@
 <!--Main content-->
   <div id="wrapper" style="padding-top: 60px;">
 
-    <div id="content-wrapper">
-    <div class="container-fluid">
-        {% if environment != 'prod' %}
-            <div class="row bg-danger justify-content-center h-100">***</div>
-            <div class="row bg-danger justify-content-center h-100">
-                DEMO ENVIRONMENT - THIS IS NOT THE REAL THING</div>
-            <div class="row bg-danger justify-content-center h-100">***</div>
-        {% endif %}
-    </div>
+    <div id="content-wrapper" class="container px-0">
+      <div class="container-fluid">
+          {% if environment != 'prod' %}
+              <div class="row bg-danger justify-content-center h-100">***</div>
+              <div class="row bg-danger justify-content-center h-100">
+                  DEMO ENVIRONMENT - THIS IS NOT THE REAL THING</div>
+              <div class="row bg-danger justify-content-center h-100">***</div>
+          {% endif %}
+      </div>
 
       <div class="container-fluid" style="font-size: 80%">
 
