@@ -14,7 +14,7 @@ from tcr_tracker.forms import (
     TrackerRiderPossessionForm,
     AddNotesForm,
     RiderControlPointForm,
-    ScratchRiderForm)
+    ScratchRiderForm, TrackerRiderForm)
 
 from tcr_tracker.tracker.models import Trackers, Riders, Events, RiderControlPoints, RaceStatus
 
@@ -40,15 +40,8 @@ class ScratchRider(
         self.object.save()
         return HttpResponseRedirect(self.object.get_absolute_url())
 
-class AddNotes(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    FormView
-):
-    form_class = AddNotesForm
-    template_name = 'tracker/basic_form.html'
-    object = None
+
+class GetObjectMixin:
 
     def get_object(self):
         path_string = self.request.path
@@ -58,6 +51,18 @@ class AddNotes(
         }
         model, pk, _ = path_string[1:].split('/')
         self.object = model_names[model].objects.get(id=pk)
+
+class AddNotes(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    GetObjectMixin,
+    FormView
+):
+    form_class = AddNotesForm
+    template_name = 'tracker/basic_form.html'
+    object = None
+
 
     def form_valid(self, form):
         self.get_object()
@@ -322,3 +327,26 @@ class OneRider(
         context['active_tab'] = 'riders'
         return context
 
+
+class TrackerRider(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    GetObjectMixin,
+    FormView
+):
+    form_class = TrackerRiderForm
+    template_name = 'tracker/basic_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(TrackerRider, self).get_form_kwargs()
+        self.get_object()
+        kwargs.update(
+            {
+                'obj': self.object
+            }
+        )
+        return kwargs
+
+    def form_valid(self, form):
+        pass

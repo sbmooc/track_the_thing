@@ -477,7 +477,7 @@ class Trackers(AbstractModel):
         verbose_name_plural = 'Trackers'
 
     def __str__(self):
-        return str(self.id)
+        return str(self.tcr_id)
 
 
 class Events(TimeStampedModel):

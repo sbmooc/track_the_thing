@@ -148,6 +148,37 @@ class TrackerRiderAssignmentForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Save'))
 
 
+class TrackerRiderForm(forms.Form):
+
+    def __init__(self, obj=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
+        self.define_fields(obj)
+
+    def define_fields(self, obj):
+        if type(obj) is Trackers:
+            self.add_tracker_fields()
+        else:
+            self.add_rider_fields()
+        self.fields['notes'] = forms.CharField(required=False)
+        self.fields['deposit'] = forms.IntegerField()
+
+    def add_tracker_fields(self):
+        self.fields['rider'] = forms.ModelChoiceField(queryset=Riders.objects.all())
+
+    def add_rider_fields(self):
+        self.fields['tracker'] = forms.ModelChoiceField(
+            queryset=Trackers.objects.filter(
+                rider_assigned=None
+            ),
+            initial=Trackers.objects.filter(
+                rider_assigned=None
+            ).first()
+        )
+
+
 class RiderTrackerAssignmentForm(forms.ModelForm):
 
     tracker = forms.ModelChoiceField(
