@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include, reverse
+from django.urls import path, include
 from django.views.generic import RedirectView
 
 from tcr_tracker.tracker.views import (
@@ -14,9 +14,11 @@ from tcr_tracker.tracker.views import (
     RiderTrackerPossession,
     TrackerRiderPossession,
     TrackerRiderAssignment,
-    AddNotes, RiderControlpointView, ScratchRider, TrackerRider)
-
-
+    AddNotes,
+    RiderControlpointView,
+    ScratchRider,
+    TrackerRider
+)
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='/accounts/login', permanent=False), name='index'),

@@ -175,14 +175,8 @@ class Riders(AbstractModel):
 
     @property
     def pre_assign_button_display_state(self):
-        display_state = False
-
         # If pre-race, then show unless also given to rider. Combine assignment with possession during race.
-        if self.pre_race:
-            if self.current_tracker is None:
-                display_state = True
-
-        return display_state
+        return True if self.pre_race and not self.current_tracker else False
 
     @property
     def de_assign_button_display_state(self):
@@ -240,7 +234,7 @@ class Riders(AbstractModel):
             },
             'pre_assign': {
                 'label': 'Pre-assign tracker',
-                'url': self.url_assign_tracker,
+                'url': reverse('rider_test', kwargs={'pk': self.id}),
                 'display': self.pre_assign_button_display_state
             },
             'de_assign': {
