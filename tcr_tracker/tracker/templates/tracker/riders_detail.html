@@ -7,7 +7,13 @@
 </div>
 {% endblock %}
 {% block content %}
-
+{% if brevet_data %}
+<div class="container-fluid">
+    <div class="row my-2">
+        Time for brevet card: {{brevet_data}}
+    </div>
+</div>
+{% endif %}
     <!--status headers-->
     <!--todo: reduce gutter size-->
     <div class="container-fluid">

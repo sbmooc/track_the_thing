@@ -16,7 +16,7 @@ from tcr_tracker.forms import (
     RiderControlPointForm
 )
 
-from tcr_tracker.tracker.models import Trackers, Riders, Events, RiderControlPoints
+from tcr_tracker.tracker.models import Trackers, Riders, Events, RiderControlPoints, RaceStatus
 
 
 class AddNotes(
@@ -51,7 +51,6 @@ class AddNotes(
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-
 class RiderControlpointView(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -68,18 +67,22 @@ class RiderControlpointView(
         return initial
 
     def form_valid(self, form):
+        time_elapsed = RaceStatus.last().elapsed_time_string
         RiderControlPoints.objects.create(
             rider=self.object,
             control_point=form.cleaned_data['control_point'],
             race_time=form.cleaned_data['race_time'],
-            input_by=form.cleaned_data['input_by']
+            input_by=form.cleaned_data['input_by'],
+            race_time_string=time_elapsed
         )
         Events.objects.create(
             event_type='arrive_checkpoint',
             rider=self.object,
             input_by=form.cleaned_data['input_by'],
-            control_point=form.cleaned_data['control_point']
+            control_point=form.cleaned_data['control_point'],
+            notes=time_elapsed
         )
+        self.request.session['brevet_data'] = time_elapsed
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
@@ -293,6 +296,7 @@ class OneRider(
 
     def get_context_data(self, **kwargs):
         context = super(OneRider, self).get_context_data(**kwargs)
+        context['brevet_data'] = self.request.session.get('brevet_data')
         context['rider_dict'] = context['riders'].__dict__
         context['page_title'] = 'Rider: %s' % context['riders'].full_name
         context['active_tab'] = 'riders'

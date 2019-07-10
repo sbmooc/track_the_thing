@@ -91,6 +91,7 @@ class Profile(models.Model):
         on_delete=models.CASCADE
     )
     is_tcr_staff = BooleanField(null=True)
+    is_collective_user = BooleanField(null=True)
 
 
 class TimeStampedModel(models.Model):
@@ -561,6 +562,9 @@ class RaceStatus(TimeStampedModel):
             )
             return f'{days} Days {hours} Hours {minutes} Minutes'
 
+    def __str__(self):
+        return self.status
+
 
 class ControlPoints(models.Model):
     name = CharField(max_length=50)
@@ -586,6 +590,9 @@ class RiderControlPoints(TimeStampedModel):
     race_time = DateField()
     input_by = CharField(
        max_length=50
+    )
+    race_time_string = CharField(
+        max_length=100
     )
 
 
