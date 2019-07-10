@@ -1,5 +1,5 @@
 from django.contrib import admin
-from tcr_tracker.tracker.models import Riders, Trackers, Events, RaceStatus, Profile
+from tcr_tracker.tracker.models import Riders, Trackers, Events, RaceStatus, Profile, ControlPoints
 
 
 @admin.register(Riders)
@@ -24,4 +24,9 @@ class RaceStatusAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ControlPoints)
+class ControlPointAdmin(admin.ModelAdmin):
     pass

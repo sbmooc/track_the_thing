@@ -508,6 +508,13 @@ class Events(TimeStampedModel):
         blank=True,
         related_name='events',
     )
+    control_point = ForeignKey(
+        'tracker.ControlPoints',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='events'
+    )
     notes = TextField(null=True, blank=True)
     deposit_change = IntegerField(null=True, blank=True)
     input_by = CharField(
@@ -555,23 +562,30 @@ class RaceStatus(TimeStampedModel):
             return f'{days} Days {hours} Hours {minutes} Minutes'
 
 
-class Checkpoints(models.Model):
+class ControlPoints(models.Model):
     name = CharField(max_length=50)
     abbreviation = CharField(max_length=50)
     latitude = CharField(max_length=50)
     longitude = CharField(max_length=50)
 
+    def __str__(self):
+        return self.abbreviation
 
-class RiderCheckpoints(TimeStampedModel):
+
+class RiderControlPoints(TimeStampedModel):
     rider = ForeignKey(
         Riders,
         on_delete=models.SET_NULL, null=True,
         related_name='checkpoints',
     )
-    checkpoint = ForeignKey(
-        Riders,
+    control_point = ForeignKey(
+        ControlPoints,
         on_delete=models.SET_NULL, null=True,
         related_name='riders'
+    )
+    race_time = DateField()
+    input_by = CharField(
+       max_length=50
     )
 
 

@@ -1,8 +1,10 @@
+from arrow import arrow
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, UpdateView, FormView
+from django.views import View
+from django.views.generic import ListView, DetailView, UpdateView, FormView, CreateView
 from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin
-
+from dateutil import tz
 from tcr_tracker.forms import (
     EditTracker,
     EditRider,
@@ -10,10 +12,11 @@ from tcr_tracker.forms import (
     RiderTrackerPossessionForm,
     TrackerRiderAssignmentForm,
     TrackerRiderPossessionForm,
-    AddNotesForm
+    AddNotesForm,
+    RiderControlPointForm
 )
 
-from tcr_tracker.tracker.models import Trackers, Riders, Events
+from tcr_tracker.tracker.models import Trackers, Riders, Events, RiderControlPoints
 
 
 class AddNotes(
@@ -49,42 +52,35 @@ class AddNotes(
 
 
 
-# class RiderAddNotes(
-#     RaceStatusMixin,
-#     EnvironmentMixin,
-#     LoginRequiredMixin,
-#     UpdateView
-# ):
-#     form_class = AddRiderNotes
-#     model = Riders
-#     template_name = 'tracker/basic_form.html'
-#
-#     def form_valid(self, form):
-#         Events.objects.create(
-#             rider=self.object,
-#             notes=form.cleaned_data['notes'],
-#             user=self.request.user.profile
-#         )
-#         return super(RiderAddNotes, self).form_valid(form)
-#
-#
-# class TrackerAddNotes(
-#     RaceStatusMixin,
-#     EnvironmentMixin,
-#     LoginRequiredMixin,
-#     UpdateView
-# ):
-#     form_class = AddTrackerNotes
-#     model = Trackers
-#     template_name = 'tracker/basic_form.html'
-#
-#     def form_valid(self, form):
-#         Events.objects.create(
-#             tracker=self.object,
-#             notes=form.cleaned_data['notes'],
-#             user=self.request.user.profile
-#         )
-#         return super(TrackerAddNotes, self).form_valid(form)
+class RiderControlpointView(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
+    model = Riders
+    template_name = 'tracker/basic_form.html'
+    form_class = RiderControlPointForm
+
+    def get_initial(self):
+        initial = super(RiderControlpointView, self).get_initial()
+        initial['race_time'] = arrow.Arrow.now(tzinfo=tz.gettz('Europe/Paris')).datetime
+        return initial
+
+    def form_valid(self, form):
+        RiderControlPoints.objects.create(
+            rider=self.object,
+            control_point=form.cleaned_data['control_point'],
+            race_time=form.cleaned_data['race_time'],
+            input_by=form.cleaned_data['input_by']
+        )
+        Events.objects.create(
+            event_type='arrive_checkpoint',
+            rider=self.object,
+            input_by=form.cleaned_data['input_by'],
+            control_point=form.cleaned_data['control_point']
+        )
+        return HttpResponseRedirect(self.object.get_absolute_url())
 
 
 class TrackerRiderPossession(
