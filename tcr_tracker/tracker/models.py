@@ -138,7 +138,6 @@ class Riders(AbstractModel):
     tracker_url = CharField(null=True, max_length=200, blank=True)
     status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
 
-
     @property
     def current_tracker(self):
         return self.trackers_possessed.all().last() or None
@@ -174,98 +173,84 @@ class Riders(AbstractModel):
         pass
 
     @property
-    def pre_assign_button_display_state(self):
-        # If pre-race, then show unless also given to rider. Combine assignment with possession during race.
-        return True if self.pre_race and not self.current_tracker else False
+    def assign_button_display_state(self):
+        return True
 
     @property
     def de_assign_button_display_state(self):
-        display_state = False
-
-        # If during race, rider not active, all trackers returned and tested
-        if not self.pre_race:
-            if self.race_status != 'active' and self.current_tracker is None:
-                display_state = True
-                for tracker in self.trackers_assigned.all():
-                    if tracker.working_status == 'to_be_tested':
-                        display_state = False
-                        break
-
-        return display_state
+        return True
 
     @property
     def give_button_display_state(self):
-        # if pre-race, only when assigned
-        if self.pre_race:
-            if self.current_tracker is None and self.trackers_assigned.all() is None:
-                return True
-            else:
-                return False
-
-        if self.status == 'finished' or self.status == 'scratched':
-            return False
-
         return True
 
     @property
     def retrieve_button_display_state(self):
-        return True if self.current_tracker else False
+        return True
 
     @property
     def race_event_button_display_state(self):
-        return True if not self.pre_race and self.status == 'active' else False
+        return True
 
     @property
     def refund_button_display_state(self):
-        display_state = False
+        return True if self.status != 'active' else False
 
-        # todo: add logic
-
-        return display_state
+    @property
+    def scratch_button_display_state(self):
+        return True if self.status == 'active' else False
 
     @property
     def get_buttons(self):
         return {
+            'notes': {
+                'label': 'Add note',
+                'url': self.url_add_notes,
+                'staff_only': False,
+                'display': True
+            },
             'race_event': {
                 'label': 'Add race event',
                 # todo update url
                 'url': reverse('rider_add_control_point', kwargs={'pk': self.id}),
+                'staff_only': False,
                 'display': self.race_event_button_display_state
-            },
-            'pre_assign': {
-                'label': 'Pre-assign tracker',
-                'url': reverse('rider_test', kwargs={'pk': self.id}),
-                'display': self.pre_assign_button_display_state
-            },
-            'de_assign': {
-                'label': 'De-assign tracker',
-                'url': self.url_assign_tracker,
-                'display': self.de_assign_button_display_state
             },
             'give': {
                 'label': 'Give tracker',
                 'url': self.url_possess_tracker,
+                'staff_only': False,
                 'display': self.give_button_display_state
             },
             'retrieve': {
                 'label': 'Retrieve tracker',
                 'url': self.url_possess_tracker,
+                'staff_only': False,
                 'display': self.retrieve_button_display_state
+            },
+            'assign': {
+                'label': 'Assign tracker',
+                'url': reverse('rider_test', kwargs={'pk': self.id}),
+                'staff_only': True,
+                'display': self.assign_button_display_state
+            },
+            'de_assign': {
+                'label': 'De-assign tracker',
+                'url': self.url_assign_tracker,
+                'staff_only': True,
+                'display': self.de_assign_button_display_state
             },
             'refund': {
                 'label': 'Refund',
                 'url': self.url_refund,
+                'staff_only': True,
                 'display': self.refund_button_display_state
-            },
-            'notes': {
-                'label': 'Add note',
-                'url': self.url_add_notes,
-                'display': True
             },
             'scratch': {
                 'label': 'Scratch Rider',
                 'url': reverse('scratch_rider', kwargs={'pk': self.id}),
-                'display': False if self.status == 'finished' or self.status == 'scratched' else True
+                'staff_only': True,
+                'display': self.scratch_button_display_state
             }
         }
 
@@ -394,44 +379,15 @@ class Trackers(AbstractModel):
 
     @property
     def give_button_display_state(self):
-        display_state = False
-
-        # If pre-race, then only show when assigned but not yet possessed
-        if self.pre_race:
-            if self.rider_assigned and self.rider_possesed is None:
-                display_state = True
-
-        # During race, only show if assignable
-        elif self.assignable:
-            display_state = True
-
-        return display_state
+        return True
 
     @property
     def retrieve_button_display_state(self):
-        display_state = False
-
-        # At any time
-        if self.rider_possesed:
-            display_state = True
-
-        return display_state
+        return True
 
     @property
     def record_status_button_display_state(self):
-        display_state = False
-
-        # todo: add logic around admin users (across all cases)
-        # If pre-race, then show unless given to rider
-        if self.pre_race:
-            if self.rider_possesed is None:
-                display_state = True
-
-        # If during/after race, display when back in staff possession. Use form to set status to "to_be_tested"
-        elif self.working_status == 'to_be_tested':
-            display_state = True
-
-        return display_state
+        return True
 
     # @property
     # def pre_assign_button_display_state(self):
@@ -440,26 +396,30 @@ class Trackers(AbstractModel):
     @property
     def get_buttons(self):
         return {
+            'notes': {
+                'label': 'Add note',
+                'url': self.url_add_notes,
+                'staff_only': False,
+                'display': True
+            },
             'record_status': {
                 'label': 'Record status',
                 #todo update url
                 'url': self.record_test,
+                'staff_only': True,
                 'display': self.record_status_button_display_state
             },
             'give': {
                 'label': 'Give to rider',
                 'url': self.url_possess_tracker,
+                'staff_only': False,
                 'display': self.give_button_display_state
             },
             'retrieve': {
                 'label': 'Retrieve',
                 'url': self.url_possess_tracker,
+                'staff_only': False,
                 'display': self.retrieve_button_display_state
-            },
-            'notes': {
-                'label': 'Add note',
-                'url': self.url_add_notes,
-                'display': True
             }
         }
 

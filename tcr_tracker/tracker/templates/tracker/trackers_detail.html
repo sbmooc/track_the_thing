@@ -42,15 +42,27 @@
     <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            {% for button in trackers.get_buttons.values %}
-                {% if button.display %}
-                    <div class="col my-2">
-                        <a href={{ button.url }}>
-                            <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
-                        </a>
-                    </div>
-                {% endif %}
-            {% endfor %}
+            {% if user.profile.is_tcr_staff %}
+                {% for button in trackers.get_buttons.values %}
+                    {% if button.display %}
+                            <div class="col my-2">
+                                <a href={{ button.url }}>
+                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                                </a>
+                            </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% for button in trackers.get_buttons.values %}
+                    {% if button.display and not button.staff_only %}
+                            <div class="col my-2">
+                                <a href={{ button.url }}>
+                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                                </a>
+                            </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 

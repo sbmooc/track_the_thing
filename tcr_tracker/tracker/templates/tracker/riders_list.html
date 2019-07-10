@@ -46,13 +46,13 @@
                 <h5>Riders</h5>
             </div>
         </div>
-        <table class="table table-hover table-responsive-sm">
+        <table class="table table-hover table-responsive-xs">
           <thead>
             <tr>
               <th scope="col">Cap No.</th>
               <th scope="col">Name</th>
               <th scope="col">Tracker</th>
-              <th scope="col" class="d-none d-sm-table-cell">Status</th>
+              <th scope="col">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -61,11 +61,7 @@
                   <td>{{ rider.cap_number }}</td>
                     <td><a href={{ rider.url }}>{{ rider.full_name }}</a></td>
                   <td>{{ rider.current_tracker }}</td>
-                  <td class="d-none d-sm-table-cell">
-                      <!--Need to add logic to models-->
-                      <div><b>In progress</b></div>
-                      <div>Checkpoint 5</div>
-                  </td>
+                  <td>{{ rider.status }}</td>
                 </tr>
             {% endfor %}
           </tbody>

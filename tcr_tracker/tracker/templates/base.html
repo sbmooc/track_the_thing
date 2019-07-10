@@ -19,6 +19,25 @@
 
 <body id="page-top">
 
+  <!-- Sticky Footer -->
+  <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded">
+  <!--<nav class="navbar fixed-top navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded" style="padding-top: 60px;">-->
+    <!--Replace with consistent link to trackers_list.html at all points-->
+      <a class="nav-item nav-link" style="{% if active_tab != 'trackers' %} color: DeepSkyBlue {% endif %}" href="{% url 'all_trackers' %}">
+        <div>
+          <i class="fa fa-satellite"></i>
+        </div>
+        <div>Trackers</div>
+      </a>
+    <a class="nav-item nav-link" style="{% if active_tab != 'riders' %} color: DeepSkyBlue {% endif %}" href="{% url 'all_riders' %}">
+        <div>
+          <i class="fa fa-bicycle"></i>
+        </div>
+        <div>Riders</div>
+      </a>
+  </nav>
+  <!--/footer-->
+
 <!--Header bar-->
     <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top shadow-sm">
       <!-- Navbar -->
@@ -36,6 +55,7 @@
         </li>
       </ul>
     </nav>
+
 <!--Main content-->
   <div id="wrapper" style="padding-top: 60px;">
 
@@ -86,24 +106,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Sticky Footer -->
-  <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded">
-    <!--Replace with consistent link to trackers_list.html at all points-->
-      <a class="nav-item nav-link" style="{% if active_tab == 'trackers' %} color: grey {% endif %}" href="{% url 'all_trackers' %}">
-        <div>
-          <i class="fa fa-satellite"></i>
-        </div>
-        <div>Trackers</div>
-      </a>
-    <a class="nav-item nav-link" style="{% if active_tab == 'riders' %} color: grey {% endif %}" href="{% url 'all_riders' %}">
-        <div>
-          <i class="fa fa-bicycle"></i>
-        </div>
-        <div>Riders</div>
-      </a>
-  </nav>
-  <!--/footer-->
 
   <!-- Bootstrap core JavaScript-->
   <script src='{% static "js/jquery/jquery.min.js" %}'></script>
