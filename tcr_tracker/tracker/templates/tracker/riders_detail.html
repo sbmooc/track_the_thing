@@ -74,22 +74,37 @@
             {% else %}
                 {% for event in riders.all_events reversed %}
                     <li class="list-group-item">
-                        <div style="color: grey; font-style: italic">
-                             {{ event.created }}
-                        </div>
-                        {% if event.event_type != "add_note" %}
-                            <div>
-                                <b>Event:</b> {{ event.event_type }}
-                                {% if event.rider %}
-                                    (<a href={{ event.tracker.url }}>{{ event.tracker.tcr_id }} / {{ event.tracker.esn_number }}</a>)
+                        <div class="row">
+                            <div class="col">
+                                <div style="color: grey; font-style: italic">
+                                     {{ event.created }}
+                                </div>
+                                {% if event.event_type != "add_note" %}
+                                    <div><b>{{ event.event_type }}</b></div>
+                                {% endif %}
+                                {% if event.control_point %}
+                                    <div>{{ event.control_point }}</div>
+                                {% endif %}
+                                {% if event.tracker %}
+                                    <div>
+                                        <a href="{{ event.tracker.url }}">
+                                            (#{{ event.tracker.tcr_id }} / {{ event.tracker.esn_number }})
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if event.notes %}
+                                    <div>
+                                        {% if event.input_by %} {{ event.input_by }}: {% endif %}
+                                        {{ event.notes }}
+                                    </div>
                                 {% endif %}
                             </div>
-                        {% endif %}
-                        {% if event.notes %}
-                            <div>
-                                <b>Note:</b> {{ event.notes }}
+                            <div class="col-3" style="text-align: right">
+                                {% if event.deposit_change %}
+                                    {{ event.deposit_change_string }}
+                                {% endif %}
                             </div>
-                        {% endif %}
+                        </div>
                     </li>
                 {% endfor %}
             {% endif %}

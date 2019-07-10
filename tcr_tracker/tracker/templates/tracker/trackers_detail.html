@@ -83,22 +83,29 @@
             {% else %}
                 {% for event in trackers.all_events reversed %}
                     <li class="list-group-item">
-                        <div style="color: grey; font-style: italic">
-                             {{ event.created }}
-                        </div>
-                        {% if event.event_type != "add_note" %}
-                            <div>
-                                <b>Event:</b> {{ event.event_type }}
+                        <div class="row">
+                            <div class="col">
+                                <div style="color: grey; font-style: italic">
+                                     {{ event.created }}
+                                </div>
+                                {% if event.event_type != "add_note" %}
+                                    <div><b>{{ event.event_type }}</b></div>
+                                {% endif %}
                                 {% if event.rider %}
-                                    (Rider: <a href={{ event.rider.url }}>{{ event.rider.full_name }}</a>)
+                                    <div>
+                                        <a href="{{ event.rider.url }}">
+                                            ({{ event.rider.full_name }} / #{{ event.rider.cap_number }})
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if event.notes %}
+                                    <div>
+                                        {% if event.input_by %} {{ event.input_by }}: {% endif %}
+                                        {{ event.notes }}
+                                    </div>
                                 {% endif %}
                             </div>
-                        {% endif %}
-                        {% if event.notes %}
-                            <div>
-                                <b>Note:</b> {{ event.notes }}
-                            </div>
-                        {% endif %}
+                        </div>
                     </li>
                 {% endfor %}
             {% endif %}

@@ -203,12 +203,6 @@ class Riders(AbstractModel):
     @property
     def get_buttons(self):
         return {
-            'notes': {
-                'label': 'Add note',
-                'url': self.url_add_notes,
-                'staff_only': False,
-                'display': True
-            },
             'race_event': {
                 'label': 'Add race event',
                 # todo update url
@@ -251,6 +245,12 @@ class Riders(AbstractModel):
                 'url': reverse('scratch_rider', kwargs={'pk': self.id}),
                 'staff_only': True,
                 'display': self.scratch_button_display_state
+            },
+            'notes': {
+                'label': 'Add note',
+                'url': self.url_add_notes,
+                'staff_only': False,
+                'display': True
             }
         }
 
@@ -396,12 +396,6 @@ class Trackers(AbstractModel):
     @property
     def get_buttons(self):
         return {
-            'notes': {
-                'label': 'Add note',
-                'url': self.url_add_notes,
-                'staff_only': False,
-                'display': True
-            },
             'record_status': {
                 'label': 'Record status',
                 #todo update url
@@ -420,6 +414,12 @@ class Trackers(AbstractModel):
                 'url': self.url_possess_tracker,
                 'staff_only': False,
                 'display': self.retrieve_button_display_state
+            },
+            'notes': {
+                'label': 'Add note',
+                'url': self.url_add_notes,
+                'staff_only': False,
+                'display': True
             }
         }
 
@@ -438,6 +438,7 @@ class Events(TimeStampedModel):
     event_type = CharField(
         max_length=50,
         choices=EVENT_CATEGORIES,
+        null=True,
     )
     tracker = ForeignKey(
         Trackers,
@@ -467,6 +468,10 @@ class Events(TimeStampedModel):
         null=True
     )
 
+    @property
+    def deposit_change_string(self):
+        sign = "-" if self.deposit_change < 0 else "+"
+        return sign + "£" + str(abs(self.deposit_change))
 
 class RaceStatus(TimeStampedModel):
     status = CharField(
