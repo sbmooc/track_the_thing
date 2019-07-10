@@ -205,13 +205,10 @@ class Riders(AbstractModel):
         if self.pre_race:
             if self.current_tracker is None and self.trackers_assigned.all() is None:
                 return True
+            else:
+                return False
 
-        # if during, then any time (warning added to front end)
-        elif self.race_status == 'active':
-            return True
-
-        # after rider finished race, don't display
-        if self.status == 'Finished':
+        if self.status == 'finished' or self.status == 'scratched':
             return False
 
         return True

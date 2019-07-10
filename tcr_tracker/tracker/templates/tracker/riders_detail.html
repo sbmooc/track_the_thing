@@ -7,19 +7,12 @@
 </div>
 {% endblock %}
 {% block content %}
-{% if brevet_data %}
-<div class="container-fluid">
-    <div class="row my-2">
-        Time for brevet card: {{brevet_data}}
-    </div>
-</div>
-{% endif %}
     <!--status headers-->
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
             <div class="col-4 my-auto">Status:</div>
-            <div class="col my-auto"><b>{{ riders.race_status }}</b></div>
+            <div class="col my-auto"><b>{{ riders.status }}</b></div>
         </div>
         <div class="row my-2">
             <div class="col-4 my-auto">Current tracker:</div>
@@ -28,10 +21,6 @@
                     <a href="{{ riders.current_tracker.url }}">
                         {{ riders.current_tracker.tcr_id }}
                     </a>
-                </div>
-                <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">
-                    <!--todo: replace with assignment/possession event date-->
-                    June 20, 2019
                 </div>
             {% else %}
                 <div class="col my-auto">
