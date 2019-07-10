@@ -2,11 +2,25 @@ from bootstrap_datepicker_plus import DatePickerInput
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
-from django.forms import fields
 
 from tcr_tracker.tracker.models import Trackers, Riders, RiderControlPoints, ControlPoints
 
-from datetimepicker.widgets import DateTimePicker
+
+class ScratchRiderForm(
+    forms.ModelForm
+):
+
+    notes = forms.CharField(required=False)
+
+    class Meta:
+        fields = ()
+        model = Riders
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Are you sure you want to scratch this rider?'))
 
 
 class AddNotesForm(forms.Form):

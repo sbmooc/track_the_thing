@@ -2,7 +2,7 @@ from arrow import arrow
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.views import View
-from django.views.generic import ListView, DetailView, UpdateView, FormView, CreateView
+from django.views.generic import ListView, DetailView, UpdateView, FormView
 from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin
 from dateutil import tz
 from tcr_tracker.forms import (
@@ -13,11 +13,32 @@ from tcr_tracker.forms import (
     TrackerRiderAssignmentForm,
     TrackerRiderPossessionForm,
     AddNotesForm,
-    RiderControlPointForm
-)
+    RiderControlPointForm,
+    ScratchRiderForm)
 
 from tcr_tracker.tracker.models import Trackers, Riders, Events, RiderControlPoints, RaceStatus
 
+
+class ScratchRider(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
+    template_name = 'tracker/basic_form.html'
+    form_class = ScratchRiderForm
+    model = Riders
+
+    def form_valid(self, form):
+        Events.objects.create(
+            event_type='scratch',
+            notes=form.cleaned_data['notes'],
+            user=self.request.user.profile,
+            rider=self.object if type(self.object) is Riders else None
+        )
+        self.object.status = 'scratched'
+        self.object.save()
+        return HttpResponseRedirect(self.object.get_absolute_url())
 
 class AddNotes(
     RaceStatusMixin,
@@ -67,7 +88,7 @@ class RiderControlpointView(
         return initial
 
     def form_valid(self, form):
-        time_elapsed = RaceStatus.last().elapsed_time_string
+        time_elapsed = RaceStatus.objects.last().elapsed_time_string
         RiderControlPoints.objects.create(
             rider=self.object,
             control_point=form.cleaned_data['control_point'],
@@ -82,7 +103,6 @@ class RiderControlpointView(
             control_point=form.cleaned_data['control_point'],
             notes=time_elapsed
         )
-        self.request.session['brevet_data'] = time_elapsed
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 

@@ -44,7 +44,6 @@ RIDER_GENDERS = (
 
 
 RIDER_STATUS = (
-    ('not_yet_started', 'Not Yet Started'),
     ('active', 'Active'),
     ('finished', 'Finished'),
     ('scratched', 'Scratched')
@@ -118,13 +117,13 @@ class AbstractModel(models.Model):
     class Meta:
         abstract = True
 
+
 class Riders(AbstractModel):
 
     first_name = CharField(max_length=50, verbose_name='First Name')
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
     cap_number = CharField(max_length=50)
-    race_status = "In progress"
     category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
     gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
     # todo put balance in pence
@@ -133,6 +132,11 @@ class Riders(AbstractModel):
     country_code = CharField(max_length=5, null=True)
     hire_tracker = BooleanField(null=True)
     tracker_url = CharField(null=True, max_length=200, blank=True)
+    status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
+
+    @property
+    def race_status(self):
+        return RaceStatus.objects.last().status
 
     @property
     def current_tracker(self):
@@ -163,11 +167,6 @@ class Riders(AbstractModel):
     @property
     def url_add_notes(self):
         return reverse('rider_add_notes', kwargs={'pk': self.id})
-
-    # todo: add urls for race events (control points, finish, scratch)
-    @property
-    def url_add_race_event(self):
-        pass
 
     # todo: add url for refunds
     @property
@@ -202,39 +201,28 @@ class Riders(AbstractModel):
 
     @property
     def give_button_display_state(self):
-        display_state = False
-
         # if pre-race, only when assigned
         if self.pre_race:
             if self.current_tracker is None and self.trackers_assigned.all() is None:
-                display_state = True
+                return True
 
         # if during, then any time (warning added to front end)
         elif self.race_status == 'active':
-            display_state = True
+            return True
 
         # after rider finished race, don't display
+        if self.status == 'Finished':
+            return False
 
-        return display_state
+        return True
 
     @property
     def retrieve_button_display_state(self):
-        display_state = False
-
-        # At any time when have possession of tracker
-        if self.current_tracker:
-            display_state = True
-
-        return display_state
+        return True if self.current_tracker else False
 
     @property
     def race_event_button_display_state(self):
-        display_state = False
-
-        if not self.pre_race:
-            display_state = True
-
-        return display_state
+        return True if not self.pre_race and self.status == 'active' else False
 
     @property
     def refund_button_display_state(self):
@@ -250,7 +238,7 @@ class Riders(AbstractModel):
             'race_event': {
                 'label': 'Add race event',
                 # todo update url
-                'url': self.url_add_race_event,
+                'url': reverse('rider_add_control_point', kwargs={'pk': self.id}),
                 'display': self.race_event_button_display_state
             },
             'pre_assign': {
@@ -282,6 +270,11 @@ class Riders(AbstractModel):
                 'label': 'Add note',
                 'url': self.url_add_notes,
                 'display': True
+            },
+            'scratch': {
+                'label': 'Scratch Rider',
+                'url': reverse('scratch_rider', kwargs={'pk': self.id}),
+                'display': False if self.status == 'finished' or self.status == 'scratched' else True
             }
         }
 
@@ -592,7 +585,8 @@ class RiderControlPoints(TimeStampedModel):
        max_length=50
     )
     race_time_string = CharField(
-        max_length=100
+        max_length=100,
+        null=True
     )
 
 
