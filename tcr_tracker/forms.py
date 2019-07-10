@@ -43,7 +43,10 @@ class EditTracker(forms.ModelForm):
 
     class Meta:
         model = Trackers
-        exclude = ()
+        exclude = (
+            'rider_assigned',
+            'rider_possesed'
+        )
 
     def __init__(self, *args, **kwargs):
 
@@ -57,7 +60,10 @@ class EditRider(forms.ModelForm):
 
     class Meta:
         model = Riders
-        exclude = ()
+        exclude = (
+            'trackers_assigned',
+            'trackers_possessed'
+        )
 
     def __init__(self, *args, **kwargs):
 

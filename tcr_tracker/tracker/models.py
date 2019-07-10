@@ -363,7 +363,7 @@ class Trackers(AbstractModel):
                                 on_delete=models.SET_NULL, null=True,
                                 related_name='trackers_assigned',
                                 blank=True)
-    rider_possess = ForeignKey(Riders,
+    rider_possesed = ForeignKey(Riders,
                                on_delete=models.SET_NULL, null=True,
                                related_name='trackers_possessed',
                                blank=True)
@@ -378,7 +378,7 @@ class Trackers(AbstractModel):
 
     @property
     def assignable(self):
-        return self.rider_assigned is None and self.working_status == 'working' and self.rider_possess is None
+        return self.rider_assigned is None and self.working_status == 'working' and self.rider_possesed is None
 
     @property
     def rider_url(self):
@@ -413,7 +413,7 @@ class Trackers(AbstractModel):
 
         # If pre-race, then only show when assigned but not yet possessed
         if self.pre_race:
-            if self.rider_assigned and self.rider_possess is None:
+            if self.rider_assigned and self.rider_possesed is None:
                 display_state = True
 
         # During race, only show if assignable
@@ -427,7 +427,7 @@ class Trackers(AbstractModel):
         display_state = False
 
         # At any time
-        if self.rider_possess:
+        if self.rider_possesed:
             display_state = True
 
         return display_state
@@ -439,7 +439,7 @@ class Trackers(AbstractModel):
         # todo: add logic around admin users (across all cases)
         # If pre-race, then show unless given to rider
         if self.pre_race:
-            if self.rider_possess is None:
+            if self.rider_possesed is None:
                 display_state = True
 
         # If during/after race, display when back in staff possession. Use form to set status to "to_be_tested"

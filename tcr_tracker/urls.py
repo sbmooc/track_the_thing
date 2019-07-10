@@ -12,8 +12,11 @@ from tcr_tracker.tracker.views import (
     TrackerTest,
     RiderTrackerAssignment,
     RiderTrackerPossession,
-    TrackerRiderPossession, TrackerRiderAssignment, TrackerAddNotes,
-    RiderAddNotes)
+    TrackerRiderPossession,
+    TrackerRiderAssignment,
+    TrackerAddNotes,
+    RiderAddNotes
+)
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='/accounts/login', permanent=False), name='index'),

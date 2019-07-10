@@ -126,7 +126,12 @@ class AllTrackers(
         return context
 
 
-class OneTracker(RaceStatusMixin, LoginRequiredMixin, DetailView):
+class OneTracker(
+    RaceStatusMixin,
+    LoginRequiredMixin,
+    DetailView,
+    EnvironmentMixin
+):
     model = Trackers
 
     def get_context_data(self, **kwargs):
@@ -224,7 +229,12 @@ class RiderTrackerPossession(
         return super(RiderTrackerPossession, self).form_valid(form)
 
 
-class RiderEdit(LoginRequiredMixin, UpdateView):
+class RiderEdit(
+    LoginRequiredMixin,
+    UpdateView,
+    RaceStatusMixin,
+    EnvironmentMixin
+):
     model = Riders
     form_class = EditRider
     template_name = 'tracker/riders_edit.html'
