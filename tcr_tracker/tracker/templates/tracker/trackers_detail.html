@@ -25,10 +25,10 @@
         </div>
         <div class="row my-2">
             <div class="col-4 my-auto">Possession:</div>
-            {% if trackers.rider_possess %}
+            {% if trackers.rider_possesed %}
                 <div class="col my-auto">
-                    <a href="{{ trackers.rider_possess.url }}">
-                        {{ trackers.rider_possess }}
+                    <a href="{{ trackers.rider_possesed.url }}">
+                        {{ trackers.rider_possesed }}
                     </a>
                 </div>
             {% else %}
@@ -42,37 +42,15 @@
     <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            <div class="col my-2">
-                <a href="{{ trackers.record_test }}">
-                    <!--todo: disable or enable based on user permissions-->
-                    {% if pre_race %}
-                        <button type="button" class="btn btn-secondary btn-block text-nowrap">Record status</button>
-                    {% else %}
-                        <button type="button" class="btn btn-secondary btn-block text-nowrap" disabled>Record status</button>
-                    {% endif %}
-                </a>
-            </div>
-            <div class="col my-2">
-                <a href="{{ trackers.url_add_notes }}">
-                    <button type="button" class="btn btn-secondary btn-block text-nowrap">Add note</button>
-                </a>
-            </div>
-<!--            <div class="col my-2">-->
-<!--                <a href="{{ trackers.url_assign_tracker }}">-->
-<!--                    &lt;!&ndash;todo: show only buttons for actions that are relevant to the context&ndash;&gt;-->
-<!--                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Assign/Deassign</button>-->
-<!--                </a>-->
-<!--            </div>-->
-            <div class="col my-2">
-                <a href="{{ trackers.url_possess_tracker }}">
-                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Give to rider</button>
-                </a>
-            </div>
-            <div class="col my-2">
-                <a href="{{ trackers.url_possess_tracker }}">
-                   <button type="button" class="btn btn-secondary btn-block text-nowrap">Retrieve</button>
-                </a>
-            </div>
+            {% for button in trackers.get_buttons.values %}
+                {% if button.display %}
+                    <div class="col my-2">
+                        <a href={{ button.url }}>
+                            <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                        </a>
+                    </div>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 

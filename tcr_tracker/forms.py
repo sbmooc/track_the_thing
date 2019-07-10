@@ -2,48 +2,66 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from tcr_tracker.tracker.models import Trackers, Riders
+from tcr_tracker.tracker.models import Trackers, Riders, RiderControlPoints, ControlPoints
 
 
-class AddNotesForm(forms.ModelForm):
-    notes = forms.CharField()
+class ScratchRiderForm(
+    forms.ModelForm
+):
+
+    notes = forms.CharField(required=False)
 
     class Meta:
-        fields = (
-            'notes',
-        )
+        fields = ()
+        model = Riders
 
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Are you sure you want to scratch this rider?'))
 
+
+class AddNotesForm(forms.Form):
+    notes = forms.CharField()
+    input_by = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
 
 
-class AddRiderNotes(AddNotesForm):
+class RiderControlPointForm(forms.ModelForm):
+
+    race_time = forms.SplitDateTimeField(
+        widget=forms.widgets.SplitDateTimeWidget(date_attrs={'type': 'date'},
+                                                 time_attrs={'type': 'time'})
+    )
 
     class Meta:
+        model = RiderControlPoints
         fields = (
-            'notes',
+            'control_point',
+            'input_by'
         )
-        model = Riders
 
-
-class AddTrackerNotes(AddNotesForm):
-
-    class Meta:
-        fields = (
-            'notes',
-        )
-        model = Trackers
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
 
 
 class EditTracker(forms.ModelForm):
 
     class Meta:
         model = Trackers
-        exclude = ()
+        exclude = (
+            'rider_assigned',
+            'rider_possesed'
+        )
 
     def __init__(self, *args, **kwargs):
 
@@ -57,7 +75,10 @@ class EditRider(forms.ModelForm):
 
     class Meta:
         model = Riders
-        exclude = ()
+        exclude = (
+            'trackers_assigned',
+            'trackers_possessed'
+        )
 
     def __init__(self, *args, **kwargs):
 
@@ -124,6 +145,37 @@ class TrackerRiderAssignmentForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
+
+
+class TrackerRiderForm(forms.Form):
+
+    def __init__(self, obj=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
+        self.define_fields(obj)
+
+    def define_fields(self, obj):
+        if type(obj) is Trackers:
+            self.add_tracker_fields()
+        else:
+            self.add_rider_fields()
+        self.fields['notes'] = forms.CharField(required=False)
+        self.fields['deposit'] = forms.IntegerField()
+
+    def add_tracker_fields(self):
+        self.fields['rider'] = forms.ModelChoiceField(queryset=Riders.objects.all())
+
+    def add_rider_fields(self):
+        self.fields['tracker'] = forms.ModelChoiceField(
+            queryset=Trackers.objects.filter(
+                rider_assigned=None
+            ),
+            initial=Trackers.objects.filter(
+                rider_assigned=None
+            ).first()
+        )
 
 
 class RiderTrackerAssignmentForm(forms.ModelForm):

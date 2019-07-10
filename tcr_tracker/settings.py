@@ -14,7 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -29,7 +29,7 @@ ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'local')
 DEBUG = False if ENVIRONMENT == 'prod' else True
 
 
-ALLOWED_HOSTS = ['134.209.26.237', '127.0.0.1']
+ALLOWED_HOSTS = ['.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -43,10 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'crispy_forms'
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',    
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -85,7 +86,7 @@ DATABASES = {
                  'ENGINE': 'django.db.backends.postgresql_psycopg2',
                  'NAME': os.environ.get('DB_NAME', 'tracker'),
                  'USER': os.environ.get('DB_USER', 'track_thing'),
-                 'PASSWORD': os.environ.get('DB_PW', ''),
+                 'PASSWORD': os.environ.get('DB_PW', 'tracker'),
                  'HOST': os.environ.get('DB_HOST', 'localhost'),
                  'PORT': os.environ.get('DB_PORT', '5432'),
      }
@@ -128,9 +129,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = '/trackers'
 
 SENTRY_API_KEY = os.environ.get('SENTRY_API', None)
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+

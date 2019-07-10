@@ -1,8 +1,10 @@
+from arrow import arrow
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, UpdateView
+from django.views import View
+from django.views.generic import ListView, DetailView, UpdateView, FormView
 from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin
-
+from dateutil import tz
 from tcr_tracker.forms import (
     EditTracker,
     EditRider,
@@ -10,49 +12,103 @@ from tcr_tracker.forms import (
     RiderTrackerPossessionForm,
     TrackerRiderAssignmentForm,
     TrackerRiderPossessionForm,
-    AddRiderNotes,
-    AddTrackerNotes
-)
+    AddNotesForm,
+    RiderControlPointForm,
+    ScratchRiderForm, TrackerRiderForm)
 
-from tcr_tracker.tracker.models import Trackers, Riders, Events
+from tcr_tracker.tracker.models import Trackers, Riders, Events, RiderControlPoints, RaceStatus
 
 
-class RiderAddNotes(
+class ScratchRider(
     RaceStatusMixin,
     EnvironmentMixin,
     LoginRequiredMixin,
     UpdateView
 ):
-    form_class = AddRiderNotes
+    template_name = 'tracker/basic_form.html'
+    form_class = ScratchRiderForm
+    model = Riders
+
+    def form_valid(self, form):
+        Events.objects.create(
+            event_type='scratch',
+            notes=form.cleaned_data['notes'],
+            user=self.request.user.profile,
+            rider=self.object if type(self.object) is Riders else None
+        )
+        self.object.status = 'scratched'
+        self.object.save()
+        return HttpResponseRedirect(self.object.get_absolute_url())
+
+
+class GetObjectMixin:
+
+    def get_object(self):
+        path_string = self.request.path
+        model_names = {
+            'trackers': Trackers,
+            'riders': Riders
+        }
+        model, pk, _ = path_string[1:].split('/')
+        self.object = model_names[model].objects.get(id=pk)
+
+class AddNotes(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    GetObjectMixin,
+    FormView
+):
+    form_class = AddNotesForm
+    template_name = 'tracker/basic_form.html'
+    object = None
+
+
+    def form_valid(self, form):
+        self.get_object()
+        Events.objects.create(
+            event_type='add_note',
+            notes=form.cleaned_data['notes'],
+            user=self.request.user.profile,
+            input_by=form.cleaned_data['input_by'],
+            tracker=self.object if type(self.object) is Trackers else None,
+            rider=self.object if type(self.object) is Riders else None
+        )
+        return HttpResponseRedirect(self.object.get_absolute_url())
+
+
+class RiderControlpointView(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
     model = Riders
     template_name = 'tracker/basic_form.html'
+    form_class = RiderControlPointForm
+
+    def get_initial(self):
+        initial = super(RiderControlpointView, self).get_initial()
+        initial['race_time'] = arrow.Arrow.now(tzinfo=tz.gettz('Europe/Paris')).datetime
+        return initial
 
     def form_valid(self, form):
-        Events.objects.create(
+        time_elapsed = RaceStatus.objects.last().elapsed_time_string
+        RiderControlPoints.objects.create(
             rider=self.object,
-            notes=form.cleaned_data['notes'],
-            user=self.request.user.profile
+            control_point=form.cleaned_data['control_point'],
+            race_time=form.cleaned_data['race_time'],
+            input_by=form.cleaned_data['input_by'],
+            race_time_string=time_elapsed
         )
-        return super(RiderAddNotes, self).form_valid(form)
-
-
-class TrackerAddNotes(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    UpdateView
-):
-    form_class = AddTrackerNotes
-    model = Trackers
-    template_name = 'tracker/basic_form.html'
-
-    def form_valid(self, form):
         Events.objects.create(
-            tracker=self.object,
-            notes=form.cleaned_data['notes'],
-            user=self.request.user.profile
+            event_type='arrive_checkpoint',
+            rider=self.object,
+            input_by=form.cleaned_data['input_by'],
+            control_point=form.cleaned_data['control_point'],
+            notes=time_elapsed
         )
-        return super(TrackerAddNotes, self).form_valid(form)
+        return HttpResponseRedirect(self.object.get_absolute_url())
 
 
 class TrackerRiderPossession(
@@ -126,7 +182,12 @@ class AllTrackers(
         return context
 
 
-class OneTracker(RaceStatusMixin, LoginRequiredMixin, DetailView):
+class OneTracker(
+    RaceStatusMixin,
+    LoginRequiredMixin,
+    DetailView,
+    EnvironmentMixin
+):
     model = Trackers
 
     def get_context_data(self, **kwargs):
@@ -224,7 +285,12 @@ class RiderTrackerPossession(
         return super(RiderTrackerPossession, self).form_valid(form)
 
 
-class RiderEdit(LoginRequiredMixin, UpdateView):
+class RiderEdit(
+    LoginRequiredMixin,
+    UpdateView,
+    RaceStatusMixin,
+    EnvironmentMixin
+):
     model = Riders
     form_class = EditRider
     template_name = 'tracker/riders_edit.html'
@@ -255,8 +321,32 @@ class OneRider(
 
     def get_context_data(self, **kwargs):
         context = super(OneRider, self).get_context_data(**kwargs)
+        context['brevet_data'] = self.request.session.get('brevet_data')
         context['rider_dict'] = context['riders'].__dict__
         context['page_title'] = 'Rider: %s' % context['riders'].full_name
         context['active_tab'] = 'riders'
         return context
 
+
+class TrackerRider(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    GetObjectMixin,
+    FormView
+):
+    form_class = TrackerRiderForm
+    template_name = 'tracker/basic_form.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(TrackerRider, self).get_form_kwargs()
+        self.get_object()
+        kwargs.update(
+            {
+                'obj': self.object
+            }
+        )
+        return kwargs
+
+    def form_valid(self, form):
+        pass

@@ -44,7 +44,6 @@ RIDER_GENDERS = (
 
 
 RIDER_STATUS = (
-    ('not_yet_started', 'Not Yet Started'),
     ('active', 'Active'),
     ('finished', 'Finished'),
     ('scratched', 'Scratched')
@@ -91,11 +90,13 @@ class Profile(models.Model):
         on_delete=models.CASCADE
     )
     is_tcr_staff = BooleanField(null=True)
+    is_collective_user = BooleanField(null=True)
 
 
 class TimeStampedModel(models.Model):
     created = DateTimeField(auto_now_add=True)
     modified = DateTimeField(auto_now=True)
+    # todo: uncomment before merge
     user = ForeignKey(
         Profile,
         on_delete=models.SET_NULL, null=True
@@ -113,8 +114,13 @@ class AbstractModel(models.Model):
     def url(self):
         return self.get_absolute_url()
 
+    @property
+    def race_status(self):
+        return RaceStatus.objects.last().status
+
     class Meta:
         abstract = True
+
 
 class Riders(AbstractModel):
 
@@ -122,7 +128,6 @@ class Riders(AbstractModel):
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
     cap_number = CharField(max_length=50)
-    race_status = "In progress"
     category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
     gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
     # todo put balance in pence
@@ -131,6 +136,8 @@ class Riders(AbstractModel):
     country_code = CharField(max_length=5, null=True)
     hire_tracker = BooleanField(null=True)
     tracker_url = CharField(null=True, max_length=200, blank=True)
+    status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
+
 
     @property
     def current_tracker(self):
@@ -140,14 +147,11 @@ class Riders(AbstractModel):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
-
     @property
     def all_events(self):
         return self.events.all()
 
-
     # todo link riders who are in pairs? or does the capnumber do that???
-    # todo add checkpoints stuff!
 
     def get_absolute_url(self):
         return reverse('one_rider', kwargs={'pk': self.id})
@@ -163,6 +167,107 @@ class Riders(AbstractModel):
     @property
     def url_add_notes(self):
         return reverse('rider_add_notes', kwargs={'pk': self.id})
+
+    # todo: add url for refunds
+    @property
+    def url_refund(self):
+        pass
+
+    @property
+    def pre_assign_button_display_state(self):
+        # If pre-race, then show unless also given to rider. Combine assignment with possession during race.
+        return True if self.pre_race and not self.current_tracker else False
+
+    @property
+    def de_assign_button_display_state(self):
+        display_state = False
+
+        # If during race, rider not active, all trackers returned and tested
+        if not self.pre_race:
+            if self.race_status != 'active' and self.current_tracker is None:
+                display_state = True
+                for tracker in self.trackers_assigned.all():
+                    if tracker.working_status == 'to_be_tested':
+                        display_state = False
+                        break
+
+        return display_state
+
+    @property
+    def give_button_display_state(self):
+        # if pre-race, only when assigned
+        if self.pre_race:
+            if self.current_tracker is None and self.trackers_assigned.all() is None:
+                return True
+            else:
+                return False
+
+        if self.status == 'finished' or self.status == 'scratched':
+            return False
+
+        return True
+
+    @property
+    def retrieve_button_display_state(self):
+        return True if self.current_tracker else False
+
+    @property
+    def race_event_button_display_state(self):
+        return True if not self.pre_race and self.status == 'active' else False
+
+    @property
+    def refund_button_display_state(self):
+        display_state = False
+
+        # todo: add logic
+
+        return display_state
+
+    @property
+    def get_buttons(self):
+        return {
+            'race_event': {
+                'label': 'Add race event',
+                # todo update url
+                'url': reverse('rider_add_control_point', kwargs={'pk': self.id}),
+                'display': self.race_event_button_display_state
+            },
+            'pre_assign': {
+                'label': 'Pre-assign tracker',
+                'url': reverse('rider_test', kwargs={'pk': self.id}),
+                'display': self.pre_assign_button_display_state
+            },
+            'de_assign': {
+                'label': 'De-assign tracker',
+                'url': self.url_assign_tracker,
+                'display': self.de_assign_button_display_state
+            },
+            'give': {
+                'label': 'Give tracker',
+                'url': self.url_possess_tracker,
+                'display': self.give_button_display_state
+            },
+            'retrieve': {
+                'label': 'Retrieve tracker',
+                'url': self.url_possess_tracker,
+                'display': self.retrieve_button_display_state
+            },
+            'refund': {
+                'label': 'Refund',
+                'url': self.url_refund,
+                'display': self.refund_button_display_state
+            },
+            'notes': {
+                'label': 'Add note',
+                'url': self.url_add_notes,
+                'display': True
+            },
+            'scratch': {
+                'label': 'Scratch Rider',
+                'url': reverse('scratch_rider', kwargs={'pk': self.id}),
+                'display': False if self.status == 'finished' or self.status == 'scratched' else True
+            }
+        }
 
     # todo: add url_edit method for riders
 
@@ -243,7 +348,7 @@ class Trackers(AbstractModel):
                                 on_delete=models.SET_NULL, null=True,
                                 related_name='trackers_assigned',
                                 blank=True)
-    rider_possess = ForeignKey(Riders,
+    rider_possesed = ForeignKey(Riders,
                                on_delete=models.SET_NULL, null=True,
                                related_name='trackers_possessed',
                                blank=True)
@@ -258,7 +363,7 @@ class Trackers(AbstractModel):
 
     @property
     def assignable(self):
-        return self.rider_assigned is None and self.working_status == 'working' and self.rider_possess is None
+        return self.rider_assigned is None and self.working_status == 'working' and self.rider_possesed is None
 
     @property
     def rider_url(self):
@@ -293,7 +398,7 @@ class Trackers(AbstractModel):
 
         # If pre-race, then only show when assigned but not yet possessed
         if self.pre_race:
-            if self.rider_assigned and self.rider_possess is None:
+            if self.rider_assigned and self.rider_possesed is None:
                 display_state = True
 
         # During race, only show if assignable
@@ -307,7 +412,7 @@ class Trackers(AbstractModel):
         display_state = False
 
         # At any time
-        if self.rider_possess:
+        if self.rider_possesed:
             display_state = True
 
         return display_state
@@ -319,7 +424,7 @@ class Trackers(AbstractModel):
         # todo: add logic around admin users (across all cases)
         # If pre-race, then show unless given to rider
         if self.pre_race:
-            if self.rider_possess is None:
+            if self.rider_possesed is None:
                 display_state = True
 
         # If during/after race, display when back in staff possession. Use form to set status to "to_be_tested"
@@ -350,12 +455,12 @@ class Trackers(AbstractModel):
                 'label': 'Retrieve',
                 'url': self.url_possess_tracker,
                 'display': self.retrieve_button_display_state
+            },
+            'notes': {
+                'label': 'Add note',
+                'url': self.url_add_notes,
+                'display': True
             }
-            # 'pre_assign': {
-            #     'label': 'Pre Assign',
-            #     'url': self.url_assign_tracker,
-            #     'display': self.pre_assign_button_display_state
-            # }
         }
 
     def record_test(self, result):
@@ -366,7 +471,7 @@ class Trackers(AbstractModel):
         verbose_name_plural = 'Trackers'
 
     def __str__(self):
-        return str(self.id)
+        return str(self.tcr_id)
 
 
 class Events(TimeStampedModel):
@@ -388,8 +493,19 @@ class Events(TimeStampedModel):
         blank=True,
         related_name='events',
     )
+    control_point = ForeignKey(
+        'tracker.ControlPoints',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='events'
+    )
     notes = TextField(null=True, blank=True)
     deposit_change = IntegerField(null=True, blank=True)
+    input_by = CharField(
+        max_length=50,
+        null=True
+    )
 
 
 class RaceStatus(TimeStampedModel):
@@ -430,24 +546,38 @@ class RaceStatus(TimeStampedModel):
             )
             return f'{days} Days {hours} Hours {minutes} Minutes'
 
+    def __str__(self):
+        return self.status
 
-class Checkpoints(models.Model):
+
+class ControlPoints(models.Model):
     name = CharField(max_length=50)
     abbreviation = CharField(max_length=50)
     latitude = CharField(max_length=50)
     longitude = CharField(max_length=50)
 
+    def __str__(self):
+        return self.abbreviation
 
-class RiderCheckpoints(TimeStampedModel):
+
+class RiderControlPoints(TimeStampedModel):
     rider = ForeignKey(
         Riders,
         on_delete=models.SET_NULL, null=True,
         related_name='checkpoints',
     )
-    checkpoint = ForeignKey(
-        Riders,
+    control_point = ForeignKey(
+        ControlPoints,
         on_delete=models.SET_NULL, null=True,
         related_name='riders'
+    )
+    race_time = DateField()
+    input_by = CharField(
+       max_length=50
+    )
+    race_time_string = CharField(
+        max_length=100,
+        null=True
     )
 
 
