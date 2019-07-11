@@ -8,7 +8,7 @@ from django.test import TestCase
 from tcr_tracker.tracker.models import (
     Riders,
     Trackers,
-    RaceStatus)
+    RaceStatus, Deposit)
 from django.db.utils import IntegrityError
 
 
@@ -20,6 +20,7 @@ class TrackerRiderTests(TestCase):
         self.tracker_1 = Trackers.objects.create()
         self.tracker_2 = Trackers.objects.create()
         self.user = User.objects.create()
+
 
 
 class TestRiders(TrackerRiderTests):
@@ -110,6 +111,21 @@ class TestRiders(TrackerRiderTests):
                 100,
                 self.user.profile
             )
+
+    def test_balance_calculation(self):
+        Deposit.objects.create(
+            rider=self.rider_1,
+            amount_in_pence=10000
+        )
+        Deposit.objects.create(
+            rider=self.rider_1,
+            amount_in_pence=10000
+        )
+        Deposit.objects.create(
+            rider=self.rider_1,
+            amount_in_pence=-10000
+        )
+        self.assertEqual(self.rider_1.balance, 10000)
 
 
 class TestTrackers(TrackerRiderTests):
