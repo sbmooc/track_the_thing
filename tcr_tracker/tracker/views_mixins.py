@@ -1,6 +1,18 @@
 from django.conf import settings
 
-from tcr_tracker.tracker.models import RaceStatus
+from tcr_tracker.tracker.models import RaceStatus, Trackers, Riders
+
+
+class GetObjectMixin:
+
+    def get_object(self):
+        path_string = self.request.path
+        model_names = {
+            'trackers': Trackers,
+            'riders': Riders
+        }
+        model, pk, _ = path_string[1:].split('/')
+        self.object = model_names[model].objects.get(id=pk)
 
 
 class RaceStatusMixin:
@@ -25,3 +37,7 @@ class EnvironmentMixin:
         context = super().get_context_data(**kwargs)
         context['environment'] = settings.ENVIRONMENT
         return context
+
+
+class StaffOnlyMixin:
+    pass

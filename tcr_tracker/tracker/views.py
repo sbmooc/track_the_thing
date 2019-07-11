@@ -1,11 +1,10 @@
 from arrow import arrow
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views import View
-from django.views.generic import ListView, DetailView, UpdateView, FormView
-from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin
+from django.views.generic import ListView, DetailView, UpdateView, FormView, CreateView
+from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin, GetObjectMixin, StaffOnlyMixin
 from dateutil import tz
-from tcr_tracker.forms import (
+from .forms import (
     EditTracker,
     EditRider,
     RiderTrackerAssignmentForm,
@@ -14,9 +13,46 @@ from tcr_tracker.forms import (
     TrackerRiderPossessionForm,
     AddNotesForm,
     RiderControlPointForm,
-    ScratchRiderForm, TrackerRiderForm)
+    ScratchRiderForm, TrackerRiderForm,
+    AdjustBalanceForm)
 
-from tcr_tracker.tracker.models import Trackers, Riders, Events, RiderControlPoints, RaceStatus
+from .models import Trackers, Riders, Events, RiderControlPoints, RaceStatus, Deposit
+
+
+class AddPayment(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    StaffOnlyMixin,
+    GetObjectMixin,
+    FormView
+):
+    template_name = 'tracker/basic_form.html'
+    form_class = AdjustBalanceForm
+    model = Deposit
+    event_type = 'payment_in'
+
+    def form_valid(self, form):
+        self.get_object()
+        Events.objects.create(
+            event_type=self.event_type,
+            user=self.request.user.profile,
+            rider=self.object
+        )
+        Deposit.objects.create(
+            rider=self.object,
+            amount_in_pence=form.cleaned_data['amount'] * 100
+        )
+        return HttpResponseRedirect(self.object.get_absolute_url())
+
+
+class AddRefund(
+    AddPayment
+):
+    def form_valid(self, form):
+        form.cleaned_data['amount'] = form.cleaned_data['amount'] * -1
+        self.event_type = 'payment_out'
+        return super(AddRefund, self).form_valid(form)
 
 
 class ScratchRider(
@@ -41,16 +77,6 @@ class ScratchRider(
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class GetObjectMixin:
-
-    def get_object(self):
-        path_string = self.request.path
-        model_names = {
-            'trackers': Trackers,
-            'riders': Riders
-        }
-        model, pk, _ = path_string[1:].split('/')
-        self.object = model_names[model].objects.get(id=pk)
 
 class AddNotes(
     RaceStatusMixin,

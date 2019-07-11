@@ -17,8 +17,8 @@ from tcr_tracker.tracker.views import (
     AddNotes,
     RiderControlpointView,
     ScratchRider,
-    TrackerRider
-)
+    TrackerRider,
+    AddPayment, AddRefund)
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='/accounts/login', permanent=False), name='index'),
@@ -36,6 +36,10 @@ urlpatterns = [
          name='rider_add_control_point'),
     path('riders/<int:pk>/scratch', ScratchRider.as_view(),
          name='scratch_rider'),
+    path('riders/<int:pk>/add_payment', AddPayment.as_view(),
+         name='add_payment'),
+    path('riders/<int:pk>/add_refund', AddRefund.as_view(),
+         name='add_refund'),
     path('riders/<int:pk>/test', TrackerRider.as_view(),
          name='rider_test'),
     path('trackers/', AllTrackers.as_view(), name='all_trackers'),

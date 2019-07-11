@@ -122,6 +122,7 @@ class AbstractModel(models.Model):
         abstract = True
 
 
+
 class Riders(AbstractModel):
 
     first_name = CharField(max_length=50, verbose_name='First Name')
@@ -131,12 +132,18 @@ class Riders(AbstractModel):
     category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
     gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
     # todo put balance in pence
-    balance = IntegerField(null=True, default=0)
     tcr_id = CharField(max_length=10, null=True)
     country_code = CharField(max_length=5, null=True)
     hire_tracker = BooleanField(null=True)
     tracker_url = CharField(null=True, max_length=200, blank=True)
     status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
+
+    @property
+    def balance(self):
+        all_deposits = Deposit.objects.filter(
+            rider=self
+        )
+        return sum(paym.amount for paym in all_deposits)
 
     @property
     def current_tracker(self):
@@ -172,31 +179,6 @@ class Riders(AbstractModel):
     def url_refund(self):
         pass
 
-    # todo: add url for deposits
-    @property
-    def url_add_deposit(self):
-        pass
-
-    @property
-    def assign_button_display_state(self):
-        return True
-
-    @property
-    def de_assign_button_display_state(self):
-        return True
-
-    @property
-    def give_button_display_state(self):
-        return True
-
-    @property
-    def retrieve_button_display_state(self):
-        return True
-
-    @property
-    def race_event_button_display_state(self):
-        return True
-
     @property
     def scratch_button_display_state(self):
         return True if self.status == 'active' else False
@@ -206,10 +188,6 @@ class Riders(AbstractModel):
         return True if self.status != 'active' else False
 
     @property
-    def deposit_button_display_state(self):
-        return True
-
-    @property
     def get_buttons(self):
         return {
             'race_event': {
@@ -217,31 +195,31 @@ class Riders(AbstractModel):
                 # todo update url
                 'url': reverse('rider_add_control_point', kwargs={'pk': self.id}),
                 'staff_only': False,
-                'display': self.race_event_button_display_state
+                'display': True
             },
             'give': {
                 'label': 'Give tracker',
                 'url': self.url_possess_tracker,
                 'staff_only': False,
-                'display': self.give_button_display_state
+                'display': True
             },
             'retrieve': {
                 'label': 'Retrieve tracker',
                 'url': self.url_possess_tracker,
                 'staff_only': False,
-                'display': self.retrieve_button_display_state
+                'display': True
             },
             'assign': {
                 'label': 'Assign tracker',
                 'url': reverse('rider_test', kwargs={'pk': self.id}),
                 'staff_only': True,
-                'display': self.assign_button_display_state
+                'display': True
             },
             'de_assign': {
                 'label': 'De-assign tracker',
                 'url': self.url_assign_tracker,
                 'staff_only': True,
-                'display': self.de_assign_button_display_state
+                'display': True
             },
             'scratch': {
                 'label': 'Scratch Rider',
@@ -251,15 +229,15 @@ class Riders(AbstractModel):
             },
             'refund': {
                 'label': 'Refund',
-                'url': self.url_refund,
+                'url': reverse('add_refund', kwargs={'pk': self.id}),
                 'staff_only': True,
                 'display': self.refund_button_display_state
             },
-            'add_deposit': {
-                'label': 'Add deposit',
-                'url': self.url_add_deposit,
+            'add_payment': {
+                'label': 'Add payment',
+                'url': reverse('add_payment', kwargs={'pk': self.id}),
                 'staff_only': True,
-                'display': self.deposit_button_display_state
+                'display': True
             },
             'notes': {
                 'label': 'Add note',
@@ -281,9 +259,14 @@ class Riders(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='add_tracker_assignment',
-            deposit_change=deposit * -1
+            deposit_change=deposit * -1,
+            user=user.profile
         )
-        self.balance -= deposit
+        Deposit.objects.create(
+            rider=self,
+            amount_in_pence=deposit * -1,
+            user=user.profile
+        )
         self.save()
 
     def tracker_remove_assignment(self, tracker, notes, deposit, user):
@@ -296,9 +279,14 @@ class Riders(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='remove_tracker_assignment',
-            deposit_change=deposit
+            deposit_change=deposit,
+            user=user.profile
         )
-        self.balance += deposit
+        Deposit.objects.create(
+            rider=self,
+            amount_in_pence=deposit,
+            user=user.profile
+        )
         self.save()
 
     def tracker_add_possession(self, tracker, notes, user):
@@ -310,6 +298,7 @@ class Riders(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='add_tracker_possession',
+            user=user.profile
         )
         self.save()
 
@@ -322,6 +311,7 @@ class Riders(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='remove_tracker_possession',
+            user=user.profile
         )
         self.save()
 
@@ -329,7 +319,18 @@ class Riders(AbstractModel):
         verbose_name_plural = 'Riders'
 
     def __str__(self):
-        return self.full_name
+        return self.cap_number, self.full_name
+
+
+class Deposit(TimeStampedModel):
+
+    rider = ForeignKey(
+        Riders,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='payment',
+    )
+    amount_in_pence = IntegerField()
 
 
 class Trackers(AbstractModel):

@@ -2,8 +2,22 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from tcr_tracker.tracker.models import Trackers, Riders, RiderControlPoints, ControlPoints
+from .models import Trackers, Riders, RiderControlPoints, ControlPoints, Deposit
 
+
+class AdjustBalanceForm(
+    forms.Form
+):
+    amount = forms.FloatField()
+
+    class Meta:
+        model = Deposit
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
 
 class ScratchRiderForm(
     forms.ModelForm
