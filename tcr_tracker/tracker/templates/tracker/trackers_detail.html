@@ -5,26 +5,12 @@
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
-            <div class="col-4 my-auto">Status:</div>
+            <div class="col-5 my-auto">Status:</div>
             <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
             <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
         </div>
         <div class="row my-2">
-            <div class="col-4 my-auto">Assignment:</div>
-            {% if trackers.rider_assigned %}
-                <div class="col my-auto">
-                    <a href="{{ trackers.rider_assigned.url }}">
-                        {{ trackers.rider_assigned }}
-                    </a>
-                </div>
-            {% else %}
-                <div class="col my-auto">
-                    N/A
-                </div>
-            {% endif %}
-        </div>
-        <div class="row my-2">
-            <div class="col-4 my-auto">Possession:</div>
+            <div class="col-5 my-auto">Possession:</div>
             {% if trackers.rider_possesed %}
                 <div class="col my-auto">
                     <a href="{{ trackers.rider_possesed.url }}">
@@ -37,20 +23,48 @@
                 </div>
             {% endif %}
         </div>
+        {% if user.profile.is_tcr_staff %}
+            <div class="row my-2">
+                <div class="col-5 my-auto">Assignment:</div>
+                {% if trackers.rider_assigned %}
+                    <div class="col my-auto">
+                        <a href="{{ trackers.rider_assigned.url }}">
+                            {{ trackers.rider_assigned }}
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="col my-auto">
+                        N/A
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 
     <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            {% for button in trackers.get_buttons.values %}
-                {% if button.display %}
-                    <div class="col my-2">
-                        <a href={{ button.url }}>
-                            <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
-                        </a>
-                    </div>
-                {% endif %}
-            {% endfor %}
+            {% if user.profile.is_tcr_staff %}
+                {% for button in trackers.get_buttons.values %}
+                    {% if button.display %}
+                            <div class="col my-2">
+                                <a href={{ button.url }}>
+                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                                </a>
+                            </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% for button in trackers.get_buttons.values %}
+                    {% if button.display and not button.staff_only %}
+                            <div class="col my-2">
+                                <a href={{ button.url }}>
+                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                                </a>
+                            </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -71,22 +85,29 @@
             {% else %}
                 {% for event in trackers.all_events reversed %}
                     <li class="list-group-item">
-                        <div style="color: grey; font-style: italic">
-                             {{ event.created }}
-                        </div>
-                        {% if event.event_type != "add_note" %}
-                            <div>
-                                <b>Event:</b> {{ event.event_type }}
+                        <div class="row">
+                            <div class="col">
+                                <div style="color: grey; font-style: italic">
+                                     {{ event.created }}
+                                </div>
+                                {% if event.event_type != "add_note" %}
+                                    <div><b>{{ event.event_type }}</b></div>
+                                {% endif %}
                                 {% if event.rider %}
-                                    (Rider: <a href={{ event.rider.url }}>{{ event.rider.full_name }}</a>)
+                                    <div>
+                                        <a href="{{ event.rider.url }}">
+                                            ({{ event.rider.full_name }} / #{{ event.rider.cap_number }})
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if event.notes %}
+                                    <div>
+                                        {% if event.input_by %} {{ event.input_by }}: {% endif %}
+                                        {{ event.notes }}
+                                    </div>
                                 {% endif %}
                             </div>
-                        {% endif %}
-                        {% if event.notes %}
-                            <div>
-                                <b>Note:</b> {{ event.notes }}
-                            </div>
-                        {% endif %}
+                        </div>
                     </li>
                 {% endfor %}
             {% endif %}

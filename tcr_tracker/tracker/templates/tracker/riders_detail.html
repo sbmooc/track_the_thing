@@ -11,11 +11,11 @@
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
-            <div class="col-4 my-auto">Status:</div>
+            <div class="col-5 my-auto">Status:</div>
             <div class="col my-auto"><b>{{ riders.status }}</b></div>
         </div>
         <div class="row my-2">
-            <div class="col-4 my-auto">Current tracker:</div>
+            <div class="col-5 my-auto">Current tracker:</div>
             {% if riders.current_tracker %}
                 <div class="col my-auto">
                     <a href="{{ riders.current_tracker.url }}">
@@ -28,20 +28,50 @@
                 </div>
             {% endif %}
         </div>
+        {% if user.profile.is_tcr_staff %}
+            <div class="row my-2">
+                <div class="col-5 my-auto">Assigned trackers:</div>
+                {% if riders.trackers_assigned.all %}
+                    <div class="col my-auto">
+                        {% for tracker in riders.trackers_assigned.all %}
+                            <a href="{{ tracker.url }}">
+                                #{{ tracker.tcr_id }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="col my-auto">
+                        None
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 
     <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            {% for button in riders.get_buttons.values %}
-                {% if button.display %}
-                    <div class="col my-2">
-                        <a href={{ button.url }}>
-                            <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
-                        </a>
-                    </div>
-                {% endif %}
-            {% endfor %}
+            {% if user.profile.is_tcr_staff %}
+                {% for button in riders.get_buttons.values %}
+                    {% if button.display %}
+                            <div class="col my-2">
+                                <a href={{ button.url }}>
+                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                                </a>
+                            </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% for button in riders.get_buttons.values %}
+                    {% if button.display and not button.staff_only %}
+                            <div class="col my-2">
+                                <a href={{ button.url }}>
+                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                                </a>
+                            </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 
@@ -62,22 +92,39 @@
             {% else %}
                 {% for event in riders.all_events reversed %}
                     <li class="list-group-item">
-                        <div style="color: grey; font-style: italic">
-                             {{ event.created }}
-                        </div>
-                        {% if event.event_type != "add_note" %}
-                            <div>
-                                <b>Event:</b> {{ event.event_type }}
-                                {% if event.rider %}
-                                    (Tracker: <a href={{ event.tracker.url }}>{{ event.tracker.tcr_id }}</a>)
+                        <div class="row">
+                            <div class="col">
+                                <div style="color: grey; font-style: italic">
+                                     {{ event.created }}
+                                </div>
+                                {% if event.event_type != "add_note" %}
+                                    <div><b>{{ event.event_type }}</b></div>
+                                {% endif %}
+                                {% if event.control_point %}
+                                    <div>{{ event.control_point }}</div>
+                                {% endif %}
+                                {% if event.tracker %}
+                                    <div>
+                                        <a href="{{ event.tracker.url }}">
+                                            (#{{ event.tracker.tcr_id }} / {{ event.tracker.esn_number }})
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if event.notes %}
+                                    <div>
+                                        {% if event.input_by %} {{ event.input_by }}: {% endif %}
+                                        {{ event.notes }}
+                                    </div>
                                 {% endif %}
                             </div>
-                        {% endif %}
-                        {% if event.notes %}
-                            <div>
-                                <b>Note:</b> {{ event.notes }}
-                            </div>
-                        {% endif %}
+                            {% if user.profile.is_tcr_staff %}
+                                <div class="col-3" style="text-align: right">
+                                    {% if event.deposit_change %}
+                                        {{ event.deposit_change_string }}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </li>
                 {% endfor %}
             {% endif %}
