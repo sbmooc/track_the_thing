@@ -2,14 +2,14 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from .models import Trackers, Riders, RiderControlPoints, ControlPoints, Deposit
+from .models import Trackers, Riders, RiderControlPoints
 
 class RecordIssueForm(
     forms.Form
 ):
     url = forms.CharField()
-    brief_description_of_issue = forms.TextInput()
-    details = forms.Textarea()
+    brief_description_of_issue = forms.CharField(widget=forms.TextInput())
+    details = forms.CharField(widget=forms.Textarea())
     your_name = forms.CharField()
 
     def __init__(self, *args, **kwargs):
