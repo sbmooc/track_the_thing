@@ -21,7 +21,7 @@ class Command(BaseCommand):
             csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
                 row['hire_tracker'] = True if row['hire_tracker'] == 'Hire TCR' else False
-                row['balance'] = int(row['balance'])
+                # row['balance'] = int(row['balance'])
                 rider = Riders(**row)
                 try:
                     rider.save()
