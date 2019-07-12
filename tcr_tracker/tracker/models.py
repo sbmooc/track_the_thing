@@ -249,7 +249,7 @@ class Riders(AbstractModel):
 
     # todo: add url_edit method for riders
 
-    def tracker_add_assignment(self, tracker, notes, deposit, user):
+    def tracker_add_assignment(self, tracker, notes, user, deposit=10000):
         if tracker.rider_assigned is not None:
             raise TrackerAlreadyAssigned()
         self.trackers_assigned.add(tracker)
@@ -259,7 +259,7 @@ class Riders(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='add_tracker_assignment',
-            deposit_change=deposit * -1,
+            deposit_change=deposit/100 * -1,
             user=user.profile
         )
         Deposit.objects.create(
@@ -269,7 +269,7 @@ class Riders(AbstractModel):
         )
         self.save()
 
-    def tracker_remove_assignment(self, tracker, notes, deposit, user):
+    def tracker_remove_assignment(self, tracker, notes, user, deposit=10000):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
@@ -279,7 +279,7 @@ class Riders(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='remove_tracker_assignment',
-            deposit_change=deposit,
+            deposit_change=deposit/100,
             user=user.profile
         )
         Deposit.objects.create(

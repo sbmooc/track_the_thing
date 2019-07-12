@@ -135,7 +135,6 @@ class TrackerRiderAssignmentForm(forms.ModelForm):
     rider = forms.ModelChoiceField(
         queryset=Riders.objects.all()
     )
-    deposit = forms.IntegerField()
     notes = forms.CharField(required=False)
     add_or_remove = forms.TypedChoiceField(
         choices=(
@@ -149,7 +148,6 @@ class TrackerRiderAssignmentForm(forms.ModelForm):
         model = Trackers
         fields = (
             'rider',
-            'deposit',
             'notes'
         )
 
@@ -176,7 +174,6 @@ class TrackerRiderForm(forms.Form):
         else:
             self.add_rider_fields()
         self.fields['notes'] = forms.CharField(required=False)
-        self.fields['deposit'] = forms.IntegerField()
 
     def add_tracker_fields(self):
         self.fields['rider'] = forms.ModelChoiceField(queryset=Riders.objects.all())
@@ -199,7 +196,6 @@ class RiderTrackerAssignmentForm(forms.ModelForm):
             rider_assigned=None
         )
     )
-    deposit = forms.IntegerField()
     notes = forms.CharField(required=False)
     add_or_remove = forms.TypedChoiceField(
         choices=(
@@ -212,7 +208,6 @@ class RiderTrackerAssignmentForm(forms.ModelForm):
         model = Riders
         fields = (
             'tracker',
-            'deposit',
             'notes'
         )
 

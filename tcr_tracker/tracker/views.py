@@ -14,7 +14,8 @@ from .forms import (
     AddNotesForm,
     RiderControlPointForm,
     ScratchRiderForm, TrackerRiderForm,
-    AdjustBalanceForm)
+    AdjustBalanceForm
+)
 
 from .models import Trackers, Riders, Events, RiderControlPoints, RaceStatus, Deposit
 
@@ -180,14 +181,12 @@ class TrackerRiderAssignment(
             rider.tracker_add_assignment(
                 self.object,
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit'],
                 self.request.user.profile
             )
         else:
             rider.tracker_remove_assignment(
                 self.object,
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit'],
                 self.request.user.profile
             )
         return HttpResponseRedirect(self.get_success_url())
@@ -272,14 +271,12 @@ class RiderTrackerAssignment(
             self.object.tracker_add_assignment(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit'],
                 self.request.user.profile
             )
         else:
             self.object.tracker_remove_assignment(
                 form.cleaned_data['tracker'],
                 form.cleaned_data['notes'],
-                form.cleaned_data['deposit'],
                 self.request.user.profile
             )
         return super(RiderTrackerAssignment, self).form_valid(form)
