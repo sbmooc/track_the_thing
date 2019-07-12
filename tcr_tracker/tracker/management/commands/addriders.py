@@ -22,6 +22,7 @@ class Command(BaseCommand):
             for row in csv_reader:
                 row['hire_tracker'] = True if row['hire_tracker'] == 'Hire TCR' else False
                 # row['balance'] = int(row['balance'])
+                row.pop('balance')
                 rider = Riders(**row)
                 try:
                     rider.save()
