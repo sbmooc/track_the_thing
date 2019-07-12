@@ -131,7 +131,7 @@ class TestRiders(TrackerRiderTests):
 class TestTrackers(TrackerRiderTests):
 
     def test_is_assignable_not_assignable(self):
-        self.tracker_1.working_status = 'working'
+        self.tracker_1.working_status = 'Functioning'
         self.assertTrue(self.tracker_1.assignable)
 
     def test_is_assignable_assignable(self):
