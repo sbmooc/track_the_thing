@@ -43,8 +43,7 @@ class RecordIssue(
     def form_valid(self, form):
         GitHubClient().create_issue(
             title=form.cleaned_data['brief_description_of_issue'],
-            body=f'''
-            URL: {form.cleaned_data['url']},
+            body=f'''URL: {form.cleaned_data['url']},
             REPORTED_BY: {form.cleaned_data['your_name']},
             DESCRIPTION: {form.cleaned_data['details']}
             '''
