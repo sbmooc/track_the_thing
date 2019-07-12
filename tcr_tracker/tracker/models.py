@@ -122,7 +122,6 @@ class AbstractModel(models.Model):
         abstract = True
 
 
-
 class Riders(AbstractModel):
 
     first_name = CharField(max_length=50, verbose_name='First Name')
@@ -131,7 +130,6 @@ class Riders(AbstractModel):
     cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
     gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
-    # todo put balance in pence
     tcr_id = CharField(max_length=10, null=True)
     country_code = CharField(max_length=5, null=True)
     hire_tracker = BooleanField(null=True)
@@ -143,7 +141,7 @@ class Riders(AbstractModel):
         all_deposits = Deposit.objects.filter(
             rider=self
         )
-        return sum(paym.amount for paym in all_deposits)
+        return sum(paym.amount for paym in all_deposits) / 100
 
     @property
     def current_tracker(self):
@@ -157,27 +155,8 @@ class Riders(AbstractModel):
     def all_events(self):
         return self.events.all()
 
-    # todo link riders who are in pairs? or does the capnumber do that???
-
     def get_absolute_url(self):
         return reverse('one_rider', kwargs={'pk': self.id})
-
-    @property
-    def url_assign_tracker(self):
-        return reverse('rider_tracker_assignment', kwargs={'pk': self.id})
-
-    @property
-    def url_possess_tracker(self):
-        return reverse('rider_tracker_possession', kwargs={'pk': self.id})
-
-    @property
-    def url_add_notes(self):
-        return reverse('rider_add_notes', kwargs={'pk': self.id})
-
-    # todo: add url for refunds
-    @property
-    def url_refund(self):
-        pass
 
     @property
     def scratch_button_display_state(self):
@@ -189,10 +168,10 @@ class Riders(AbstractModel):
 
     @property
     def get_buttons(self):
+
         return {
             'race_event': {
                 'label': 'Add race event',
-                # todo update url
                 'url': reverse('rider_add_control_point', kwargs={'pk': self.id}),
                 'staff_only': False,
                 'display': True
@@ -211,13 +190,13 @@ class Riders(AbstractModel):
             },
             'assign': {
                 'label': 'Assign tracker',
-                'url': None,
+                'url': reverse('rider_tracker_assignment', kwargs={'pk': self.id}),
                 'staff_only': True,
                 'display': True
             },
             'de_assign': {
                 'label': 'De-assign tracker',
-                'url': self.url_assign_tracker,
+                'url': reverse('rider_tracker_assignment', kwargs={'pk': self.id}),
                 'staff_only': True,
                 'display': True
             },
@@ -241,7 +220,7 @@ class Riders(AbstractModel):
             },
             'notes': {
                 'label': 'Add note',
-                'url': self.url_add_notes,
+                'url': reverse('rider_add_notes', kwargs={'pk': self.id}),
                 'staff_only': False,
                 'display': True
             }
@@ -254,17 +233,17 @@ class Riders(AbstractModel):
             raise TrackerNotAssignable()
         self.trackers_assigned.add(tracker)
         self.save()
+        deposit = Deposit.objects.create(
+            rider=self,
+            amount_in_pence=deposit * -1,
+            user=user.profile
+        )
         Events.objects.create(
             rider=self,
             tracker=tracker,
             notes=notes,
             event_type='add_tracker_assignment',
-            deposit_change=deposit/100 * -1,
-            user=user.profile
-        )
-        Deposit.objects.create(
-            rider=self,
-            amount_in_pence=deposit * -1,
+            deposit_change=deposit,
             user=user.profile
         )
         self.save()
@@ -273,17 +252,17 @@ class Riders(AbstractModel):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
+        deposit = Deposit.objects.create(
+            rider=self,
+            amount_in_pence=deposit,
+            user=user.profile
+        )
         Events.objects.create(
             rider=self,
             tracker=tracker,
             notes=notes,
             event_type='remove_tracker_assignment',
-            deposit_change=deposit/100,
-            user=user.profile
-        )
-        Deposit.objects.create(
-            rider=self,
-            amount_in_pence=deposit,
+            deposit_change=deposit,
             user=user.profile
         )
         tracker.working_status = 'to_be_tested'
@@ -405,10 +384,6 @@ class Trackers(AbstractModel):
     def record_status_button_display_state(self):
         return True
 
-    # @property
-    # def pre_assign_button_display_state(self):
-    #     return True if self.pre_race and self.rider_assigned is not None else False
-
     @property
     def get_buttons(self):
         return {
@@ -478,7 +453,13 @@ class Events(TimeStampedModel):
         related_name='events'
     )
     notes = TextField(null=True, blank=True)
-    deposit_change = IntegerField(null=True, blank=True)
+    deposit_change = ForeignKey(
+        Deposit,
+        on_delete=set.NULL,
+        null=True,
+        blank=True,
+        related_name='events'
+    )
     input_by = CharField(
         max_length=50,
         null=True
@@ -486,8 +467,8 @@ class Events(TimeStampedModel):
 
     @property
     def deposit_change_string(self):
-        sign = "-" if self.deposit_change < 0 else "+"
-        return sign + "£" + str(abs(self.deposit_change))
+        sign = "-" if self.deposit_change.amount_in_pence < 0 else "+"
+        return sign + "£" + str(abs(self.deposit_change.amount_in_pence / 100))
 
 class RaceStatus(TimeStampedModel):
     status = CharField(
