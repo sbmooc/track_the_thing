@@ -18,7 +18,7 @@ from tcr_tracker.tracker.views import (
     RiderControlpointView,
     ScratchRider,
     TrackerRider,
-    AddPayment, AddRefund, RecordIssue)
+    AddPayment, AddRefund, RecordIssue, LoginView)
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='/accounts/login', permanent=False), name='index'),
