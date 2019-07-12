@@ -1,7 +1,10 @@
 from arrow import arrow
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, UpdateView, FormView, CreateView
+
+from tcr_tracker.api_clients import GitHubClient
 from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin, GetObjectMixin, StaffOnlyMixin
 from dateutil import tz
 from .forms import (
@@ -14,11 +17,39 @@ from .forms import (
     AddNotesForm,
     RiderControlPointForm,
     ScratchRiderForm, TrackerRiderForm,
-    AdjustBalanceForm
-)
+    AdjustBalanceForm,
+    RecordIssueForm)
 
 from .models import Trackers, Riders, Events, RiderControlPoints, RaceStatus, Deposit
 
+class LoginView(
+    EnvironmentMixin,
+    LoginView
+):
+    pass
+
+
+class RecordIssue(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    StaffOnlyMixin,
+    GetObjectMixin,
+    FormView
+):
+    template_name = 'tracker/basic_form.html'
+    form_class = RecordIssueForm
+
+    def form_valid(self, form):
+        GitHubClient().create_issue(
+            title=form.cleaned_data['brief_description_of_issue'],
+            body=f'''
+            URL: {form.cleaned_data['url']},
+            REPORTED_BY: {form.cleaned_data['your_name']},
+            DESCRIPTION: {form.cleaned_data['details']}
+            '''
+        )
+        return HttpResponseRedirect('www.bbc.co.uk')
 
 class AddPayment(
     RaceStatusMixin,

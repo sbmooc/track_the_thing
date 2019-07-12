@@ -4,14 +4,25 @@ from django import forms
 
 from .models import Trackers, Riders, RiderControlPoints, ControlPoints, Deposit
 
+class RecordIssueForm(
+    forms.Form
+):
+    url = forms.CharField()
+    brief_description_of_issue = forms.TextInput()
+    details = forms.Textarea()
+    your_name = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
+
 
 class AdjustBalanceForm(
     forms.Form
 ):
     amount = forms.FloatField()
-
-    class Meta:
-        model = Deposit
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

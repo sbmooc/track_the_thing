@@ -18,7 +18,7 @@ from tcr_tracker.tracker.views import (
     RiderControlpointView,
     ScratchRider,
     TrackerRider,
-    AddPayment, AddRefund)
+    AddPayment, AddRefund, RecordIssue)
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='/accounts/login', permanent=False), name='index'),
@@ -54,5 +54,8 @@ urlpatterns = [
          name='tracker_add_notes'),
     path('trackers/<int:pk>/test', TrackerRider.as_view(),
          name='tracker_rider_test'),
+    path('issues/record', RecordIssue.as_view(),
+         name='record_issue'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/login', LoginView.as_view()),
 ]
