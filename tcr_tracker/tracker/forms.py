@@ -161,31 +161,50 @@ class TrackerRiderAssignmentForm(forms.ModelForm):
 
 class TrackerRiderForm(forms.Form):
 
-    def __init__(self, obj=None, *args, **kwargs):
+    def __init__(self, obj=None, action=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
-        self.define_fields(obj)
-
-    def define_fields(self, obj):
-        if type(obj) is Trackers:
-            self.add_tracker_fields()
-        else:
-            self.add_rider_fields()
+        if action == 'give':
+            self.define_give_fields(obj)
+        elif action == 'retrive':
+            self.define_retrive_fields(obj)
         self.fields['notes'] = forms.CharField(required=False)
 
-    def add_tracker_fields(self):
+    def define_give_fields(self, obj):
+
+        if type(obj) is Trackers:
+            self.add_tracker_give_fields()
+        else:
+            self.add_rider_give_fields()
+
+    def define_retrive_fields(self, obj):
+
+        if type(obj) is Trackers:
+            self.add_tracker_retrive_fields(obj)
+        else:
+            self.add_rider_retrive_fields(obj)
+
+    def add_tracker_give_fields(self):
         self.fields['rider'] = forms.ModelChoiceField(queryset=Riders.objects.all())
 
-    def add_rider_fields(self):
+    def add_rider_give_fields(self):
         self.fields['tracker'] = forms.ModelChoiceField(
             queryset=Trackers.objects.filter(
-                rider_assigned=None
-            ),
-            initial=Trackers.objects.filter(
-                rider_assigned=None
-            ).first()
+                rider_assigned=None,
+                working_status='Functioning'
+            )
+        )
+
+    def add_tracker_retrive_fields(self, obj):
+        self.fields['rider'] = forms.ModelChoiceField(queryset=Riders.objects.filter(trackers_possessed=obj))
+
+    def add_rider_retrive_fields(self, obj):
+        self.fields['tracker'] = forms.ModelChoiceField(
+            queryset=Trackers.objects.filter(
+                rider_possesed=obj
+            )
         )
 
 

@@ -15,8 +15,8 @@ from django.urls import reverse
 from tcr_tracker.tracker.errors import (
     TrackerNotAssigned,
     TrackerAlreadyAssigned,
-    TrackerNotPossessed
-)
+    TrackerNotPossessed,
+    TrackerNotAssignable)
 
 TRACKER_WORKING_STATUS = (
     ('working', 'Working'),
@@ -199,19 +199,19 @@ class Riders(AbstractModel):
             },
             'give': {
                 'label': 'Give tracker',
-                'url': self.url_possess_tracker,
+                'url': reverse('rider_test', kwargs={'pk': self.id}) + '?action=give',
                 'staff_only': False,
                 'display': True
             },
             'retrieve': {
                 'label': 'Retrieve tracker',
-                'url': self.url_possess_tracker,
+                'url': reverse('rider_test', kwargs={'pk': self.id}) + '?action=retrive',
                 'staff_only': False,
                 'display': True
             },
             'assign': {
                 'label': 'Assign tracker',
-                'url': reverse('rider_test', kwargs={'pk': self.id}),
+                'url': None,
                 'staff_only': True,
                 'display': True
             },
@@ -247,11 +247,11 @@ class Riders(AbstractModel):
             }
         }
 
-    # todo: add url_edit method for riders
-
     def tracker_add_assignment(self, tracker, notes, user, deposit=10000):
         if tracker.rider_assigned is not None:
             raise TrackerAlreadyAssigned()
+        if not tracker.assignable:
+            raise TrackerNotAssignable()
         self.trackers_assigned.add(tracker)
         self.save()
         Events.objects.create(
@@ -273,7 +273,6 @@ class Riders(AbstractModel):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
-        self.save()
         Events.objects.create(
             rider=self,
             tracker=tracker,
@@ -287,6 +286,8 @@ class Riders(AbstractModel):
             amount_in_pence=deposit,
             user=user.profile
         )
+        tracker.working_status = 'to_be_tested'
+        tracker.save()
         self.save()
 
     def tracker_add_possession(self, tracker, notes, user):
@@ -319,7 +320,7 @@ class Riders(AbstractModel):
         verbose_name_plural = 'Riders'
 
     def __str__(self):
-        return self.cap_number, self.full_name
+        return str(self.cap_number)
 
 
 class Deposit(TimeStampedModel):
@@ -354,8 +355,7 @@ class Trackers(AbstractModel):
                                related_name='trackers_possessed',
                                blank=True)
     tcr_id = CharField(max_length=20, null=True)
-    # todo add relationship to user!
-    test_by = CharField(max_length=20, null=True, blank=True)
+    test_by = CharField(max_length=20, null=True)
     clip = BooleanField(null=True)
 
     @property
@@ -364,7 +364,7 @@ class Trackers(AbstractModel):
 
     @property
     def assignable(self):
-        return self.rider_assigned is None and self.working_status == 'working' and self.rider_possesed is None
+        return self.rider_assigned is None and self.working_status == 'Functioning' and self.rider_possesed is None
 
     @property
     def rider_url(self):

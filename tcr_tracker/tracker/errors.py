@@ -11,3 +11,6 @@ class TrackerAlreadyAssigned(BaseException):
 
 class TrackerNotPossessed(BaseException):
     pass
+
+class TrackerNotAssignable(BaseException):
+    pass

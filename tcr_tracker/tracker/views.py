@@ -366,10 +366,47 @@ class TrackerRider(
         self.get_object()
         kwargs.update(
             {
-                'obj': self.object
+                'obj': self.object,
+                'action': self.request.GET['action']
             }
         )
         return kwargs
 
     def form_valid(self, form):
-        pass
+        if type(self.object) == Riders:
+            if self.request.GET['action'] == 'give':
+                self.object.tracker_add_assignment(
+                    form.cleaned_data['tracker'],
+                    form.cleaned_data['notes'],
+                    self.request.user
+                )
+                self.object.tracker_add_possession(
+                    form.cleaned_data['tracker'],
+                    form.cleaned_data['notes'],
+                    self.request.user
+                )
+            elif self.request.GET['action'] == 'retrive':
+                self.object.tracker_remove_possession(
+                    form.cleaned_data['tracker'],
+                    form.cleaned_data['notes'],
+                    self.request.user
+                )
+        elif type(self.object) == Trackers:
+            if self.request.GET['action'] == 'give':
+                form.cleaned_data['rider'].tracker_add_assignment(
+                    self.object,
+                    form.cleaned_data['notes'],
+                    self.request.user.profile
+                )
+                form.cleaned_data['rider'].tracker_add_possession(
+                    self.object,
+                    form.cleaned_data['notes'],
+                    self.request.user
+                )
+            elif self.request.GET['action'] == 'retrive':
+                form.cleaned_data['rider'].tracker_remove_possession(
+                    self.object,
+                    form.cleaned_data['notes'],
+                    self.request.user
+                )
+        return HttpResponseRedirect(self.object.url)
