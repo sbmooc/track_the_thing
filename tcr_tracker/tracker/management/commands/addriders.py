@@ -23,6 +23,7 @@ class Command(BaseCommand):
                 row['hire_tracker'] = True if row['hire_tracker'] == 'Hire TCR' else False
                 # row['balance'] = int(row['balance'])
                 row.pop('balance')
+                print(row.items())
                 rider = Riders(**row)
                 try:
                     rider.save()

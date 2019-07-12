@@ -319,7 +319,7 @@ class Riders(AbstractModel):
         verbose_name_plural = 'Riders'
 
     def __str__(self):
-        return self.cap_number, self.full_name
+        return str(self.cap_number) + ", " + str(self.full_name)
 
 
 class Deposit(TimeStampedModel):
