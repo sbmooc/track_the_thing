@@ -2,6 +2,7 @@ from arrow import arrow
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.views.generic import ListView, DetailView, UpdateView, FormView, CreateView
 
 from tcr_tracker.api_clients import GitHubClient
@@ -48,7 +49,7 @@ class RecordIssue(
             DESCRIPTION: {form.cleaned_data['details']}
             '''
         )
-        return HttpResponseRedirect('www.bbc.co.uk')
+        return HttpResponseRedirect(reverse('all_riders'))
 
 class AddPayment(
     RaceStatusMixin,
