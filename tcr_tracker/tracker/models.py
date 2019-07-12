@@ -455,7 +455,7 @@ class Events(TimeStampedModel):
     notes = TextField(null=True, blank=True)
     deposit_change = ForeignKey(
         Deposit,
-        on_delete=set.NULL,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='events'
