@@ -241,7 +241,6 @@ class Rider(AbstractModel):
         if not tracker.assignable:
             raise TrackerNotAssignable()
         self.trackers_assigned.add(tracker)
-        self.save()
         deposit = Deposit.objects.create(
             rider=self,
             amount_in_pence=deposit * -1,
@@ -261,7 +260,7 @@ class Rider(AbstractModel):
     def tracker_remove_assignment(self, tracker, notes, user, input_by, deposit=10000):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
-        self.trackers_assigned.remove(tracker)
+        tracker.rider_assigned = None
         deposit = Deposit.objects.create(
             rider=self,
             amount_in_pence=deposit,
@@ -297,7 +296,7 @@ class Rider(AbstractModel):
     def tracker_remove_possession(self, tracker, notes, user, input_by):
         if tracker not in self.trackers_possessed.all():
             raise TrackerNotPossessed()
-        self.trackers_possessed.remove(tracker)
+        tracker.rider_possesed = None
         Event.objects.create(
             rider=self,
             tracker=tracker,
@@ -306,6 +305,7 @@ class Rider(AbstractModel):
             user=user.profile,
             input_by=input_by
         )
+        tracker.save()
         self.save()
 
     class Meta:

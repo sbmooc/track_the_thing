@@ -8,7 +8,7 @@ from django.test import TestCase
 from tcr_tracker.tracker.models import (
     Rider,
     Tracker,
-    RaceStatus, Deposit)
+    RaceStatus, Deposit, Profile)
 from django.db.utils import IntegrityError
 
 
@@ -17,10 +17,12 @@ class TrackerRiderTests(TestCase):
     def setUp(self):
         self.rider_1 = Rider.objects.create()
         self.rider_2 = Rider.objects.create()
-        self.tracker_1 = Tracker.objects.create()
-        self.tracker_2 = Tracker.objects.create()
+        self.tracker_1 = Tracker.objects.create(working_status='Functioning')
+        self.tracker_2 = Tracker.objects.create(working_status='Functioning')
         self.user = User.objects.create()
-
+        self.profile = Profile.objects.create(
+            user=self.user
+        )
 
 
 class TestRiders(TrackerRiderTests):
@@ -48,22 +50,19 @@ class TestRiders(TrackerRiderTests):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            100,
-            self.user.profile
+            self.user,
+            None
         )
         self.rider_1.tracker_add_assignment(
             self.tracker_2,
             None,
-            100,
-            self.user.profile
+            self.user,
+            None
         )
         rider_from_db = Rider.objects.get(id=self.rider_1.id)
         trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(trackers), 2
-        )
-        self.assertEqual(
-            rider_from_db.balance, -200
         )
         self.assertCountEqual(
             trackers, [self.tracker_1, self.tracker_2]
@@ -73,8 +72,8 @@ class TestRiders(TrackerRiderTests):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            100,
-            self.user.profile
+            self.user,
+            None
         )
         rider_from_db = Rider.objects.get(id=self.rider_1.id)
         trackers = rider_from_db.trackers_assigned.all()
@@ -84,16 +83,13 @@ class TestRiders(TrackerRiderTests):
         self.rider_1.tracker_remove_assignment(
             self.tracker_1,
             None,
-            100,
-            self.user.profile
+            self.user,
+            None
         )
         rider_from_db.refresh_from_db()
         trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(trackers), 0
-        )
-        self.assertEqual(
-            rider_from_db.balance, 0
         )
 
     def test_same_tracker_cant_be_assigned_to_more_than_one_rider(self):
