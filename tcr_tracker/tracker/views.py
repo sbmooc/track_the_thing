@@ -17,9 +17,11 @@ from .forms import (
     TrackerRiderPossessionForm,
     AddNotesForm,
     RiderControlPointForm,
-    ScratchRiderForm, TrackerRiderForm,
+    ScratchRiderForm,
+    GiveRetriveForm,
     AdjustBalanceForm,
-    RecordIssueForm)
+    RecordIssueForm,
+    AssignmentPossessionForm)
 
 from .models import Trackers, Riders, Events, RiderControlPoints, RaceStatus, Deposit
 
@@ -382,18 +384,21 @@ class OneRider(
         return context
 
 
-class TrackerRider(
+class MultiActionFormView(
     RaceStatusMixin,
     EnvironmentMixin,
     LoginRequiredMixin,
     GetObjectMixin,
     FormView
 ):
-    form_class = TrackerRiderForm
     template_name = 'tracker/basic_form.html'
 
+    def get(self, request, *args, **kwargs):
+        self.get_object()
+        return super(MultiActionFormView, self).get(request, *args, **kwargs)
+
     def get_form_kwargs(self):
-        kwargs = super(TrackerRider, self).get_form_kwargs()
+        kwargs = super(MultiActionFormView, self).get_form_kwargs()
         self.get_object()
         kwargs.update(
             {
@@ -402,6 +407,83 @@ class TrackerRider(
             }
         )
         return kwargs
+
+
+class AssignmentPossessionView(
+    MultiActionFormView
+):
+    form_class = AssignmentPossessionForm
+
+    def get(self, request, *args, **kwargs):
+        self.get_object()
+        if request.GET.get('action') == 'assignment':
+            if type(self.object) == Trackers:
+                return HttpResponseRedirect(self.object.url)
+            else:
+                return super(AssignmentPossessionView, self).get(request, *args, **kwargs)
+        elif request.GET.get('action') == 'possession':
+            if type(self.object) == Trackers and not self.object.rider_assigned:
+                return HttpResponseRedirect(self.object.url)
+            elif type(self.object) == Riders and not self.object.trackers_assigned.all():
+                return HttpResponseRedirect(self.object.url)
+            else:
+                return super(AssignmentPossessionView, self).get(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect(self.object.url)
+
+    def form_valid(self, form):
+        if type(self.object) == Riders:
+            if self.request.GET.get('action') == 'assignment':
+                if form.cleaned_data.get('assign_tracker'):
+                    self.object.tracker_add_assignment(
+                        tracker=form.cleaned_data['assign_tracker'],
+                        notes=form.cleaned_data['notes'],
+                        user=self.request.user
+                    )
+                if form.cleaned_data.get('remove_assignment'):
+                    self.object.tracker_remove_assignment(
+                        tracker=form.cleaned_data.get('remove_assignment'),
+                        notes=form.cleaned_data['notes'],
+                        user=self.request.user
+                    )
+            if self.request.GET.get('action') == 'possession':
+                if form.cleaned_data['add_possession']:
+                    self.object.tracker_add_possession(
+                        tracker=form.cleaned_data['assign_tracker'],
+                        notes=form.cleaned_data['notes'],
+                        user=self.request.user
+                    )
+                for tracker in form.cleaned_data['remove_possession']:
+                    self.object.tracker_remove_possession(
+                        tracker=tracker,
+                        notes=form.cleaned_data['notes'],
+                        user=self.request.user
+                    )
+        elif type(self.object) == Trackers:
+            if self.request.GET.get('action') == 'possession':
+                rider = (
+                        form.cleaned_data.get('remove_possession') or
+                        form.cleaned_data.get('add_possession')
+                )
+                if form.cleaned_data.get('add_possession'):
+                    rider.tracker_add_possession(
+                        tracker=self.object,
+                        notes=form.cleaned_data['notes'],
+                        user=self.request.user
+                    )
+                else:
+                    rider.tracker_remove_possession(
+                        tracker=self.object,
+                        notes=form.cleaned_data['notes'],
+                        user=self.request.user
+                    )
+        return HttpResponseRedirect(self.object.url)
+
+
+class GiveRetriveView(
+    MultiActionFormView
+):
+    form_class = GiveRetriveForm
 
     def form_valid(self, form):
         if type(self.object) == Riders:

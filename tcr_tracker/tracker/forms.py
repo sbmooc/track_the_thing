@@ -170,18 +170,78 @@ class TrackerRiderAssignmentForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Save'))
 
 
-class TrackerRiderForm(forms.Form):
-
-    def __init__(self, obj=None, action=None, *args, **kwargs):
+class MultiActionForm(forms.Form):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Save'))
+        self.fields['notes'] = forms.CharField(required=False)
+
+
+class AssignmentPossessionForm(MultiActionForm):
+    def __init__(self, obj=None, action=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.object = obj
+        if action == 'assignment':
+            self.define_assignment_fields()
+        elif action == 'possession':
+            self.define_possession_fields()
+
+    def define_assignment_fields(self):
+        if type(self.object) is Riders:
+            self.assignment_rider_fields()
+
+    def define_possession_fields(self):
+        if type(self.object) is Trackers:
+            self.possession_tracker_fields()
+        if type(self.object) is Riders:
+            self.possession_rider_fields()
+
+    def assignment_rider_fields(self):
+        # todo put assignable trackers into custom manager
+        self.fields['assign_tracker'] = forms.ModelChoiceField(
+            queryset=Trackers.objects.filter(
+                rider_assigned=None,
+                working_status='Functioning'
+            ),
+            required=False
+        )
+        if self.object.trackers_assigned.all():
+            self.fields['remove_assignment'] = forms.ModelChoiceField(
+                queryset=self.object.trackers_assigned,
+                required=False,
+                label='De-assign Tracker'
+            )
+
+    def possession_rider_fields(self):
+        self.fields['add_possession'] = forms.ModelChoiceField(queryset=self.object.trackers_assigned)
+        if self.object.trackers_possessed.all():
+            self.fields['remove_possession'] = forms.ModelChoiceField(
+                widget=forms.CheckboxInput,
+                queryset=self.object.trackers_possessed
+            )
+
+    def possession_tracker_fields(self):
+        if self.object.rider_possesed:
+            self.fields['remove_possession'] = forms.ModelChoiceField(
+                widget=forms.CheckboxInput, queryset=self.object.rider_possesed
+            )
+        else:
+            self.fields['add_possession'] = forms.ModelChoiceField(
+                widget=forms.CheckboxInput, queryset=self.object.rider_assigned
+            )
+
+
+
+class GiveRetriveForm(MultiActionForm):
+
+    def __init__(self, obj=None, action=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if action == 'give':
             self.define_give_fields(obj)
         elif action == 'retrive':
             self.define_retrive_fields(obj)
-        self.fields['notes'] = forms.CharField(required=False)
 
     def define_give_fields(self, obj):
 

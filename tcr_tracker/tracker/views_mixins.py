@@ -11,7 +11,7 @@ class GetObjectMixin:
             'trackers': Trackers,
             'riders': Riders
         }
-        model, pk, _ = path_string[1:].split('/')
+        model, pk, _, _= path_string[1:].split('/')
         self.object = model_names[model].objects.get(id=pk)
 
 
