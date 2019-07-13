@@ -437,7 +437,7 @@ class Event(TimeStampedModel):
         related_name='events',
     )
     control_point = ForeignKey(
-        'tracker.ControlPoints',
+        'tracker.ControlPoint',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
