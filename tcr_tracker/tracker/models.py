@@ -141,7 +141,7 @@ class Rider(AbstractModel):
         all_deposits = Deposit.objects.filter(
             rider=self
         )
-        return sum(paym.amount for paym in all_deposits) / 100
+        return sum(paym.amount_in_pence for paym in all_deposits) / 100
 
     @property
     def current_tracker(self):

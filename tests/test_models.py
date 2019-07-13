@@ -31,8 +31,8 @@ class TestRiders(TrackerRiderTests):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            100,
-            self.user.profile
+            self.user,
+            None
         )
         rider_from_db = Rider.objects.get(id=self.rider_1.id)
         assigned_trackers = rider_from_db.trackers_assigned.all()
@@ -41,9 +41,6 @@ class TestRiders(TrackerRiderTests):
         )
         self.assertEqual(
             assigned_trackers[0], self.tracker_1
-        )
-        self.assertEqual(
-            rider_from_db.balance, -100
         )
 
     def test_add_multiple_tracker_assignment(self):
@@ -96,8 +93,8 @@ class TestRiders(TrackerRiderTests):
         self.rider_1.tracker_add_assignment(
             self.tracker_1,
             None,
-            100,
-            self.user.profile
+            self.user,
+            None
         )
 
         with self.assertRaises(TrackerAlreadyAssigned):
@@ -121,7 +118,7 @@ class TestRiders(TrackerRiderTests):
             rider=self.rider_1,
             amount_in_pence=-10000
         )
-        self.assertEqual(self.rider_1.balance, 10000)
+        self.assertEqual(self.rider_1.balance, 100)
 
 
 class TestTrackers(TrackerRiderTests):
