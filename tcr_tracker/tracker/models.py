@@ -148,6 +148,11 @@ class Rider(AbstractModel):
         return self.trackers_possessed.all().last() or None
 
     @property
+    def trackers_assigned_not_possessed(self):
+        # todo sort out this unecessary hit on the db
+        return Tracker.objects.filter(rider_assigned=self, rider_possesed=None)
+
+    @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 

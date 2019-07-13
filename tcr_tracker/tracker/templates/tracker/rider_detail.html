@@ -1,40 +1,47 @@
 {% extends 'base.html' %}
+{% block headertitle %}
+<div class="text-light">
+    Rider: {{ rider.first_name}} {{ rider.last_name }}
+    <br>
+    Cap: {{rider.cap_number}}
+</div>
+{% endblock %}
 {% block content %}
-
     <!--status headers-->
     <!--todo: reduce gutter size-->
     <div class="container-fluid">
         <div class="row my-2">
             <div class="col-5 my-auto">Status:</div>
-            <div class="col my-auto"><b>{{ trackers.working_status }}</b></div>
-            <div class="col my-auto" style="color: grey; font-size: 80%; text-align: right">{{ trackers.last_test_date }}</div>
+            <div class="col my-auto"><b>{{ rider.status }}</b></div>
         </div>
         <div class="row my-2">
-            <div class="col-5 my-auto">Possession:</div>
-            {% if trackers.rider_possesed %}
+            <div class="col-5 my-auto">Current tracker:</div>
+            {% if rider.current_tracker %}
                 <div class="col my-auto">
-                    <a href="{{ trackers.rider_possesed.url }}">
-                        {{ trackers.rider_possesed }}
+                    <a href="{{ rider.current_tracker.url }}">
+                        {{ rider.current_tracker.tcr_id }}
                     </a>
                 </div>
             {% else %}
                 <div class="col my-auto">
-                    N/A
+                    None
                 </div>
             {% endif %}
         </div>
         {% if user.profile.is_tcr_staff %}
             <div class="row my-2">
-                <div class="col-5 my-auto">Assignment:</div>
-                {% if trackers.rider_assigned %}
+                <div class="col-5 my-auto">Assigned trackers:</div>
+                {% if rider.trackers_assigned.all %}
                     <div class="col my-auto">
-                        <a href="{{ trackers.rider_assigned.url }}">
-                            {{ trackers.rider_assigned }}
-                        </a>
+                        {% for tracker in rider.trackers_assigned.all %}
+                            <a href="{{ tracker.url }}">
+                                #{{ tracker.tcr_id }}
+                            </a>
+                        {% endfor %}
                     </div>
                 {% else %}
                     <div class="col my-auto">
-                        N/A
+                        None
                     </div>
                 {% endif %}
             </div>
@@ -45,7 +52,7 @@
     <div class="container-fluid my-2">
         <div class="row">
             {% if user.profile.is_tcr_staff %}
-                {% for button in trackers.get_buttons.values %}
+                {% for button in rider.get_buttons.values %}
                     {% if button.display %}
                             <div class="col my-2">
                                 <a href={{ button.url }}>
@@ -55,7 +62,7 @@
                     {% endif %}
                 {% endfor %}
             {% else %}
-                {% for button in trackers.get_buttons.values %}
+                {% for button in rider.get_buttons.values %}
                     {% if button.display and not button.staff_only %}
                             <div class="col my-2">
                                 <a href={{ button.url }}>
@@ -68,7 +75,7 @@
         </div>
     </div>
 
-    <!--Events and notes list-->
+    <!--Notes list-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
@@ -76,14 +83,14 @@
             </div>
         </div>
         <ul class="list-group">
-            {% if not trackers.all_events %}
+            {% if not rider.all_events %}
                 <li class="list-group-item">
                     <div>
-                        There are no events or notes for this tracker.
+                        There are no events or notes for this rider.
                     </div>
                 </li>
             {% else %}
-                {% for event in trackers.all_events reversed %}
+                {% for event in rider.all_events reversed %}
                     <li class="list-group-item">
                         <div class="row">
                             <div class="col">
@@ -93,10 +100,13 @@
                                 {% if event.event_type != "add_note" %}
                                     <div><b>{{ event.event_type }}</b></div>
                                 {% endif %}
-                                {% if event.rider %}
+                                {% if event.control_point %}
+                                    <div>{{ event.control_point }}</div>
+                                {% endif %}
+                                {% if event.tracker %}
                                     <div>
-                                        <a href="{{ event.rider.url }}">
-                                            ({{ event.rider.full_name }} / #{{ event.rider.cap_number }})
+                                        <a href="{{ event.tracker.url }}">
+                                            (#{{ event.tracker.tcr_id }} / {{ event.tracker.esn_number }})
                                         </a>
                                     </div>
                                 {% endif %}
@@ -107,6 +117,13 @@
                                     </div>
                                 {% endif %}
                             </div>
+                            {% if user.profile.is_tcr_staff %}
+                                <div class="col-3" style="text-align: right">
+                                    {% if event.deposit_change %}
+                                        {{ event.deposit_change_string }}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
                         </div>
                     </li>
                 {% endfor %}
@@ -114,14 +131,58 @@
         </ul>
     </div>
 
-    <!--Tracker info table-->
+    <!--&lt;!&ndash;Events log&ndash;&gt;-->
+    <!--<div class="container-fluid my-2">-->
+        <!--<div class="row">-->
+            <!--<div class="col my-2">-->
+                <!--<h5>Events</h5>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--{% if not rider.all_events %}-->
+            <!--<ul class="list-group">-->
+                <!--<li class="list-group-item">-->
+                    <!--<div>-->
+                        <!--There are no events for this rider.-->
+                    <!--</div>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--{% else %}-->
+            <!--<table class="table table-hover table-responsive-xs">-->
+                <!--<thead>-->
+                <!--<tr>-->
+                    <!--<th scope="col">Date</th>-->
+                    <!--<th scope="col">Event</th>-->
+                    <!--<th scope="col">User</th>-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody>-->
+                <!--&lt;!&ndash;todo: replace with for-loop&ndash;&gt;-->
+                <!--{% for event in rider.all_events reversed %}-->
+                    <!--<tr>-->
+                        <!--<td>-->
+                            <!--{{event.created}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--{{event.event_type}}-->
+                        <!--</td>-->
+                        <!--<td>-->
+                            <!--{{event.user}}-->
+                        <!--</td>-->
+                    <!--</tr>-->
+                <!--{% endfor %}-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--{% endif %}-->
+    <!--</div>-->
+
+    <!--Rider info table-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
-                <h5>Tracker info</h5>
+                <h5>Rider info</h5>
             </div>
             <div class="col my-2 mr-1" style="text-align: right">
-                <a href="{{ trackers.url_edit }}"  style="font-size: 120%">
+                <a href="{{ rider.url_edit }}"  style="font-size: 120%">
                     <i class="fa fa-pen"></i>
                 </a>
             </div>
@@ -129,7 +190,7 @@
         <table class="table table-hover">
             <tbody>
             <tr>
-                {% for field, value in tracker_dict.items %}
+                {% for field, value in rider_dict.items %}
                     {% if field != "_state" and field != "id" %}
                         <td>
                             {{ field }}

@@ -209,7 +209,7 @@ class TrackerEdit(
 ):
     model = Tracker
     form_class = EditTracker
-    template_name = 'tracker/trackers_edit.html'
+    template_name = 'tracker/tracker_edit.html'
 
 
 class TrackerTest(
@@ -219,7 +219,7 @@ class TrackerTest(
     DetailView
 ):
     model = Tracker
-    template_name = 'tracker/trackers_detail.html'
+    template_name = 'tracker/tracker_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(TrackerTest, self).get_context_data(**kwargs)
@@ -241,7 +241,7 @@ class RiderEdit(
 ):
     model = Rider
     form_class = EditRider
-    template_name = 'tracker/riders_edit.html'
+    template_name = 'tracker/rider_edit.html'
 
 
 class AllRiders(
@@ -270,9 +270,9 @@ class OneRider(
     def get_context_data(self, **kwargs):
         context = super(OneRider, self).get_context_data(**kwargs)
         context['brevet_data'] = self.request.session.get('brevet_data')
-        context['rider_dict'] = context['riders'].__dict__
-        context['page_title'] = 'Rider: %s' % context['riders'].full_name
-        context['active_tab'] = 'riders'
+        context['rider_dict'] = context['rider'].__dict__
+        context['page_title'] = 'Rider: %s' % context['rider'].full_name
+        context['active_tab'] = 'rider'
         return context
 
 
@@ -345,9 +345,9 @@ class AssignmentPossessionView(
                         notes=form.cleaned_data['notes'],
                         user=self.request.user
                     )
-                for tracker in form.cleaned_data['remove_possession']:
+                if form.cleaned_data.get('remove_possession'):
                     self.object.tracker_remove_possession(
-                        tracker=tracker,
+                        tracker=form.cleaned_data.get('remove_possession'),
                         notes=form.cleaned_data['notes'],
                         user=self.request.user
                     )

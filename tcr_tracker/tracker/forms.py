@@ -5,9 +5,7 @@ from django import forms
 from .models import Tracker, Rider, RiderControlPoint
 
 
-class CrispyFormMixin(
-    forms.Form
-):
+class CrispyFormMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -17,7 +15,8 @@ class CrispyFormMixin(
 
 
 class RecordIssueForm(
-    CrispyFormMixin
+    CrispyFormMixin,
+    forms.Form,
 ):
     url = forms.CharField()
     brief_description_of_issue = forms.CharField(widget=forms.TextInput())
@@ -26,11 +25,14 @@ class RecordIssueForm(
 
 
 class AdjustBalanceForm(
-    CrispyFormMixin
+    CrispyFormMixin,
+    forms.Form
 ):
     amount = forms.FloatField()
 
+
 class ScratchRiderForm(
+    forms.ModelForm,
     CrispyFormMixin
 ):
 
@@ -46,14 +48,16 @@ class ScratchRiderForm(
 
 
 class AddNotesForm(
-    CrispyFormMixin
+    CrispyFormMixin,
+    forms.Form,
 ):
     notes = forms.CharField()
     input_by = forms.CharField()
 
 
 class RiderControlPointForm(
-    CrispyFormMixin
+    CrispyFormMixin,
+    forms.ModelForm
 ):
 
     race_time = forms.SplitDateTimeField(
@@ -70,7 +74,8 @@ class RiderControlPointForm(
 
 
 class EditTracker(
-    CrispyFormMixin
+    CrispyFormMixin,
+    forms.Form
 ):
 
     class Meta:
@@ -82,7 +87,8 @@ class EditTracker(
 
 
 class EditRider(
-    CrispyFormMixin
+    CrispyFormMixin,
+    forms.Form
 ):
 
     class Meta:
@@ -94,11 +100,12 @@ class EditRider(
 
 
 class MultiActionForm(
-    CrispyFormMixin
+    CrispyFormMixin,
+    forms.Form
 ):
     def __init__(self, *args, **kwargs):
-        self.fields['notes'] = forms.CharField(required=False)
         super().__init__(*args, **kwargs)
+        self.fields['notes'] = forms.CharField(required=False)
 
 
 class AssignmentPossessionForm(MultiActionForm):
@@ -137,11 +144,14 @@ class AssignmentPossessionForm(MultiActionForm):
             )
 
     def possession_rider_fields(self):
-        self.fields['add_possession'] = forms.ModelChoiceField(queryset=self.object.trackers_assigned)
+        self.fields['add_possession'] = forms.ModelChoiceField(
+            queryset=self.object.trackers_assigned_not_possessed,
+            required=False
+        )
         if self.object.trackers_possessed.all():
             self.fields['remove_possession'] = forms.ModelChoiceField(
-                widget=forms.CheckboxInput,
-                queryset=self.object.trackers_possessed
+                queryset=self.object.trackers_possessed,
+                required=False
             )
 
     def possession_tracker_fields(self):
