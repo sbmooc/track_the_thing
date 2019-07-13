@@ -1,7 +1,7 @@
 import csv
 
 from django.core.management.base import BaseCommand, CommandError
-from tcr_tracker.tracker.models import Riders, Deposit, Events
+from tcr_tracker.tracker.models import Rider, Deposit, Event
 
 
 class Command(BaseCommand):
@@ -24,14 +24,14 @@ class Command(BaseCommand):
                 row['hire_tracker'] = True if row['hire_tracker'] == 'Hire TCR' else False
                 balance = int(row['balance'])
                 row.pop('balance')
-                rider = Riders(**row)
+                rider = Rider(**row)
                 try:
                     rider.save()
                     deposit = Deposit.objects.create(
                         rider=rider,
                         amount_in_pence=balance*100
                     )
-                    Events.objects.create(
+                    Event.objects.create(
                         deposit_change=deposit,
                         rider=rider,
                         event_type='payment_in',

@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from tcr_tracker.tracker.models import RaceStatus, Trackers, Riders
+from tcr_tracker.tracker.models import RaceStatus, Tracker, Rider
 
 
 class GetObjectMixin:
@@ -8,8 +8,8 @@ class GetObjectMixin:
     def get_object(self):
         path_string = self.request.path
         model_names = {
-            'trackers': Trackers,
-            'riders': Riders
+            'trackers': Tracker,
+            'riders': Rider
         }
         model, pk, _, _= path_string[1:].split('/')
         self.object = model_names[model].objects.get(id=pk)

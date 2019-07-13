@@ -2,7 +2,7 @@ import csv
 from datetime import datetime
 
 from django.core.management.base import BaseCommand
-from tcr_tracker.tracker.models import Trackers
+from tcr_tracker.tracker.models import Tracker
 
 class Command(BaseCommand):
     help = 'Add trackers to application'
@@ -22,7 +22,7 @@ class Command(BaseCommand):
                 row['purchase_date'] = datetime.strptime(row['purchase_date'].strip(), '%d/%m/%Y')
                 row['warranty_expiry'] = datetime.strptime(row['warranty_expiry'].strip(), '%d/%m/%Y')
                 row['clip'] = row['clip'] == 'Y'
-                tracker = Trackers(**row)
+                tracker = Tracker(**row)
                 try:
                     tracker.save()
                     count += 1

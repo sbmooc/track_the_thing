@@ -122,7 +122,7 @@ class AbstractModel(models.Model):
         abstract = True
 
 
-class Riders(AbstractModel):
+class Rider(AbstractModel):
 
     first_name = CharField(max_length=50, verbose_name='First Name')
     last_name = CharField(max_length=50)
@@ -178,27 +178,27 @@ class Riders(AbstractModel):
             },
             'give': {
                 'label': 'Give tracker',
-                'url': reverse('rider_test', kwargs={'pk': self.id}) + '?action=give',
+                'url': reverse('rider_give_retrive', kwargs={'pk': self.id}) + '?action=give',
                 'staff_only': False,
                 'display': True
             },
             'retrieve': {
                 'label': 'Retrieve tracker',
-                'url': reverse('rider_test', kwargs={'pk': self.id}) + '?action=retrive',
+                'url': reverse('rider_give_retrive', kwargs={'pk': self.id}) + '?action=retrive',
                 'staff_only': False,
                 'display': True
             },
             'assign': {
-                'label': 'Assign tracker',
-                'url': reverse('rider_tracker_assignment', kwargs={'pk': self.id}),
+                'label': 'Assign/Deassign tracker',
+                'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=assignment',
                 'staff_only': True,
                 'display': True
             },
-            'de_assign': {
-                'label': 'De-assign tracker',
-                'url': reverse('rider_tracker_assignment', kwargs={'pk': self.id}),
+            'possession': {
+                'label': 'Possession/De-Possession tracker',
+                'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=possession',
                 'staff_only': True,
-                'display': True
+                'display': True if self.trackers_assigned.all() else False
             },
             'scratch': {
                 'label': 'Scratch Rider',
@@ -238,7 +238,7 @@ class Riders(AbstractModel):
             amount_in_pence=deposit * -1,
             user=user.profile
         )
-        Events.objects.create(
+        Event.objects.create(
             rider=self,
             tracker=tracker,
             notes=notes,
@@ -257,7 +257,7 @@ class Riders(AbstractModel):
             amount_in_pence=deposit,
             user=user.profile
         )
-        Events.objects.create(
+        Event.objects.create(
             rider=self,
             tracker=tracker,
             notes=notes,
@@ -273,7 +273,7 @@ class Riders(AbstractModel):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_possessed.add(tracker)
-        Events.objects.create(
+        Event.objects.create(
             rider=self,
             tracker=tracker,
             notes=notes,
@@ -286,7 +286,7 @@ class Riders(AbstractModel):
         if tracker not in self.trackers_possessed.all():
             raise TrackerNotPossessed()
         self.trackers_possessed.remove(tracker)
-        Events.objects.create(
+        Event.objects.create(
             rider=self,
             tracker=tracker,
             notes=notes,
@@ -305,7 +305,7 @@ class Riders(AbstractModel):
 class Deposit(TimeStampedModel):
 
     rider = ForeignKey(
-        Riders,
+        Rider,
         on_delete=models.SET_NULL,
         null=True,
         related_name='payment',
@@ -313,7 +313,7 @@ class Deposit(TimeStampedModel):
     amount_in_pence = IntegerField()
 
 
-class Trackers(AbstractModel):
+class Tracker(AbstractModel):
 
     esn_number = CharField(max_length=50)
     working_status = CharField(
@@ -325,14 +325,14 @@ class Trackers(AbstractModel):
     purchase_date = DateField(null=True)
     warranty_expiry = DateField(null=True)
     owner = CharField(max_length=50, choices=TRACKER_OWNER)
-    rider_assigned = ForeignKey(Riders,
+    rider_assigned = ForeignKey(Rider,
                                 on_delete=models.SET_NULL, null=True,
                                 related_name='trackers_assigned',
                                 blank=True)
-    rider_possesed = ForeignKey(Riders,
-                               on_delete=models.SET_NULL, null=True,
-                               related_name='trackers_possessed',
-                               blank=True)
+    rider_possesed = ForeignKey(Rider,
+                                on_delete=models.SET_NULL, null=True,
+                                related_name='trackers_possessed',
+                                blank=True)
     tcr_id = CharField(max_length=20, null=True)
     test_by = CharField(max_length=20, null=True)
     clip = BooleanField(null=True)
@@ -373,14 +373,6 @@ class Trackers(AbstractModel):
         return self.get_loan_status_display()
 
     @property
-    def give_button_display_state(self):
-        return True
-
-    @property
-    def retrieve_button_display_state(self):
-        return True
-
-    @property
     def record_status_button_display_state(self):
         return True
 
@@ -389,22 +381,21 @@ class Trackers(AbstractModel):
         return {
             'record_status': {
                 'label': 'Record status',
-                #todo update url
                 'url': self.record_test,
                 'staff_only': True,
                 'display': self.record_status_button_display_state
             },
             'give': {
                 'label': 'Give to rider',
-                'url': self.url_possess_tracker,
+                'url': reverse('tracker_give_retrive', kwargs={'pk': self.id}) + '?action=give',
                 'staff_only': False,
-                'display': self.give_button_display_state
+                'display': False if Tracker.rider_assigned else True
             },
             'retrieve': {
-                'label': 'Retrieve',
-                'url': self.url_possess_tracker,
+                'label': 'Retrieve from rider',
+                'url': reverse('tracker_give_retrive', kwargs={'pk': self.id}) + '?action=give',
                 'staff_only': False,
-                'display': self.retrieve_button_display_state
+                'display': True if Tracker.rider_possessed else False
             },
             'notes': {
                 'label': 'Add note',
@@ -425,21 +416,21 @@ class Trackers(AbstractModel):
         return str(self.tcr_id)
 
 
-class Events(TimeStampedModel):
+class Event(TimeStampedModel):
     event_type = CharField(
         max_length=50,
         choices=EVENT_CATEGORIES,
         null=True,
     )
     tracker = ForeignKey(
-        Trackers,
+        Tracker,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='events',
     )
     rider = ForeignKey(
-        Riders,
+        Rider,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -469,6 +460,7 @@ class Events(TimeStampedModel):
     def deposit_change_string(self):
         sign = "-" if self.deposit_change.amount_in_pence < 0 else "+"
         return sign + "£" + str(abs(self.deposit_change.amount_in_pence / 100))
+
 
 class RaceStatus(TimeStampedModel):
     status = CharField(
@@ -512,7 +504,7 @@ class RaceStatus(TimeStampedModel):
         return self.status
 
 
-class ControlPoints(models.Model):
+class ControlPoint(models.Model):
     name = CharField(max_length=50)
     abbreviation = CharField(max_length=50)
     latitude = CharField(max_length=50)
@@ -522,14 +514,14 @@ class ControlPoints(models.Model):
         return self.abbreviation
 
 
-class RiderControlPoints(TimeStampedModel):
+class RiderControlPoint(TimeStampedModel):
     rider = ForeignKey(
-        Riders,
+        Rider,
         on_delete=models.SET_NULL, null=True,
         related_name='checkpoints',
     )
     control_point = ForeignKey(
-        ControlPoints,
+        ControlPoint,
         on_delete=models.SET_NULL, null=True,
         related_name='riders'
     )

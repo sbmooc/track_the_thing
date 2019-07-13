@@ -20,7 +20,7 @@ from .forms import (
     AssignmentPossessionForm
 )
 
-from .models import Trackers, Riders, Events, RiderControlPoints, RaceStatus, Deposit
+from .models import Tracker, Rider, Event, RiderControlPoint, RaceStatus, Deposit
 
 
 class TrackerLoginView(
@@ -66,7 +66,7 @@ class AddPayment(
 
     def form_valid(self, form):
         self.get_object()
-        Events.objects.create(
+        Event.objects.create(
             event_type=self.event_type,
             user=self.request.user.profile,
             rider=self.object
@@ -95,14 +95,14 @@ class ScratchRider(
 ):
     template_name = 'tracker/basic_form.html'
     form_class = ScratchRiderForm
-    model = Riders
+    model = Rider
 
     def form_valid(self, form):
-        Events.objects.create(
+        Event.objects.create(
             event_type='scratch',
             notes=form.cleaned_data['notes'],
             user=self.request.user.profile,
-            rider=self.object if type(self.object) is Riders else None
+            rider=self.object if type(self.object) is Rider else None
         )
         self.object.status = 'scratched'
         self.object.save()
@@ -124,13 +124,13 @@ class AddNotes(
 
     def form_valid(self, form):
         self.get_object()
-        Events.objects.create(
+        Event.objects.create(
             event_type='add_note',
             notes=form.cleaned_data['notes'],
             user=self.request.user.profile,
             input_by=form.cleaned_data['input_by'],
-            tracker=self.object if type(self.object) is Trackers else None,
-            rider=self.object if type(self.object) is Riders else None
+            tracker=self.object if type(self.object) is Tracker else None,
+            rider=self.object if type(self.object) is Rider else None
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
 
@@ -141,7 +141,7 @@ class RiderControlpointView(
     LoginRequiredMixin,
     UpdateView
 ):
-    model = Riders
+    model = Rider
     template_name = 'tracker/basic_form.html'
     form_class = RiderControlPointForm
 
@@ -152,14 +152,14 @@ class RiderControlpointView(
 
     def form_valid(self, form):
         time_elapsed = RaceStatus.objects.last().elapsed_time_string
-        RiderControlPoints.objects.create(
+        RiderControlPoint.objects.create(
             rider=self.object,
             control_point=form.cleaned_data['control_point'],
             race_time=form.cleaned_data['race_time'],
             input_by=form.cleaned_data['input_by'],
             race_time_string=time_elapsed
         )
-        Events.objects.create(
+        Event.objects.create(
             event_type='arrive_checkpoint',
             rider=self.object,
             input_by=form.cleaned_data['input_by'],
@@ -176,7 +176,7 @@ class AllTrackers(
     LoginRequiredMixin,
     ListView
 ):
-    model = Trackers
+    model = Tracker
 
     def get_context_data(self, **kwargs):
         context = super(AllTrackers, self).get_context_data(**kwargs)
@@ -191,7 +191,7 @@ class OneTracker(
     DetailView,
     EnvironmentMixin
 ):
-    model = Trackers
+    model = Tracker
 
     def get_context_data(self, **kwargs):
         context = super(OneTracker, self).get_context_data(**kwargs)
@@ -207,7 +207,7 @@ class TrackerEdit(
     LoginRequiredMixin,
     UpdateView
 ):
-    model = Trackers
+    model = Tracker
     form_class = EditTracker
     template_name = 'tracker/trackers_edit.html'
 
@@ -218,7 +218,7 @@ class TrackerTest(
     LoginRequiredMixin,
     DetailView
 ):
-    model = Trackers
+    model = Tracker
     template_name = 'tracker/trackers_detail.html'
 
     def get_context_data(self, **kwargs):
@@ -239,7 +239,7 @@ class RiderEdit(
     RaceStatusMixin,
     EnvironmentMixin
 ):
-    model = Riders
+    model = Rider
     form_class = EditRider
     template_name = 'tracker/riders_edit.html'
 
@@ -250,7 +250,7 @@ class AllRiders(
     LoginRequiredMixin,
     ListView
 ):
-    model = Riders
+    model = Rider
 
     def get_context_data(self, **kwargs):
         context = super(AllRiders, self).get_context_data(**kwargs)
@@ -265,7 +265,7 @@ class OneRider(
     LoginRequiredMixin,
     DetailView
 ):
-    model = Riders
+    model = Rider
 
     def get_context_data(self, **kwargs):
         context = super(OneRider, self).get_context_data(**kwargs)
@@ -309,14 +309,14 @@ class AssignmentPossessionView(
     def get(self, request, *args, **kwargs):
         self.get_object()
         if request.GET.get('action') == 'assignment':
-            if type(self.object) == Trackers:
+            if type(self.object) == Tracker:
                 return HttpResponseRedirect(self.object.url)
             else:
                 return super(AssignmentPossessionView, self).get(request, *args, **kwargs)
         elif request.GET.get('action') == 'possession':
-            if type(self.object) == Trackers and not self.object.rider_assigned:
+            if type(self.object) == Tracker and not self.object.rider_assigned:
                 return HttpResponseRedirect(self.object.url)
-            elif type(self.object) == Riders and not self.object.trackers_assigned.all():
+            elif type(self.object) == Rider and not self.object.trackers_assigned.all():
                 return HttpResponseRedirect(self.object.url)
             else:
                 return super(AssignmentPossessionView, self).get(request, *args, **kwargs)
@@ -324,7 +324,7 @@ class AssignmentPossessionView(
             return HttpResponseRedirect(self.object.url)
 
     def form_valid(self, form):
-        if type(self.object) == Riders:
+        if type(self.object) == Rider:
             if self.request.GET.get('action') == 'assignment':
                 if form.cleaned_data.get('assign_tracker'):
                     self.object.tracker_add_assignment(
@@ -351,7 +351,7 @@ class AssignmentPossessionView(
                         notes=form.cleaned_data['notes'],
                         user=self.request.user
                     )
-        elif type(self.object) == Trackers:
+        elif type(self.object) == Tracker:
             if self.request.GET.get('action') == 'possession':
                 rider = (
                         form.cleaned_data.get('remove_possession') or
@@ -378,7 +378,7 @@ class GiveRetriveView(
     form_class = GiveRetriveForm
 
     def form_valid(self, form):
-        if type(self.object) == Riders:
+        if type(self.object) == Rider:
             if self.request.GET['action'] == 'give':
                 self.object.tracker_add_assignment(
                     form.cleaned_data['tracker'],
@@ -396,7 +396,7 @@ class GiveRetriveView(
                     form.cleaned_data['notes'],
                     self.request.user
                 )
-        elif type(self.object) == Trackers:
+        elif type(self.object) == Tracker:
             if self.request.GET['action'] == 'give':
                 form.cleaned_data['rider'].tracker_add_assignment(
                     self.object,

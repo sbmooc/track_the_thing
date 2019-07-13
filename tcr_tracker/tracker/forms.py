@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from .models import Trackers, Riders, RiderControlPoints
+from .models import Tracker, Rider, RiderControlPoint
 
 
 class CrispyFormMixin(
@@ -38,7 +38,7 @@ class ScratchRiderForm(
 
     class Meta:
         fields = ()
-        model = Riders
+        model = Rider
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,7 +62,7 @@ class RiderControlPointForm(
     )
 
     class Meta:
-        model = RiderControlPoints
+        model = RiderControlPoint
         fields = (
             'control_point',
             'input_by'
@@ -74,7 +74,7 @@ class EditTracker(
 ):
 
     class Meta:
-        model = Trackers
+        model = Tracker
         exclude = (
             'rider_assigned',
             'rider_possesed'
@@ -86,7 +86,7 @@ class EditRider(
 ):
 
     class Meta:
-        model = Riders
+        model = Rider
         exclude = (
             'trackers_assigned',
             'trackers_possessed'
@@ -111,19 +111,19 @@ class AssignmentPossessionForm(MultiActionForm):
             self.define_possession_fields()
 
     def define_assignment_fields(self):
-        if type(self.object) is Riders:
+        if type(self.object) is Rider:
             self.assignment_rider_fields()
 
     def define_possession_fields(self):
-        if type(self.object) is Trackers:
+        if type(self.object) is Tracker:
             self.possession_tracker_fields()
-        if type(self.object) is Riders:
+        if type(self.object) is Rider:
             self.possession_rider_fields()
 
     def assignment_rider_fields(self):
         # todo put assignable trackers into custom manager
         self.fields['assign_tracker'] = forms.ModelChoiceField(
-            queryset=Trackers.objects.filter(
+            queryset=Tracker.objects.filter(
                 rider_assigned=None,
                 working_status='Functioning'
             ),
@@ -166,35 +166,35 @@ class GiveRetriveForm(MultiActionForm):
 
     def define_give_fields(self, obj):
 
-        if type(obj) is Trackers:
+        if type(obj) is Tracker:
             self.add_tracker_give_fields()
         else:
             self.add_rider_give_fields()
 
     def define_retrive_fields(self, obj):
 
-        if type(obj) is Trackers:
+        if type(obj) is Tracker:
             self.add_tracker_retrive_fields(obj)
         else:
             self.add_rider_retrive_fields(obj)
 
     def add_tracker_give_fields(self):
-        self.fields['rider'] = forms.ModelChoiceField(queryset=Riders.objects.all())
+        self.fields['rider'] = forms.ModelChoiceField(queryset=Rider.objects.all())
 
     def add_rider_give_fields(self):
         self.fields['tracker'] = forms.ModelChoiceField(
-            queryset=Trackers.objects.filter(
+            queryset=Tracker.objects.filter(
                 rider_assigned=None,
                 working_status='Functioning'
             )
         )
 
     def add_tracker_retrive_fields(self, obj):
-        self.fields['rider'] = forms.ModelChoiceField(queryset=Riders.objects.filter(trackers_possessed=obj))
+        self.fields['rider'] = forms.ModelChoiceField(queryset=Rider.objects.filter(trackers_possessed=obj))
 
     def add_rider_retrive_fields(self, obj):
         self.fields['tracker'] = forms.ModelChoiceField(
-            queryset=Trackers.objects.filter(
+            queryset=Tracker.objects.filter(
                 rider_possesed=obj
             )
         )

@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from tcr_tracker.tracker.errors import TrackerAlreadyAssigned
 from django.test import TestCase
 from tcr_tracker.tracker.models import (
-    Riders,
-    Trackers,
+    Rider,
+    Tracker,
     RaceStatus, Deposit)
 from django.db.utils import IntegrityError
 
@@ -15,10 +15,10 @@ from django.db.utils import IntegrityError
 class TrackerRiderTests(TestCase):
 
     def setUp(self):
-        self.rider_1 = Riders.objects.create()
-        self.rider_2 = Riders.objects.create()
-        self.tracker_1 = Trackers.objects.create()
-        self.tracker_2 = Trackers.objects.create()
+        self.rider_1 = Rider.objects.create()
+        self.rider_2 = Rider.objects.create()
+        self.tracker_1 = Tracker.objects.create()
+        self.tracker_2 = Tracker.objects.create()
         self.user = User.objects.create()
 
 
@@ -32,7 +32,7 @@ class TestRiders(TrackerRiderTests):
             100,
             self.user.profile
         )
-        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        rider_from_db = Rider.objects.get(id=self.rider_1.id)
         assigned_trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(assigned_trackers), 1
@@ -57,7 +57,7 @@ class TestRiders(TrackerRiderTests):
             100,
             self.user.profile
         )
-        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        rider_from_db = Rider.objects.get(id=self.rider_1.id)
         trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             len(trackers), 2
@@ -76,7 +76,7 @@ class TestRiders(TrackerRiderTests):
             100,
             self.user.profile
         )
-        rider_from_db = Riders.objects.get(id=self.rider_1.id)
+        rider_from_db = Rider.objects.get(id=self.rider_1.id)
         trackers = rider_from_db.trackers_assigned.all()
         self.assertEqual(
             trackers[0], self.tracker_1
