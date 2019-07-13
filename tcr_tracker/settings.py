@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+import dj_database_url
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -24,8 +24,19 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
                             'kg_fftds@&uk4tc&368z1*91j^hf#uuti#n^7b%sbh1f%q@!_#')
 
 ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'local')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'tracker',
+        'USER': 'track_thing',
+        'PASSWORD': 'tracker',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+if ENVIRONMENT != 'local':
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if ENVIRONMENT == 'prod' else True
 
 
@@ -83,16 +94,6 @@ WSGI_APPLICATION = 'tcr_tracker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-     'default': {
-                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                 'NAME': os.environ.get('DB_NAME', 'tracker'),
-                 'USER': os.environ.get('DB_USER', 'track_thing'),
-                 'PASSWORD': os.environ.get('DB_PW', 'tracker'),
-                 'HOST': os.environ.get('DB_HOST', 'localhost'),
-                 'PORT': os.environ.get('DB_PORT', '5432'),
-     }
- }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
