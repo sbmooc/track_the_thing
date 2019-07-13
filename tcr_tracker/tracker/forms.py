@@ -33,7 +33,6 @@ class AdjustBalanceForm(
 
 class ScratchRiderForm(
     forms.ModelForm,
-    CrispyFormMixin
 ):
 
     notes = forms.CharField(required=False)
@@ -44,6 +43,8 @@ class ScratchRiderForm(
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Are you sure you want to scratch this rider?'))
 
 
