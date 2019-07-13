@@ -24,21 +24,25 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
                             'kg_fftds@&uk4tc&368z1*91j^hf#uuti#n^7b%sbh1f%q@!_#')
 
 ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'local')
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'tracker',
-        'USER': 'track_thing',
-        'PASSWORD': 'tracker',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
 if ENVIRONMENT != 'local':
-    DATABASES['default'] = dj_database_url.config(
-        default=os.environ.get('DATABASE_URL') or os.environ.get('HEROKU_POSTGRESQL_AMBER_URL'),
-        conn_max_age=600
-    )
+    DATABASES = {
+        'default':
+            dj_database_url.config(
+                default=os.environ.get('DATABASE_URL') or os.environ.get('HEROKU_POSTGRESQL_AMBER_URL'),
+                conn_max_age=600
+            )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'tracker',
+            'USER': 'track_thing',
+            'PASSWORD': 'tracker',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 DEBUG = False if ENVIRONMENT == 'prod' else True
 
