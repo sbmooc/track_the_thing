@@ -1,6 +1,7 @@
 from github import Github
 from django.conf import settings
 
+
 class GitHubClient:
 
     def __init__(self):

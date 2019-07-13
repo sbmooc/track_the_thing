@@ -43,13 +43,14 @@ class RecordIssue(
 
     def form_valid(self, form):
         GitHubClient().create_issue(
-            title=form.cleaned_data['brief_description_of_issue'],
-            body=f'''URL: {form.cleaned_data['url']},
-            REPORTED_BY: {form.cleaned_data['your_name']},
-            DESCRIPTION: {form.cleaned_data['details']}
+            title=form.cleaned_data.get('brief_description_of_issue'),
+            body=f'''URL: {form.cleaned_data.get('url')},
+            REPORTED_BY: {form.cleaned_data.get('your_name')},
+            DESCRIPTION: {form.cleaned_data.get('details')}
             '''
         )
         return HttpResponseRedirect(reverse('all_riders'))
+
 
 class AddPayment(
     RaceStatusMixin,

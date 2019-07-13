@@ -18,10 +18,10 @@ class RecordIssueForm(
     CrispyFormMixin,
     forms.Form,
 ):
-    url = forms.CharField()
+    your_name = forms.CharField()
     brief_description_of_issue = forms.CharField(widget=forms.TextInput())
     details = forms.CharField(widget=forms.Textarea())
-    your_name = forms.CharField()
+    url = forms.CharField(required=False, label='URL (not required)')
 
 
 class AdjustBalanceForm(
