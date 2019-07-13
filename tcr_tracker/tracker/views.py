@@ -197,7 +197,7 @@ class OneTracker(
         context = super(OneTracker, self).get_context_data(**kwargs)
         context['tracker_dict'] = context['tracker'].__dict__
         context['page_title'] = 'Tracker %s' % context['tracker'].tcr_id
-        context['active_tab'] = 'tracker'
+        context['active_tab'] = 'trackers'
         return context
 
 
@@ -272,7 +272,7 @@ class OneRider(
         context['brevet_data'] = self.request.session.get('brevet_data')
         context['rider_dict'] = context['rider'].__dict__
         context['page_title'] = 'Rider: %s' % context['rider'].full_name
-        context['active_tab'] = 'rider'
+        context['active_tab'] = 'riders'
         return context
 
 

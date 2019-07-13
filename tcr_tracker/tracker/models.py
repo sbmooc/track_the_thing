@@ -144,6 +144,12 @@ class Rider(AbstractModel):
         return sum(paym.amount_in_pence for paym in all_deposits) / 100
 
     @property
+    def balance_string(self):
+        current_balance = self.balance
+        sign = "-" if current_balance < 0 else ""
+        return sign + "£" + '%.2f' % abs(current_balance)
+
+    @property
     def current_tracker(self):
         return self.trackers_possessed.all().last() or None
 
@@ -473,7 +479,7 @@ class Event(TimeStampedModel):
     @property
     def deposit_change_string(self):
         sign = "-" if self.deposit_change.amount_in_pence < 0 else "+"
-        return sign + "£" + str(abs(self.deposit_change.amount_in_pence / 100))
+        return sign + "£" + '%.2f' % abs(self.deposit_change.amount_in_pence / 100)
 
 
 class RaceStatus(TimeStampedModel):
