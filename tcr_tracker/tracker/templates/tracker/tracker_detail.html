@@ -115,6 +115,7 @@
     </div>
 
     <!--Tracker info table-->
+{% if user.profile.is_staff %}
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
@@ -143,5 +144,6 @@
             </tbody>
         </table>
     </div>
+{% endif %}
 
 {% endblock %}

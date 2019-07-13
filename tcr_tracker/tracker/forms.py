@@ -64,6 +64,9 @@ class RiderControlPointForm(
         widget=forms.widgets.SplitDateTimeWidget(date_attrs={'type': 'date'},
                                                  time_attrs={'type': 'time'})
     )
+    input_by = forms.CharField(
+        label='Volunteer Name'
+    )
 
     class Meta:
         model = RiderControlPoint
@@ -75,7 +78,7 @@ class RiderControlPointForm(
 
 class EditTracker(
     CrispyFormMixin,
-    forms.Form
+    forms.ModelForm
 ):
 
     class Meta:
@@ -88,7 +91,7 @@ class EditTracker(
 
 class EditRider(
     CrispyFormMixin,
-    forms.Form
+    forms.ModelForm
 ):
 
     class Meta:
@@ -103,9 +106,11 @@ class MultiActionForm(
     CrispyFormMixin,
     forms.Form
 ):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, is_tcr_staff=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['notes'] = forms.CharField(required=False)
+        if not is_tcr_staff:
+            self.fields['volunteer_name'] = forms.CharField()
 
 
 class AssignmentPossessionForm(MultiActionForm):

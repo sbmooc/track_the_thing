@@ -153,6 +153,10 @@ class Rider(AbstractModel):
         return Tracker.objects.filter(rider_assigned=self, rider_possesed=None)
 
     @property
+    def url_edit(self):
+        return reverse('rider_edit', kwargs={'pk': self.id})
+
+    @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
@@ -231,7 +235,7 @@ class Rider(AbstractModel):
             }
         }
 
-    def tracker_add_assignment(self, tracker, notes, user, deposit=10000):
+    def tracker_add_assignment(self, tracker, notes, user, input_by, deposit=10000):
         if tracker.rider_assigned is not None:
             raise TrackerAlreadyAssigned()
         if not tracker.assignable:
@@ -249,11 +253,12 @@ class Rider(AbstractModel):
             notes=notes,
             event_type='add_tracker_assignment',
             deposit_change=deposit,
-            user=user.profile
+            user=user.profile,
+            input_by=input_by
         )
         self.save()
 
-    def tracker_remove_assignment(self, tracker, notes, user, deposit=10000):
+    def tracker_remove_assignment(self, tracker, notes, user, input_by, deposit=10000):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_assigned.remove(tracker)
@@ -268,13 +273,14 @@ class Rider(AbstractModel):
             notes=notes,
             event_type='remove_tracker_assignment',
             deposit_change=deposit,
-            user=user.profile
+            user=user.profile,
+            input_by=input_by
         )
         tracker.working_status = 'to_be_tested'
         tracker.save()
         self.save()
 
-    def tracker_add_possession(self, tracker, notes, user):
+    def tracker_add_possession(self, tracker, notes, user, input_by):
         if tracker not in self.trackers_assigned.all():
             raise TrackerNotAssigned()
         self.trackers_possessed.add(tracker)
@@ -283,11 +289,12 @@ class Rider(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='add_tracker_possession',
-            user=user.profile
+            user=user.profile,
+            input_by=input_by
         )
         self.save()
 
-    def tracker_remove_possession(self, tracker, notes, user):
+    def tracker_remove_possession(self, tracker, notes, user, input_by):
         if tracker not in self.trackers_possessed.all():
             raise TrackerNotPossessed()
         self.trackers_possessed.remove(tracker)
@@ -296,7 +303,8 @@ class Rider(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='remove_tracker_possession',
-            user=user.profile
+            user=user.profile,
+            input_by=input_by
         )
         self.save()
 
@@ -398,9 +406,9 @@ class Tracker(AbstractModel):
             },
             'retrieve': {
                 'label': 'Retrieve from rider',
-                'url': reverse('tracker_give_retrive', kwargs={'pk': self.id}) + '?action=give',
+                'url': reverse('tracker_give_retrive', kwargs={'pk': self.id}) + '?action=retrive',
                 'staff_only': False,
-                'display': True if Tracker.rider_possessed else False
+                'display': True if Tracker.rider_possesed else False
             },
             'notes': {
                 'label': 'Add note',

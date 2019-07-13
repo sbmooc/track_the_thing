@@ -195,9 +195,9 @@ class OneTracker(
 
     def get_context_data(self, **kwargs):
         context = super(OneTracker, self).get_context_data(**kwargs)
-        context['tracker_dict'] = context['trackers'].__dict__
-        context['page_title'] = 'Tracker %s' % context['trackers'].tcr_id
-        context['active_tab'] = 'trackers'
+        context['tracker_dict'] = context['tracker'].__dict__
+        context['page_title'] = 'Tracker %s' % context['tracker'].tcr_id
+        context['active_tab'] = 'tracker'
         return context
 
 
@@ -295,7 +295,8 @@ class MultiActionFormView(
         kwargs.update(
             {
                 'obj': self.object,
-                'action': self.request.GET['action']
+                'action': self.request.GET['action'],
+                'is_tcr_staff': self.request.user.profile.is_tcr_staff
             }
         )
         return kwargs
@@ -330,26 +331,30 @@ class AssignmentPossessionView(
                     self.object.tracker_add_assignment(
                         tracker=form.cleaned_data['assign_tracker'],
                         notes=form.cleaned_data['notes'],
-                        user=self.request.user
+                        user=self.request.user,
+                        input_by=form.cleaned_data.get('volunteer_name')
                     )
                 if form.cleaned_data.get('remove_assignment'):
                     self.object.tracker_remove_assignment(
                         tracker=form.cleaned_data.get('remove_assignment'),
                         notes=form.cleaned_data['notes'],
-                        user=self.request.user
+                        user=self.request.user,
+                        input_by=form.cleaned_data.get('volunteer_name')
                     )
             if self.request.GET.get('action') == 'possession':
                 if form.cleaned_data['add_possession']:
                     self.object.tracker_add_possession(
-                        tracker=form.cleaned_data['assign_tracker'],
+                        tracker=form.cleaned_data.get('add_possession'),
                         notes=form.cleaned_data['notes'],
-                        user=self.request.user
+                        user=self.request.user,
+                        input_by=form.cleaned_data.get('volunteer_name')
                     )
                 if form.cleaned_data.get('remove_possession'):
                     self.object.tracker_remove_possession(
                         tracker=form.cleaned_data.get('remove_possession'),
                         notes=form.cleaned_data['notes'],
-                        user=self.request.user
+                        user=self.request.user,
+                        input_by=form.cleaned_data.get('volunteer_name')
                     )
         elif type(self.object) == Tracker:
             if self.request.GET.get('action') == 'possession':
@@ -361,13 +366,15 @@ class AssignmentPossessionView(
                     rider.tracker_add_possession(
                         tracker=self.object,
                         notes=form.cleaned_data['notes'],
-                        user=self.request.user
+                        user=self.request.user,
+                        input_by=form.cleaned_data.get('volunteer_name')
                     )
                 else:
                     rider.tracker_remove_possession(
                         tracker=self.object,
                         notes=form.cleaned_data['notes'],
-                        user=self.request.user
+                        user=self.request.user,
+                        input_by=form.cleaned_data.get('volunteer_name')
                     )
         return HttpResponseRedirect(self.object.url)
 
@@ -383,35 +390,41 @@ class GiveRetriveView(
                 self.object.tracker_add_assignment(
                     form.cleaned_data['tracker'],
                     form.cleaned_data['notes'],
-                    self.request.user
+                    self.request.user,
+                    input_by=form.cleaned_data.get('input_by')
                 )
                 self.object.tracker_add_possession(
                     form.cleaned_data['tracker'],
                     form.cleaned_data['notes'],
-                    self.request.user
+                    self.request.user,
+                    input_by=form.cleaned_data.get('input_by')
                 )
             elif self.request.GET['action'] == 'retrive':
                 self.object.tracker_remove_possession(
                     form.cleaned_data['tracker'],
                     form.cleaned_data['notes'],
-                    self.request.user
+                    self.request.user,
+                    input_by=form.cleaned_data.get('input_by')
                 )
         elif type(self.object) == Tracker:
             if self.request.GET['action'] == 'give':
                 form.cleaned_data['rider'].tracker_add_assignment(
                     self.object,
                     form.cleaned_data['notes'],
-                    self.request.user.profile
+                    self.request.user,
+                    input_by=form.cleaned_data.get('input_by')
                 )
                 form.cleaned_data['rider'].tracker_add_possession(
                     self.object,
                     form.cleaned_data['notes'],
-                    self.request.user
+                    self.request.user,
+                    input_by=form.cleaned_data.get('input_by')
                 )
             elif self.request.GET['action'] == 'retrive':
                 form.cleaned_data['rider'].tracker_remove_possession(
                     self.object,
                     form.cleaned_data['notes'],
-                    self.request.user
+                    self.request.user,
+                    input_by=form.cleaned_data.get('input_by')
                 )
         return HttpResponseRedirect(self.object.url)
