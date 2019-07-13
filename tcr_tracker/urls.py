@@ -10,7 +10,6 @@ from tcr_tracker.tracker.views import (
     TrackerEdit,
     RiderEdit,
     TrackerTest,
-    RiderTrackerAssignment,
     AddNotes,
     RiderControlpointView,
     ScratchRider,
@@ -18,7 +17,7 @@ from tcr_tracker.tracker.views import (
     AddPayment,
     AddRefund,
     RecordIssue,
-    LoginView,
+    TrackerLoginView,
     AssignmentPossessionView
 )
 
@@ -29,7 +28,7 @@ urlpatterns = [
     path('riders/<int:pk>/', OneRider.as_view(), name='one_rider'),
     path('riders/<int:pk>/edit/', RiderEdit.as_view(), name='rider_edit'),
     path('riders/<int:pk>/assignment_possession/', AssignmentPossessionView.as_view(),
-         name='rider_tracker_assignment'),
+         name='rider_tracker_assignment_possession'),
     path('riders/<int:pk>/notes/', AddNotes.as_view(),
          name='rider_add_notes'),
     path('riders/<int:pk>/control_point/', RiderControlpointView.as_view(),
@@ -55,5 +54,5 @@ urlpatterns = [
     path('issues/record/', RecordIssue.as_view(),
          name='record_issue'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/login/', LoginView.as_view()),
+    path('accounts/login/', TrackerLoginView.as_view()),
 ]

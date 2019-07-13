@@ -11,21 +11,19 @@ from dateutil import tz
 from .forms import (
     EditTracker,
     EditRider,
-    RiderTrackerAssignmentForm,
-    RiderTrackerPossessionForm,
-    TrackerRiderAssignmentForm,
-    TrackerRiderPossessionForm,
     AddNotesForm,
     RiderControlPointForm,
     ScratchRiderForm,
     GiveRetriveForm,
     AdjustBalanceForm,
     RecordIssueForm,
-    AssignmentPossessionForm)
+    AssignmentPossessionForm
+)
 
 from .models import Trackers, Riders, Events, RiderControlPoints, RaceStatus, Deposit
 
-class LoginView(
+
+class TrackerLoginView(
     EnvironmentMixin,
     LoginView
 ):
@@ -171,59 +169,6 @@ class RiderControlpointView(
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-class TrackerRiderPossession(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    UpdateView
-):
-    model = Trackers
-    form_class = TrackerRiderPossessionForm
-    template_name = 'tracker/basic_form.html'
-
-    def form_valid(self, form):
-        rider = form.cleaned_data['rider']
-        if form.cleaned_data['add_or_remove']:
-            rider.tracker_add_possession(
-                self.object,
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        else:
-            rider.tracker_remove_possession(
-                self.object,
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class TrackerRiderAssignment(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    UpdateView
-):
-    model = Trackers
-    form_class = TrackerRiderAssignmentForm
-    template_name = 'tracker/basic_form.html'
-
-    def form_valid(self, form):
-        rider = form.cleaned_data['rider']
-        if form.cleaned_data['add_or_remove']:
-            rider.tracker_add_assignment(
-                self.object,
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        else:
-            rider.tracker_remove_assignment(
-                self.object,
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        return HttpResponseRedirect(self.get_success_url())
-
 
 class AllTrackers(
     RaceStatusMixin,
@@ -286,59 +231,6 @@ class TrackerTest(
         self.object.record_test(request.GET['result'])
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
-
-
-class RiderTrackerAssignment(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    UpdateView
-):
-    model = Riders
-    form_class = RiderTrackerAssignmentForm
-    template_name = 'tracker/basic_form.html'
-    # todo update success_url
-
-    def form_valid(self, form):
-        if form.cleaned_data['add_or_remove']:
-            self.object.tracker_add_assignment(
-                form.cleaned_data['tracker'],
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        else:
-            self.object.tracker_remove_assignment(
-                form.cleaned_data['tracker'],
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        return super(RiderTrackerAssignment, self).form_valid(form)
-
-
-class RiderTrackerPossession(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    UpdateView
-):
-    model = Riders
-    form_class = RiderTrackerPossessionForm
-    template_name = 'tracker/basic_form.html'
-
-    def form_valid(self, form):
-        if form.cleaned_data['add_or_remove']:
-            self.object.tracker_add_possession(
-                form.cleaned_data['tracker'],
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        else:
-            self.object.tracker_remove_possession(
-                form.cleaned_data['tracker'],
-                form.cleaned_data['notes'],
-                self.request.user.profile
-            )
-        return super(RiderTrackerPossession, self).form_valid(form)
 
 
 class RiderEdit(
