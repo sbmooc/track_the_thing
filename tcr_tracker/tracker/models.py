@@ -244,7 +244,7 @@ class Rider(AbstractModel):
         deposit = Deposit.objects.create(
             rider=self,
             amount_in_pence=deposit * -1,
-            user=user.profile
+            user=user.profile if user else None
         )
         Event.objects.create(
             rider=self,
@@ -252,7 +252,7 @@ class Rider(AbstractModel):
             notes=notes,
             event_type='add_tracker_assignment',
             deposit_change=deposit,
-            user=user.profile,
+            user=user.profile if user else None,
             input_by=input_by
         )
         self.save()
@@ -264,7 +264,7 @@ class Rider(AbstractModel):
         deposit = Deposit.objects.create(
             rider=self,
             amount_in_pence=deposit,
-            user=user.profile
+            user=user.profile if user else None
         )
         Event.objects.create(
             rider=self,
@@ -272,7 +272,7 @@ class Rider(AbstractModel):
             notes=notes,
             event_type='remove_tracker_assignment',
             deposit_change=deposit,
-            user=user.profile,
+            user=user.profile if user else None,
             input_by=input_by
         )
         tracker.working_status = 'to_be_tested'
@@ -288,7 +288,7 @@ class Rider(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='add_tracker_possession',
-            user=user.profile,
+            user=user.profile if user else None,
             input_by=input_by
         )
         self.save()
@@ -302,7 +302,7 @@ class Rider(AbstractModel):
             tracker=tracker,
             notes=notes,
             event_type='remove_tracker_possession',
-            user=user.profile,
+            user=user.profile if user else None,
             input_by=input_by
         )
         tracker.save()
@@ -332,7 +332,8 @@ class Tracker(AbstractModel):
     working_status = CharField(
         max_length=50,
         choices=TRACKER_WORKING_STATUS,
-        verbose_name='Working Status')
+        verbose_name='Working Status',
+        null=True)
     loan_status = CharField(max_length=50, choices=TRACKER_LOAN_STATUS, null=True)
     last_test_date = DateField(null=True)
     purchase_date = DateField(null=True)
