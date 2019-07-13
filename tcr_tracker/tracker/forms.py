@@ -4,34 +4,34 @@ from django import forms
 
 from .models import Trackers, Riders, RiderControlPoints
 
-class RecordIssueForm(
+
+class CrispyFormMixin(
     forms.Form
+):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = 'post'
+        self.helper.add_input(Submit('submit', 'Save'))
+
+
+class RecordIssueForm(
+    CrispyFormMixin
 ):
     url = forms.CharField()
     brief_description_of_issue = forms.CharField(widget=forms.TextInput())
     details = forms.CharField(widget=forms.Textarea())
     your_name = forms.CharField()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Save'))
-
 
 class AdjustBalanceForm(
-    forms.Form
+    CrispyFormMixin
 ):
     amount = forms.FloatField()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Save'))
-
 class ScratchRiderForm(
-    forms.ModelForm
+    CrispyFormMixin
 ):
 
     notes = forms.CharField(required=False)
@@ -42,23 +42,19 @@ class ScratchRiderForm(
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
         self.helper.add_input(Submit('submit', 'Are you sure you want to scratch this rider?'))
 
 
-class AddNotesForm(forms.Form):
+class AddNotesForm(
+    CrispyFormMixin
+):
     notes = forms.CharField()
     input_by = forms.CharField()
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Save'))
 
-
-class RiderControlPointForm(forms.ModelForm):
+class RiderControlPointForm(
+    CrispyFormMixin
+):
 
     race_time = forms.SplitDateTimeField(
         widget=forms.widgets.SplitDateTimeWidget(date_attrs={'type': 'date'},
@@ -72,14 +68,10 @@ class RiderControlPointForm(forms.ModelForm):
             'input_by'
         )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Save'))
 
-
-class EditTracker(forms.ModelForm):
+class EditTracker(
+    CrispyFormMixin
+):
 
     class Meta:
         model = Trackers
@@ -88,15 +80,10 @@ class EditTracker(forms.ModelForm):
             'rider_possesed'
         )
 
-    def __init__(self, *args, **kwargs):
 
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Save'))
-
-
-class EditRider(forms.ModelForm):
+class EditRider(
+    CrispyFormMixin
+):
 
     class Meta:
         model = Riders
@@ -105,21 +92,13 @@ class EditRider(forms.ModelForm):
             'trackers_possessed'
         )
 
+
+class MultiActionForm(
+    CrispyFormMixin
+):
     def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Save'))
-
-
-class MultiActionForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.form_method = 'post'
-        self.helper.add_input(Submit('submit', 'Save'))
         self.fields['notes'] = forms.CharField(required=False)
+        super().__init__(*args, **kwargs)
 
 
 class AssignmentPossessionForm(MultiActionForm):
@@ -174,7 +153,6 @@ class AssignmentPossessionForm(MultiActionForm):
             self.fields['add_possession'] = forms.ModelChoiceField(
                 widget=forms.CheckboxInput, queryset=self.object.rider_assigned
             )
-
 
 
 class GiveRetriveForm(MultiActionForm):
