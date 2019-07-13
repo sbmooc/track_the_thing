@@ -27,16 +27,17 @@ class Command(BaseCommand):
                 rider = Rider(**row)
                 try:
                     rider.save()
-                    deposit = Deposit.objects.create(
-                        rider=rider,
-                        amount_in_pence=balance*100
-                    )
-                    Event.objects.create(
-                        deposit_change=deposit,
-                        rider=rider,
-                        event_type='payment_in',
-                        notes='Automatic Import'
-                    )
+                    if balance > 0:
+                        deposit = Deposit.objects.create(
+                            rider=rider,
+                            amount_in_pence=balance*100
+                        )
+                        Event.objects.create(
+                            deposit_change=deposit,
+                            rider=rider,
+                            event_type='payment_in',
+                            notes='Automatic Import'
+                        )
                     count += 1
                 except:
                     print(
