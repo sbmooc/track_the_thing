@@ -8,7 +8,7 @@ class GitHubClient:
         self.access_token = settings.GITHUB_ACCESS_TOKEN
         if self.access_token:
             self.g = Github(self.access_token)
-            self.repo = self.g.get_repo('sbmooc/track_the_thing')
+            self.repo = self.g.get_repo(settings.GITHUB_REPO)
 
     def create_issue(self, title, body):
         if self.access_token:
