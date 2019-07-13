@@ -92,6 +92,9 @@ class Profile(models.Model):
     is_tcr_staff = BooleanField(null=True)
     is_collective_user = BooleanField(null=True)
 
+    def __str__(self):
+        return str(self.user)
+
 
 class TimeStampedModel(models.Model):
     created = DateTimeField(auto_now_add=True)
