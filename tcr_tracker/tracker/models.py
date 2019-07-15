@@ -140,6 +140,13 @@ class Rider(AbstractModel):
     status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
 
     @property
+    def display_order(self):
+        try:
+            return int(self.cap_number)
+        except ValueError:
+            return int(self.cap_number[:-1])
+
+    @property
     def balance(self):
         all_deposits = Deposit.objects.filter(
             rider=self
