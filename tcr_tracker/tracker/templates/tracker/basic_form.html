@@ -1,5 +1,21 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
+    {% if not user.profile.is_tcr_staff %}
+        <div class="container-fluid">
+            <div class="row my-2">
+                <div class="col-1">
+                    <h5 style="text-align: right">
+                        <i class="fa fa-exclamation mr-2"  style="color: red"></i>
+                    </h5>
+                </div>
+                <div class="col">
+                    <h5>
+                        Remember to check with Anna, Rory or Katie before handing out a new tracker.
+                    </h5>
+                </div>
+            </div>
+        </div>
+    {% endif %}
     {% crispy form %}
 {% endblock %}
