@@ -44,28 +44,34 @@
     <!--Event buttons-->
     <div class="container-fluid my-2">
         <div class="row">
-            {% if user.profile.is_tcr_staff %}
-                {% for button in tracker.get_buttons.values %}
-                    {% if button.display %}
-                            <div class="col my-2">
-                                <a href={{ button.url }}>
-                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
-                                </a>
-                            </div>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                {% for button in tracker.get_buttons.values %}
-                    {% if button.display and not button.staff_only %}
-                            <div class="col my-2">
-                                <a href={{ button.url }}>
-                                    <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
-                                </a>
-                            </div>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+            {% for button in tracker.get_buttons.values %}
+                {% if button.display and not button.staff_only %}
+                        <div class="col my-2">
+                            <a href={{ button.url }}>
+                                <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                            </a>
+                        </div>
+                {% endif %}
+            {% endfor %}
         </div>
+        {% if user.profile.is_tcr_staff %}
+            <div class="row my-2">
+                <div class="col my-auto">
+                    <b>Staff only buttons:</b>
+                </div>
+            </div>
+            <div class="row">
+                {% for button in tracker.get_buttons.values %}
+                    {% if button.display and button.staff_only %}
+                            <div class="col my-2">
+                                <a href={{ button.url }}>
+                                    <button type="button" class="btn btn-info btn-block text-nowrap">{{ button.label }}</button>
+                                </a>
+                            </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
 
     <!--Events and notes list-->
@@ -115,35 +121,35 @@
     </div>
 
     <!--Tracker info table-->
-{% if user.profile.is_staff %}
-    <div class="container-fluid my-2">
-        <div class="row">
-            <div class="col my-2">
-                <h5>Tracker info</h5>
+    {% if user.profile.is_staff %}
+        <div class="container-fluid my-2">
+            <div class="row">
+                <div class="col my-2">
+                    <h5>Tracker info</h5>
+                </div>
+                <div class="col my-2 mr-1" style="text-align: right">
+                    <a href="{{ tracker.url_edit }}"  style="font-size: 120%">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                </div>
             </div>
-            <div class="col my-2 mr-1" style="text-align: right">
-                <a href="{{ tracker.url_edit }}"  style="font-size: 120%">
-                    <i class="fa fa-pen"></i>
-                </a>
-            </div>
+            <table class="table table-hover">
+                <tbody>
+                <tr>
+                    {% for field, value in tracker_dict.items %}
+                        {% if field != "_state" and field != "id" %}
+                            <td>
+                                {{ field }}
+                            </td>
+                            <td style="font-style: italic">
+                                {{ value }}
+                            </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <table class="table table-hover">
-            <tbody>
-            <tr>
-                {% for field, value in tracker_dict.items %}
-                    {% if field != "_state" and field != "id" %}
-                        <td>
-                            {{ field }}
-                        </td>
-                        <td style="font-style: italic">
-                            {{ value }}
-                        </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endif %}
+    {% endif %}
 
 {% endblock %}
