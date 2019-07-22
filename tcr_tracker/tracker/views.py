@@ -151,8 +151,23 @@ class RiderControlpointView(
         initial['race_time'] = arrow.Arrow.now(tzinfo=tz.gettz('Europe/Paris')).datetime
         return initial
 
+    @staticmethod
+    def days_hours_minutes(td):
+        return td.days, td.seconds // 3600, (td.seconds // 60) % 60
+
+
+    @classmethod
+    def elapsed_time_string(cls, race_time, start_time):
+        days, hours, minutes = cls.days_hours_minutes(
+            race_time - start_time
+        )
+        return f'{days} Days {hours} Hours {minutes} Minutes'
+
     def form_valid(self, form):
-        time_elapsed = RaceStatus.objects.last().elapsed_time_string
+        time_elapsed = self.elapsed_time_string(
+            form.cleaned_data['race_time'],
+            RaceStatus.objects.last().created
+        )
         RiderControlPoint.objects.create(
             rider=self.object,
             control_point=form.cleaned_data['control_point'],
