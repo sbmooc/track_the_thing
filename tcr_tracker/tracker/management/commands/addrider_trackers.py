@@ -23,10 +23,12 @@ class Command(BaseCommand):
                     rider = Rider.objects.get(
                         tcr_id=row['rider_id']
                     )
+                    rider_own_id = 'RIDER_OWN_' + str(count)
                     tracker = Tracker.objects.create(
                         esn_number=row['tracker_esn'],
                         owner='rider_owned',
-                        working_status='Functioning'
+                        working_status='Functioning',
+                        tcr_id=rider_own_id
                     )
                     rider.tracker_add_assignment(
                         tracker,
