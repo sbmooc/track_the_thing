@@ -21,7 +21,7 @@
             {% if rider.current_tracker %}
                 <div class="col my-auto">
                     <a href="{{ rider.current_tracker.url }}">
-                        {{ rider.current_tracker.tcr_id }}
+                        #{{ rider.current_tracker.tcr_id }}
                     </a>
                 </div>
             {% else %}
@@ -80,7 +80,7 @@
                     {% if button.display and button.staff_only %}
                         <div class="col my-2">
                             <a href={{ button.url }}>
-                                <button type="button" class="btn btn-secondary btn-block text-nowrap">{{ button.label }}</button>
+                                <button type="button" class="btn btn-info btn-block text-nowrap">{{ button.label }}</button>
                             </a>
                         </div>
                     {% endif %}
@@ -145,76 +145,49 @@
         </ul>
     </div>
 
-    <!--&lt;!&ndash;Events log&ndash;&gt;-->
-    <!--<div class="container-fluid my-2">-->
-        <!--<div class="row">-->
-            <!--<div class="col my-2">-->
-                <!--<h5>Events</h5>-->
-            <!--</div>-->
-        <!--</div>-->
-        <!--{% if not rider.all_events %}-->
-            <!--<ul class="list-group">-->
-                <!--<li class="list-group-item">-->
-                    <!--<div>-->
-                        <!--There are no events for this rider.-->
-                    <!--</div>-->
-                <!--</li>-->
-            <!--</ul>-->
-        <!--{% else %}-->
-            <!--<table class="table table-hover table-responsive-xs">-->
-                <!--<thead>-->
-                <!--<tr>-->
-                    <!--<th scope="col">Date</th>-->
-                    <!--<th scope="col">Event</th>-->
-                    <!--<th scope="col">User</th>-->
-                <!--</tr>-->
-                <!--</thead>-->
-                <!--<tbody>-->
-                <!--&lt;!&ndash;todo: replace with for-loop&ndash;&gt;-->
-                <!--{% for event in rider.all_events reversed %}-->
-                    <!--<tr>-->
-                        <!--<td>-->
-                            <!--{{event.created}}-->
-                        <!--</td>-->
-                        <!--<td>-->
-                            <!--{{event.event_type}}-->
-                        <!--</td>-->
-                        <!--<td>-->
-                            <!--{{event.user}}-->
-                        <!--</td>-->
-                    <!--</tr>-->
-                <!--{% endfor %}-->
-                <!--</tbody>-->
-            <!--</table>-->
-        <!--{% endif %}-->
-    <!--</div>-->
-
     <!--Rider info table-->
     <div class="container-fluid my-2">
         <div class="row">
             <div class="col my-2">
                 <h5>Rider info</h5>
             </div>
-            <div class="col my-2 mr-1" style="text-align: right">
-                <a href="{{ rider.url_edit }}"  style="font-size: 120%">
-                    <i class="fa fa-pen"></i>
-                </a>
-            </div>
+            {% if user.profile.is_tcr_staff %}
+                <div class="col my-2 mr-1" style="text-align: right">
+                    <a href="{{ rider.url_edit }}"  style="font-size: 120%">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                </div>
+            {% endif %}
         </div>
         <table class="table table-hover">
             <tbody>
-            <tr>
-                {% for field, value in rider_dict.items %}
-                    {% if field != "_state" and field != "id" %}
-                        <td>
-                            {{ field }}
-                        </td>
-                        <td style="font-style: italic">
-                            {{ value }}
-                        </td>
-                        </tr>
-                    {% endif %}
-                {% endfor %}
+                {% if user.profile.is_tcr_staff %}
+                    {% for field, value in rider_dict.items %}
+                        {% if field != "_state" and field != "id" %}
+                            <tr>
+                                <td>
+                                    {{ field }}
+                                </td>
+                                <td style="font-style: italic">
+                                    {{ value }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% for field, value in rider_dict.items %}
+                        {% if field == "first_name" or field == "last_name" or field == "cap_number" or field == "category" %}
+                            <tr>
+                                <td>
+                                    {{ field }}
+                                </td>
+                                <td style="font-style: italic">
+                                    {{ value }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </tbody>
         </table>
     </div>

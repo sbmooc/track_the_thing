@@ -207,13 +207,13 @@ class Rider(AbstractModel):
                 'display': True
             },
             'assign': {
-                'label': 'Assign/Deassign tracker',
+                'label': 'Tracker assignment',
                 'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=assignment',
                 'staff_only': True,
                 'display': True
             },
             'possession': {
-                'label': 'Possession/De-Possession tracker',
+                'label': 'Tracker possession',
                 'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=possession',
                 'staff_only': True,
                 'display': True if self.trackers_assigned.all() else False
