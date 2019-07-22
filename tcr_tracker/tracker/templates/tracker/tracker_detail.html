@@ -14,7 +14,7 @@
             {% if tracker.rider_possesed %}
                 <div class="col my-auto">
                     <a href="{{ tracker.rider_possesed.url }}">
-                        {{ tracker.rider_possesed }}
+                        #{{ tracker.rider_possesed }} {{ tracker.rider_possesed.full_name }}
                     </a>
                 </div>
             {% else %}
@@ -29,7 +29,7 @@
                 {% if tracker.rider_assigned %}
                     <div class="col my-auto">
                         <a href="{{ tracker.rider_assigned.url }}">
-                            {{ tracker.rider_assigned }}
+                            #{{ tracker.rider_assigned }} {{ tracker.rider_assigned.full_name }}
                         </a>
                     </div>
                 {% else %}

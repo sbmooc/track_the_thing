@@ -175,6 +175,7 @@ class GiveRetriveForm(MultiActionForm):
 
     def __init__(self, obj=None, action=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['notes'] = forms.CharField(required=True)
         if action == 'give':
             self.define_give_fields(obj)
         elif action == 'retrive':
