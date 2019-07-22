@@ -1,5 +1,6 @@
 import arrow as arrow
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import (
     CharField,
@@ -130,7 +131,8 @@ class Rider(AbstractModel):
     first_name = CharField(max_length=50, verbose_name='First Name')
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
-    cap_number = CharField(max_length=50)
+    cap_number = CharField(max_length=50,
+                           validators=[RegexValidator(regex='^.{1}$', message='Length has to be 1', code='nomatch')])
     category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
     gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
     tcr_id = CharField(max_length=10, null=True)
@@ -138,6 +140,15 @@ class Rider(AbstractModel):
     hire_tracker = BooleanField(null=True)
     tracker_url = CharField(null=True, max_length=200, blank=True)
     status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
+
+    @property
+    def display_order(self):
+        if self.cap_number:
+            try:
+                return int(self.cap_number)
+            except ValueError:
+                return int(self.cap_number[:-1])
+        return 10000
 
     @property
     def balance(self):
@@ -207,13 +218,13 @@ class Rider(AbstractModel):
                 'display': True
             },
             'assign': {
-                'label': 'Tracker assignment',
+                'label': 'Tracker Assignment',
                 'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=assignment',
                 'staff_only': True,
                 'display': True
             },
             'possession': {
-                'label': 'Tracker possession',
+                'label': 'Tracker Possession',
                 'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=possession',
                 'staff_only': True,
                 'display': True if self.trackers_assigned.all() else False
