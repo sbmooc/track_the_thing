@@ -252,7 +252,6 @@ class AllRiders(
     ListView
 ):
     model = Rider
-    queryset = Rider.objects.all().order_by('display_order')
 
     def get_context_data(self, **kwargs):
         context = super(AllRiders, self).get_context_data(**kwargs)

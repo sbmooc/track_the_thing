@@ -120,14 +120,6 @@ class TestRiders(TrackerRiderTests):
         )
         self.assertEqual(self.rider_1.balance, 100)
 
-    def test_display_order(self):
-        self.rider_1.cap_number = '2'
-        self.assertEqual(self.rider_1.display_order, 2)
-
-    def test_display_order_for_pairs(self):
-        self.rider_1.cap_number = '200a'
-        self.assertEqual(self.rider_1.display_order, 200)
-
 
 class TestTrackers(TrackerRiderTests):
 
