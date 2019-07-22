@@ -44,10 +44,12 @@ else:
         }
     }
 
+SECURE_SSL_REDIRECT=True
+
 DEBUG = False if ENVIRONMENT == 'prod' else True
 
 
-ALLOWED_HOSTS = ['.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['track3r.co.uk', 'www.track3r.co.uk', '.herokuapp.com', '127.0.0.1']
 
 
 # Application definition

@@ -140,13 +140,6 @@ class Rider(AbstractModel):
     status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
 
     @property
-    def display_order(self):
-        try:
-            return int(self.cap_number)
-        except ValueError:
-            return int(self.cap_number[:-1])
-
-    @property
     def balance(self):
         all_deposits = Deposit.objects.filter(
             rider=self
@@ -214,13 +207,13 @@ class Rider(AbstractModel):
                 'display': True
             },
             'assign': {
-                'label': 'Assign/Deassign tracker',
+                'label': 'Tracker assignment',
                 'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=assignment',
                 'staff_only': True,
                 'display': True
             },
             'possession': {
-                'label': 'Possession/De-Possession tracker',
+                'label': 'Tracker possession',
                 'url': reverse('rider_ass_pos', kwargs={'pk': self.id}) + '?action=possession',
                 'staff_only': True,
                 'display': True if self.trackers_assigned.all() else False
