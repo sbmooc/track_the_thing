@@ -76,10 +76,15 @@
       </div>
 
       <div class="container-fluid" style="font-size: 80%">
+{% block ting %}
+    {% load tz %}
 
+    {% timezone "Europe/Paris" %}
         {% block content %}
 
         {% endblock %}
+    {% endtimezone %}
+{% endblock %}
       </div>
       <!-- /.container-fluid -->
 
