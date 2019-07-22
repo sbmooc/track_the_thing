@@ -26,6 +26,10 @@ class Command(BaseCommand):
                 row.pop('balance')
                 rider = Rider(**row)
                 try:
+                    rider.display_order = int(rider.cap_number)
+                except ValueError:
+                    rider.display_order = int(rider.cap_number[:-1])
+                try:
                     rider.save()
                     if balance > 0:
                         deposit = Deposit.objects.create(
