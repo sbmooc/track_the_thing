@@ -140,15 +140,7 @@ class Rider(AbstractModel):
     hire_tracker = BooleanField(null=True)
     tracker_url = CharField(null=True, max_length=200, blank=True)
     status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
-
-    @property
-    def display_order(self):
-        if self.cap_number:
-            try:
-                return int(self.cap_number)
-            except ValueError:
-                return int(self.cap_number[:-1])
-        return 10000
+    display_order = IntegerField()
 
     @property
     def balance(self):

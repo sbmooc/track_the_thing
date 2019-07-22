@@ -44,7 +44,7 @@ else:
         }
     }
 
-SECURE_SSL_REDIRECT=True
+SECURE_SSL_REDIRECT=False if ENVIRONMENT == 'local' else True
 
 DEBUG = False if ENVIRONMENT == 'prod' else True
 
