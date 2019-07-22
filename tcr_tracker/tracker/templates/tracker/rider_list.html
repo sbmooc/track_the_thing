@@ -1,30 +1,42 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!--&lt;!&ndash;Rider search and tag bar&ndash;&gt;-->
-<!--    <div class="container-fluid my-2">-->
-<!--        <div class="row">-->
-<!--            <div class="col my-2">-->
-<!--                <a href="#">-->
-<!--                    <button type="button"-->
-<!--                            class="btn btn-outline-secondary btn-block text-nowrap" data-toggle="button">In progress-->
-<!--                    </button>-->
-<!--                </a>-->
-<!--            </div>-->
-<!--            <div class="col my-2">-->
-<!--                <a href="#">-->
-<!--                    <button type="button"-->
-<!--                            class="btn btn-outline-secondary btn-block" data-toggle="button">Finished-->
-<!--                    </button>-->
-<!--                </a>-->
-<!--            </div>-->
-<!--            <div class="col my-2">-->
-<!--                <a href="#">-->
-<!--                    <button type="button"-->
-<!--                            class="btn btn-outline-secondary btn-block" data-toggle="button">Scratched-->
-<!--                    </button>-->
-<!--                </a>-->
-<!--            </div>-->
+<!--Rider search and tag bar-->
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <a href="#">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-block text-nowrap"
+                            data-toggle="button"
+                            id="tracker_button"
+                            onclick="toggle_tracker()">
+                                No tracker
+                    </button>
+                </a>
+            </div>
+            <div class="col my-2">
+                <a href="#">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-block"
+                            data-toggle="button"
+                            id="finished_button"
+                            onclick="toggle_finished()">
+                                Finished
+                    </button>
+                </a>
+            </div>
+            <div class="col my-2">
+                <a href="#">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-block"
+                            data-toggle="button"
+                            id="scratched_button"
+                            onclick="toggle_scratched()">
+                                Scratched
+                    </button>
+                </a>
+            </div>
 <!--            <div class="col-sm my-2">-->
 <!--                <form class="form-inline" role="search">-->
 <!--                    <div class="input-group">-->
@@ -35,8 +47,8 @@
 <!--                    </div>-->
 <!--                </form>-->
 <!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
+        </div>
+    </div>
 
 <!--main content-->
 
@@ -57,9 +69,11 @@
           </thead>
           <tbody>
             {% for rider in rider_list %}
-                <tr>
+                <tr class="{% if rider.trackers_possessed is None %} no_tracker {% else %} has_tracker {% endif %}
+                            {% if rider.status == 'finished' %} finished {% else %} not_finished {% endif %}
+                            {% if rider.status == 'scratched' %} scratched {% else %} not_scratched {% endif %}">
                   <td>{{ rider.cap_number }}</td>
-                    <td><a href={{ rider.url }}>{{ rider.full_name }}</a></td>
+                    <td><a href="{{ rider.url }}">{{ rider.full_name }}</a></td>
                   <td>{{ rider.current_tracker }}</td>
                   <td>{{ rider.status }}</td>
                 </tr>
@@ -67,4 +81,61 @@
           </tbody>
         </table>
     </div>
+
+<script type="text/javascript">
+    function toggle_tracker() {
+        var button_id = document.getElementById('tracker_button');
+        var button_state = "inactive";
+        if ( button_id.className.includes("active") ) {
+            button_state = "active";
+        } else {
+            button_state = "inactive";
+        }
+        var rows = document.getElementsByClassName("has_tracker")
+        for (i = 0; i < rows.length; i++) {
+            if ( button_state == 'active') {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+
+    function toggle_finished() {
+        var button_id = document.getElementById('finished_button');
+        var button_state = "inactive";
+        if ( button_id.className.includes("active") ) {
+            button_state = "active";
+        } else {
+            button_state = "inactive";
+        }
+        var rows = document.getElementsByClassName("not_finished")
+        for (i = 0; i < rows.length; i++) {
+            if ( button_state == 'active') {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+
+    function toggle_scratched() {
+        var button_id = document.getElementById('scratched_button');
+        var button_state = "inactive";
+        if ( button_id.className.includes("active") ) {
+            button_state = "active";
+        } else {
+            button_state = "inactive";
+        }
+        var rows = document.getElementsByClassName("not_scratched")
+        for (i = 0; i < rows.length; i++) {
+            if ( button_state == 'active') {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
 {% endblock %}

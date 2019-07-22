@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-import dj_database_url
+# import dj_database_url
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -23,30 +23,21 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY',
                             'kg_fftds@&uk4tc&368z1*91j^hf#uuti#n^7b%sbh1f%q@!_#')
 
-ENVIRONMENT = os.environ.get('DJANGO_ENVIRONMENT', 'local')
-if ENVIRONMENT != 'local':
-    DATABASES = {
-        'default':
-            dj_database_url.config(
-                default=os.environ.get('DATABASE_URL') or os.environ.get('HEROKU_POSTGRESQL_AMBER_URL'),
-                conn_max_age=600
-            )
+ENVIRONMENT = os.environ.get('local')
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'sqlite3.db',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'tracker',
-            'USER': 'track_thing',
-            'PASSWORD': 'tracker',
-            'HOST': 'localhost',
-            'PORT': '5432',
-        }
-    }
+}
 
-SECURE_SSL_REDIRECT=True
+# SECURE_SSL_REDIRECT=True
 
-DEBUG = False if ENVIRONMENT == 'prod' else True
+DEBUG = True
 
 
 ALLOWED_HOSTS = ['track3r.co.uk', 'www.track3r.co.uk', '.herokuapp.com', '127.0.0.1']
@@ -67,7 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',    
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -150,7 +141,7 @@ SENTRY_API_KEY = os.environ.get('SENTRY_API', None)
 GITHUB_ACCESS_TOKEN = os.environ.get('GITHUB_ACCESS_TOKEN', None)
 GITHUB_REPO = os.environ.get('GITHUB_REPO', None)
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 LOGGING = {
     'version': 1,

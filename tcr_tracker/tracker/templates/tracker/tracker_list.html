@@ -9,7 +9,8 @@
                     <button type="button"
                             class="btn btn-outline-secondary btn-block"
                             data-toggle="button"
-                            id="working">
+                            id="working_button"
+                            onclick="toggle_working()">
                                 Working
                     </button>
                 </a>
@@ -19,7 +20,7 @@
                     <button type="button"
                             class="btn btn-outline-secondary btn-block"
                             data-toggle="button"
-                            id="assignable"
+                            id="assignable_button"
                             onclick="toggle_assignable()">
                                 Assignable
                     </button>
@@ -61,7 +62,8 @@
           </thead>
           <tbody>
             {% for tracker in tracker_list %}
-                <tr class="{% if tracker.assignable %} Assignable {% else %} Unassignable {% endif %}">
+                <tr class="{% if tracker.assignable %} assignable {% else %} unassignable {% endif %}
+                            {% if tracker.working_status == 'working' %} Working {% else %} not_working {% endif %}">
                   <td><a href={{ tracker.url }}>{{ tracker.tcr_id }}</a></td>
                   <td>
                       <div>{{ tracker.working_status }}</div>
@@ -89,21 +91,36 @@
 
 <script type="text/javascript">
     function toggle_assignable() {
-        var button_id = document.getElementById('assignable');
+        var button_id = document.getElementById('assignable_button');
         var button_state = "inactive";
         if ( button_id.className.includes("active") ) {
             button_state = "active";
         } else {
             button_state = "inactive";
         }
-        if ( button_state == 'active') {
-            var rows = document.getElementsByClassName("Unassignable")
-            for (i = 0; i < rows.length; i++) {
+        var rows = document.getElementsByClassName("unassignable")
+        for (i = 0; i < rows.length; i++) {
+            if ( button_state == 'active') {
                 rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
             }
+        }
+    }
+
+    function toggle_working() {
+        var button_id = document.getElementById('working_button');
+        var button_state = "inactive";
+        if ( button_id.className.includes("active") ) {
+            button_state = "active";
         } else {
-            var rows = document.getElementsByClassName("Unassignable")
-            for (i = 0; i < rows.length; i++) {
+            button_state = "inactive";
+        }
+        var rows = document.getElementsByClassName("not_working")
+        for (i = 0; i < rows.length; i++) {
+            if ( button_state == 'active') {
+                rows[i].style.display = "";
+            } else {
                 rows[i].style.display = "none";
             }
         }
