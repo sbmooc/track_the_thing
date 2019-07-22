@@ -166,7 +166,8 @@ class RiderControlpointView(
     def form_valid(self, form):
         time_elapsed = self.elapsed_time_string(
             form.cleaned_data['race_time'],
-            RaceStatus.objects.last().created
+            arrow.Arrow.get(RaceStatus.objects.last().created).datetime(
+                tzinfo=tz.gettz('Europe/Paris'))
         )
         RiderControlPoint.objects.create(
             rider=self.object,
