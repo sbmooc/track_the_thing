@@ -67,14 +67,16 @@ class AddPayment(
 
     def form_valid(self, form):
         self.get_object()
+        deposit = Deposit.objects.create(
+            rider=self.object,
+            amount_in_pence=form.cleaned_data['amount'] * 100
+        )
         Event.objects.create(
             event_type=self.event_type,
             user=self.request.user.profile,
-            rider=self.object
-        )
-        Deposit.objects.create(
+            notes=form.cleaned_data['notes'],
             rider=self.object,
-            amount_in_pence=form.cleaned_data['amount'] * 100
+            deposit_change=deposit
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
 

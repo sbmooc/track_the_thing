@@ -29,6 +29,7 @@ class AdjustBalanceForm(
     forms.Form
 ):
     amount = forms.FloatField()
+    notes = forms.CharField(required=False)
 
 
 class ScratchRiderForm(
