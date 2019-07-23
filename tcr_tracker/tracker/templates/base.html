@@ -35,11 +35,11 @@
           </div>
           <div>Riders</div>
       </a>
-      <a class="nav-item nav-link" style="color: pink" href="{% url 'record_issue' %}">
+      <a class="nav-item nav-link" style="{% if active_tab != 'events' %} color: slategray {% endif %}" href="{% url 'all_events' %}">
           <div>
-            <i class="fa fa-exclamation"></i>
+            <i class="fa fa-flag-checkered"></i>
           </div>
-          <div>Record Issue</div>
+          <div>Events</div>
       </a>
   </nav>
   <!--/footer-->
@@ -48,9 +48,14 @@
     <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top shadow-sm">
       <!-- Navbar -->
       <ul class="navbar-nav container-fluid">
-        <!--blank div same size as user icon on the right, to properly centre the title-->
-        <li class="nav-item" style="width: 36px"></li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'record_issue' %}" role="button">
+                <i class="fas fa-exclamation-circle fa-fw"></i>
+            </a>
+        </li>
+
         <li class="navbar-brand mr-0 justify-content-center">{{ page_title }}</li>
+
         <li class="nav-item dropdown no-arrow  justify-content-end">
           <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-user-circle fa-fw"></i>

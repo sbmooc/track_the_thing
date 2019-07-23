@@ -279,6 +279,21 @@ class OneRider(
         return context
 
 
+class AllEvents(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    ListView
+):
+    model = Event
+
+    def get_context_data(self, **kwargs):
+        context = super(AllEvents, self).get_context_data(**kwargs)
+        context['page_title'] = 'Events'
+        context['active_tab'] = 'events'
+        return context
+
+
 class MultiActionFormView(
     RaceStatusMixin,
     EnvironmentMixin,

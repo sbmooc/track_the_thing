@@ -18,7 +18,8 @@ from tcr_tracker.tracker.views import (
     AddRefund,
     RecordIssue,
     TrackerLoginView,
-    AssignmentPossessionView
+    AssignmentPossessionView,
+    AllEvents
 )
 
 urlpatterns = [
@@ -53,6 +54,7 @@ urlpatterns = [
          name='tracker_give_retrive'),
     path('issues/record/', RecordIssue.as_view(),
          name='record_issue'),
+    path('events/', AllEvents.as_view(), name='all_events'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/login/', TrackerLoginView.as_view()),
 ]

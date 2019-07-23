@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!--Event tag search bar-->
+    <!--<div class="container-fluid my-2">-->
+        <!--<div class="row">-->
+            <!--<div class="col my-2">-->
+                <!--<a href="#">-->
+                    <!--<button type="button"-->
+                            <!--class="btn btn-outline-secondary btn-block text-nowrap"-->
+                            <!--data-toggle="button"-->
+                            <!--id="no_tracker"-->
+                            <!--onclick="toggleFilters(this)">-->
+                                <!--No tracker-->
+                    <!--</button>-->
+                <!--</a>-->
+            <!--</div>-->
+            <!--<div class="col my-2">-->
+                <!--<a href="#">-->
+                    <!--<button type="button"-->
+                            <!--class="btn btn-outline-secondary btn-block"-->
+                            <!--data-toggle="button"-->
+                            <!--id="finished"-->
+                            <!--onclick="toggleFilters(this)">-->
+                                <!--Finished-->
+                    <!--</button>-->
+                <!--</a>-->
+            <!--</div>-->
+            <!--<div class="col my-2">-->
+                <!--<a href="#">-->
+                    <!--<button type="button"-->
+                            <!--class="btn btn-outline-secondary btn-block"-->
+                            <!--data-toggle="button"-->
+                            <!--id="scratched"-->
+                            <!--onclick="toggleFilters(this)">-->
+                                <!--Scratched-->
+                    <!--</button>-->
+                <!--</a>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+
+<!--main content-->
+
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h5>All events</h5>
+            </div>
+        </div>
+        <ul class="list-group">
+            {% if not event_list %}
+                <li class="list-group-item">
+                    <div>
+                        There are no events yet!
+                    </div>
+                </li>
+            {% else %}
+                {% for event in event_list reversed %}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col">
+                                <div style="color: grey; font-style: italic">
+                                     {{ event.created }}
+                                </div>
+                                {% if event.rider %}
+                                    <div>
+                                        <a href="{{ event.rider.url }}">
+                                            ({{ event.rider.full_name }} / #{{ event.rider.cap_number }})
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if event.event_type != "add_note" %}
+                                    <div><b>{{ event.event_type }}</b></div>
+                                {% endif %}
+                                {% if event.control_point %}
+                                    <div>{{ event.control_point }}</div>
+                                {% endif %}
+                                {% if event.tracker %}
+                                    <div>
+                                        <a href="{{ event.tracker.url }}">
+                                            (#{{ event.tracker.tcr_id }} / {{ event.tracker.esn_number }})
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                {% if event.notes %}
+                                    <div>
+                                        {% if event.input_by %} {{ event.input_by }}: {% endif %}
+                                        {{ event.notes }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </div>
+
+<script type="text/javascript">
+    function isActive(buttonId) {
+        var buttonState = false;
+        var buttonClass = document.getElementById(buttonId).className;
+        if ( buttonClass.includes("active") ) {
+            buttonState = true;
+        }
+        return buttonState;
+    }
+
+    function toggleFilters(clickedButton) {
+        var buttons = document.getElementsByClassName('btn-outline-secondary');
+        var activeStates = [];
+
+        for (i = 0; i < buttons.length; i++) {
+            var buttonId = buttons[i].id;
+            if ( buttonId == clickedButton.id && isActive(buttonId) == false ) {
+                activeStates.push(buttonId);
+            } else if ( buttonId != clickedButton.id && isActive(buttonId) == true ) {
+                activeStates.push(buttonId);
+            }
+        }
+
+        var rows = document.getElementsByClassName("filterable");
+        for (i = 0; i < rows.length; i++) {
+            var rowClass = rows[i].className;
+            rows[i].style.display = "";
+            for (j = 0; j < activeStates.length; j++) {
+                if ( rowClass.includes(activeStates[j]) ) {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
+
+{% endblock %}
