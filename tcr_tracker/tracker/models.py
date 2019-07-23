@@ -20,7 +20,7 @@ from tcr_tracker.tracker.errors import (
     TrackerNotAssignable)
 
 TRACKER_WORKING_STATUS = (
-    ('working', 'Working'),
+    ('functioning', 'Functioning'),
     ('broken', 'Broken'),
     ('to_be_tested', 'To Be Tested'),
     ('lost', 'Lost'),
@@ -39,8 +39,8 @@ RIDER_CATEGORIES = (
 )
 
 RIDER_GENDERS = (
-    ('male', 'M'),
-    ('female', 'F')
+    ('M', 'M'),
+    ('F', 'F')
 )
 
 
@@ -139,7 +139,7 @@ class Rider(AbstractModel):
     country_code = CharField(max_length=5, null=True)
     hire_tracker = BooleanField(null=True)
     tracker_url = CharField(null=True, max_length=200, blank=True)
-    status = CharField(max_length=50, choices=RIDER_STATUS, null=True)
+    status = CharField(max_length=50, choices=RIDER_STATUS, null=True, blank=True)
     display_order = IntegerField()
 
     @property
