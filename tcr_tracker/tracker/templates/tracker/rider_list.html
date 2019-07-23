@@ -9,8 +9,8 @@
                     <button type="button"
                             class="btn btn-outline-secondary btn-block text-nowrap"
                             data-toggle="button"
-                            id="tracker_button"
-                            onclick="toggle_tracker()">
+                            id="no_tracker"
+                            onclick="toggleFilters(this)">
                                 No tracker
                     </button>
                 </a>
@@ -20,8 +20,8 @@
                     <button type="button"
                             class="btn btn-outline-secondary btn-block"
                             data-toggle="button"
-                            id="finished_button"
-                            onclick="toggle_finished()">
+                            id="finished"
+                            onclick="toggleFilters(this)">
                                 Finished
                     </button>
                 </a>
@@ -31,8 +31,8 @@
                     <button type="button"
                             class="btn btn-outline-secondary btn-block"
                             data-toggle="button"
-                            id="scratched_button"
-                            onclick="toggle_scratched()">
+                            id="scratched"
+                            onclick="toggleFilters(this)">
                                 Scratched
                     </button>
                 </a>
@@ -69,9 +69,7 @@
           </thead>
           <tbody>
             {% for rider in rider_list %}
-                <tr class="{% if rider.trackers_possessed is None %} no_tracker {% else %} has_tracker {% endif %}
-                            {% if rider.status == 'finished' %} finished {% else %} not_finished {% endif %}
-                            {% if rider.status == 'scratched' %} scratched {% else %} not_scratched {% endif %}">
+                <tr class="filterable{% if rider.current_tracker is not None %} no_tracker{% endif %}{% if rider.status != 'finished' %} finished{% endif %}{% if rider.status != 'scratched' %} scratched{% endif %}">
                   <td>{{ rider.cap_number }}</td>
                     <td><a href="{{ rider.url }}">{{ rider.full_name }}</a></td>
                   <td>{{ rider.current_tracker }}</td>
@@ -83,56 +81,36 @@
     </div>
 
 <script type="text/javascript">
-    function toggle_tracker() {
-        var button_id = document.getElementById('tracker_button');
-        var button_state = "inactive";
-        if ( button_id.className.includes("active") ) {
-            button_state = "active";
-        } else {
-            button_state = "inactive";
+    function isActive(buttonId) {
+        var buttonState = false;
+        var buttonClass = document.getElementById(buttonId).className;
+        if ( buttonClass.includes("active") ) {
+            buttonState = true;
         }
-        var rows = document.getElementsByClassName("has_tracker")
-        for (i = 0; i < rows.length; i++) {
-            if ( button_state == 'active') {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
-            }
-        }
+        return buttonState;
     }
 
-    function toggle_finished() {
-        var button_id = document.getElementById('finished_button');
-        var button_state = "inactive";
-        if ( button_id.className.includes("active") ) {
-            button_state = "active";
-        } else {
-            button_state = "inactive";
-        }
-        var rows = document.getElementsByClassName("not_finished")
-        for (i = 0; i < rows.length; i++) {
-            if ( button_state == 'active') {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
+    function toggleFilters(clickedButton) {
+        var buttons = document.getElementsByClassName('btn-outline-secondary');
+        var activeStates = [];
+
+        for (i = 0; i < buttons.length; i++) {
+            var buttonId = buttons[i].id;
+            if ( buttonId == clickedButton.id && isActive(buttonId) == false ) {
+                activeStates.push(buttonId);
+            } else if ( buttonId != clickedButton.id && isActive(buttonId) == true ) {
+                activeStates.push(buttonId);
             }
         }
-    }
 
-    function toggle_scratched() {
-        var button_id = document.getElementById('scratched_button');
-        var button_state = "inactive";
-        if ( button_id.className.includes("active") ) {
-            button_state = "active";
-        } else {
-            button_state = "inactive";
-        }
-        var rows = document.getElementsByClassName("not_scratched")
+        var rows = document.getElementsByClassName("filterable");
         for (i = 0; i < rows.length; i++) {
-            if ( button_state == 'active') {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
+            var rowClass = rows[i].className;
+            rows[i].style.display = "";
+            for (j = 0; j < activeStates.length; j++) {
+                if ( rowClass.includes(activeStates[j]) ) {
+                    rows[i].style.display = "none";
+                }
             }
         }
     }

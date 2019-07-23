@@ -9,8 +9,8 @@
                     <button type="button"
                             class="btn btn-outline-secondary btn-block"
                             data-toggle="button"
-                            id="working_button"
-                            onclick="toggle_working()">
+                            id="working"
+                            onclick="toggleFilters(this)">
                                 Working
                     </button>
                 </a>
@@ -20,8 +20,8 @@
                     <button type="button"
                             class="btn btn-outline-secondary btn-block"
                             data-toggle="button"
-                            id="assignable_button"
-                            onclick="toggle_assignable()">
+                            id="assignable"
+                            onclick="toggleFilters(this)">
                                 Assignable
                     </button>
                 </a>
@@ -62,8 +62,7 @@
           </thead>
           <tbody>
             {% for tracker in tracker_list %}
-                <tr class="{% if tracker.assignable %} assignable {% else %} unassignable {% endif %}
-                            {% if tracker.working_status == 'working' %} Working {% else %} not_working {% endif %}">
+                <tr class="filterable{% if not tracker.assignable %} assignable{% endif %}{% if tracker.working_status != 'working' %} working{% endif %}">
                   <td><a href={{ tracker.url }}>{{ tracker.tcr_id }}</a></td>
                   <td>
                       <div>{{ tracker.working_status }}</div>
@@ -90,38 +89,36 @@
     </div>
 
 <script type="text/javascript">
-    function toggle_assignable() {
-        var button_id = document.getElementById('assignable_button');
-        var button_state = "inactive";
-        if ( button_id.className.includes("active") ) {
-            button_state = "active";
-        } else {
-            button_state = "inactive";
+    function isActive(buttonId) {
+        var buttonState = false;
+        var buttonClass = document.getElementById(buttonId).className;
+        if ( buttonClass.includes("active") ) {
+            buttonState = true;
         }
-        var rows = document.getElementsByClassName("unassignable")
-        for (i = 0; i < rows.length; i++) {
-            if ( button_state == 'active') {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
-            }
-        }
+        return buttonState;
     }
 
-    function toggle_working() {
-        var button_id = document.getElementById('working_button');
-        var button_state = "inactive";
-        if ( button_id.className.includes("active") ) {
-            button_state = "active";
-        } else {
-            button_state = "inactive";
+    function toggleFilters(clickedButton) {
+        var buttons = document.getElementsByClassName('btn-outline-secondary');
+        var activeStates = [];
+
+        for (i = 0; i < buttons.length; i++) {
+            var buttonId = buttons[i].id;
+            if ( buttonId == clickedButton.id && isActive(buttonId) == false ) {
+                activeStates.push(buttonId);
+            } else if ( buttonId != clickedButton.id && isActive(buttonId) == true ) {
+                activeStates.push(buttonId);
+            }
         }
-        var rows = document.getElementsByClassName("not_working")
+
+        var rows = document.getElementsByClassName("filterable");
         for (i = 0; i < rows.length; i++) {
-            if ( button_state == 'active') {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
+            var rowClass = rows[i].className;
+            rows[i].style.display = "";
+            for (j = 0; j < activeStates.length; j++) {
+                if ( rowClass.includes(activeStates[j]) ) {
+                    rows[i].style.display = "none";
+                }
             }
         }
     }

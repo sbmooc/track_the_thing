@@ -24,23 +24,23 @@
   <!--<nav class="navbar fixed-top navbar-expand-sm navbar-dark nav-justified shadow-lg bg-white rounded" style="padding-top: 60px;">-->
     <!--Replace with consistent link to tracker_list.html at all points-->
       <a class="nav-item nav-link" style="{% if active_tab != 'trackers' %} color: slategray {% endif %}" href="{% url 'all_trackers' %}">
-        <div>
-          <i class="fa fa-satellite"></i>
-        </div>
-        <div>Trackers</div>
+          <div>
+            <i class="fa fa-satellite"></i>
+          </div>
+          <div>Trackers</div>
       </a>
-    <a class="nav-item nav-link" style="{% if active_tab != 'riders' %} color: slategray {% endif %}" href="{% url 'all_riders' %}">
-        <div>
-          <i class="fa fa-bicycle"></i>
-        </div>
-        <div>Riders</div>
+      <a class="nav-item nav-link" style="{% if active_tab != 'riders' %} color: slategray {% endif %}" href="{% url 'all_riders' %}">
+          <div>
+            <i class="fa fa-bicycle"></i>
+          </div>
+          <div>Riders</div>
       </a>
-    <a class="nav-item nav-link" style="color: pink" href="{% url 'record_issue' %}">
-      <div>
-        <i class="fa fa-exclamation"></i>
-      </div>
-      <div>Record Issue</div>
-    </a>
+      <a class="nav-item nav-link" style="color: pink" href="{% url 'record_issue' %}">
+          <div>
+            <i class="fa fa-exclamation"></i>
+          </div>
+          <div>Record Issue</div>
+      </a>
   </nav>
   <!--/footer-->
 
