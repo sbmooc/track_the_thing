@@ -168,8 +168,7 @@ class RiderControlpointView(
         return f'{days} Days {hours} Hours {minutes} Minutes'
 
     def form_valid(self, form):
-        race_time = timezone.make_aware(form.cleaned_data['race_time'], timezone.make_aware(
-            timezone.make_naive(form.cleaned_data['race_time']), timezone=pytz.timezone('Europe/Paris')))
+        race_time = arrow.get(form.cleaned_data['race_time']).shift(hours=-2).datetime
         time_elapsed = self.elapsed_time_string(
             race_time,
             RaceStatus.objects.last().created
