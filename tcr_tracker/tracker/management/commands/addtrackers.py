@@ -18,10 +18,16 @@ class Command(BaseCommand):
         with open(tracker_csv, 'r', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
-                row['last_test_date'] = datetime.strptime(row['last_test_date'].strip(), '%d/%m/%y')
-                row['purchase_date'] = datetime.strptime(row['purchase_date'].strip(), '%d/%m/%Y')
-                row['warranty_expiry'] = datetime.strptime(row['warranty_expiry'].strip(), '%d/%m/%Y')
-                row['clip'] = row['clip'] == 'Y'
+                if row['last_test_date']:
+                    row['last_test_date'] = datetime.strptime(row['last_test_date'].strip(), '%d/%m/%y')
+                else:
+                    row['last_test_date'] = None
+                row.update(
+                    {
+                        'warranty_expiry': None,
+                        'purchase_date': None
+                     }
+                )
                 tracker = Tracker(**row)
                 try:
                     tracker.save()

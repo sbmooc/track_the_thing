@@ -370,7 +370,7 @@ class Tracker(AbstractModel):
     @property
     def assignable(self):
         return self.rider_assigned is None and (
-                self.working_status == 'Functioning' or self.working_status == 'working')and (
+                self.working_status == 'functioning' or self.working_status == 'working')and (
                 self.rider_possesed is None)
 
     @property

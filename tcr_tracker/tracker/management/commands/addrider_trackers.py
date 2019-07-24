@@ -27,7 +27,7 @@ class Command(BaseCommand):
                     tracker = Tracker.objects.create(
                         esn_number=row['tracker_esn'],
                         owner='rider_owned',
-                        working_status='Functioning',
+                        working_status='functioning',
                         tcr_id=rider_own_id
                     )
                     rider.tracker_add_assignment(
