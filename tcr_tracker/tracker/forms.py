@@ -64,7 +64,7 @@ class RiderControlPointForm(
 
     race_time = forms.SplitDateTimeField(
         widget=forms.widgets.SplitDateTimeWidget(date_attrs={'type': 'date'},
-                                                 time_attrs={'type': 'time'})
+                                                 time_attrs={'type': 'time'}),
     )
     input_by = forms.CharField(
         label='Volunteer Name'

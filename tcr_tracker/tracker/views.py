@@ -1,4 +1,5 @@
-from arrow import arrow
+import arrow
+import pytz
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
@@ -8,6 +9,7 @@ from django.views.generic import ListView, DetailView, UpdateView, FormView, Cre
 from tcr_tracker.api_clients import GitHubClient
 from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin, GetObjectMixin, StaffOnlyMixin
 from dateutil import tz
+from django.utils import timezone
 from .forms import (
     EditTracker,
     EditRider,
@@ -150,7 +152,7 @@ class RiderControlpointView(
 
     def get_initial(self):
         initial = super(RiderControlpointView, self).get_initial()
-        initial['race_time'] = arrow.Arrow.now(tzinfo=tz.gettz('Europe/Paris')).datetime
+        initial['race_time'] = arrow.Arrow.now().datetime
         return initial
 
     @staticmethod
@@ -166,15 +168,16 @@ class RiderControlpointView(
         return f'{days} Days {hours} Hours {minutes} Minutes'
 
     def form_valid(self, form):
+        race_time = timezone.make_aware(form.cleaned_data['race_time'], timezone.make_aware(
+            timezone.make_naive(form.cleaned_data['race_time']), timezone=pytz.timezone('Europe/Paris')))
         time_elapsed = self.elapsed_time_string(
-            form.cleaned_data['race_time'],
-            arrow.Arrow.get(RaceStatus.objects.last().created).datetime(
-                tzinfo=tz.gettz('Europe/Paris'))
+            race_time,
+            RaceStatus.objects.last().created
         )
         RiderControlPoint.objects.create(
             rider=self.object,
             control_point=form.cleaned_data['control_point'],
-            race_time=form.cleaned_data['race_time'],
+            race_time=race_time,
             input_by=form.cleaned_data['input_by'],
             race_time_string=time_elapsed
         )
@@ -186,7 +189,6 @@ class RiderControlpointView(
             notes=time_elapsed
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
-
 
 
 class AllTrackers(
