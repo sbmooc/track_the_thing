@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, FormView
 
 from tcr_tracker.api_clients import GitHubClient
@@ -259,6 +260,25 @@ class RiderEdit(
     model = Rider
     form_class = EditRider
     template_name = 'tracker/rider_edit.html'
+
+
+
+class Registration(
+    LoginRequiredMixin,
+    RaceStatusMixin,
+    EnvironmentMixin,
+    View
+):
+    def get(self, request, *args, **kwargs):
+        rider = Rider.objects.get(**kwargs)
+        rider.attended_registration_desk = True
+        Event.objects.create(
+            rider=rider,
+            event_type='attend_registration',
+            user=request.user.profile,
+        )
+        rider.save()
+        return HttpResponseRedirect(rider.url)
 
 
 class AllRiders(

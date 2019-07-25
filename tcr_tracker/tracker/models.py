@@ -81,7 +81,8 @@ EVENT_CATEGORIES = (
     ('remove_tracker_assignment', 'Tracker remove assignment'),
     ('add_tracker_possession', 'Tracker add possession'),
     ('remove_tracker_possession', 'Tracker remove possession'),
-    ('add_note', 'Add_note')
+    ('add_note', 'Add_note'),
+    ('attend_registation', 'Attend Registration')
 )
 
 
@@ -180,7 +181,7 @@ class Rider(AbstractModel):
 
     @property
     def all_events(self):
-        return self.events.all()
+        return self.events.all().order_by('created')
 
     def get_absolute_url(self):
         return reverse('one_rider', kwargs={'pk': self.id})
@@ -244,6 +245,12 @@ class Rider(AbstractModel):
                 'url': reverse('add_payment', kwargs={'pk': self.id}),
                 'staff_only': True,
                 'display': True
+            },
+            'attend_registration': {
+                'label': 'Attend Registration',
+                'url': reverse('rider_registration', kwargs={'pk': self.id}),
+                'staff_only': True,
+                'display': True if self.pre_race else False
             },
             'notes': {
                 'label': 'Add note',
