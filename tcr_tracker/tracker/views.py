@@ -1,15 +1,12 @@
 import arrow
-import pytz
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import ListView, DetailView, UpdateView, FormView, CreateView
+from django.views.generic import ListView, DetailView, UpdateView, FormView
 
 from tcr_tracker.api_clients import GitHubClient
 from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin, GetObjectMixin, StaffOnlyMixin
-from dateutil import tz
-from django.utils import timezone
 from .forms import (
     EditTracker,
     EditRider,
@@ -272,10 +269,19 @@ class AllRiders(
 ):
     model = Rider
     queryset = Rider.objects.order_by('display_order')
+
     def get_context_data(self, **kwargs):
         context = super(AllRiders, self).get_context_data(**kwargs)
         context['page_title'] = 'Riders'
         context['active_tab'] = 'riders'
+        context['key_stats'] = {
+            'active_riders':
+                Rider.objects.filter(status='active').count(),
+            'scratched_riders':
+                Rider.objects.filter(status='scratched').count(),
+            'attended_registration_desk':
+                Rider.objects.filter(attended_registration_desk=True).count()
+        }
         return context
 
 

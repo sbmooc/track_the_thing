@@ -139,8 +139,15 @@ class Rider(AbstractModel):
     country_code = CharField(max_length=5, null=True)
     hire_tracker = BooleanField(null=True)
     tracker_url = CharField(null=True, max_length=200, blank=True)
-    status = CharField(max_length=50, choices=RIDER_STATUS, null=True, blank=True)
+    status = CharField(
+        max_length=50,
+        choices=RIDER_STATUS,
+        null=True,
+        blank=True,
+        default='active'
+    )
     display_order = IntegerField()
+    attended_registration_desk = BooleanField()
 
     @property
     def balance(self):
@@ -546,7 +553,7 @@ class RiderControlPoint(TimeStampedModel):
     rider = ForeignKey(
         Rider,
         on_delete=models.SET_NULL, null=True,
-        related_name='checkpoints',
+        related_name='controlpoints',
     )
     control_point = ForeignKey(
         ControlPoint,
