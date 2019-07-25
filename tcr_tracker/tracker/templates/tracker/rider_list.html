@@ -83,7 +83,7 @@
                   <td>{{ rider.cap_number }}</td>
                     <td><a href="{{ rider.url }}">{{ rider.full_name }}</a></td>
                   <td>{% for tracker in rider.trackers_assigned.all %}
-                      <a href="{{ tracker.url }}">{{ tracker.id }}</a>
+                      <a href="{{ tracker.url }}">{{ tracker.tcr_id }}</a>
                       {% endfor %}
                       </td>
                     <td>
