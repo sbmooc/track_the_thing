@@ -139,7 +139,7 @@ class AssignmentPossessionForm(MultiActionForm):
         self.fields['assign_tracker'] = forms.ModelChoiceField(
             queryset=Tracker.objects.filter(
                 rider_assigned=None,
-                working_status='Functioning'
+                working_status='functioning'
             ),
             required=False
         )
@@ -203,7 +203,7 @@ class GiveRetriveForm(MultiActionForm):
         self.fields['tracker'] = forms.ModelChoiceField(
             queryset=Tracker.objects.filter(
                 rider_assigned=None,
-                working_status='Functioning'
+                working_status='functioning'
             )
         )
 
