@@ -342,6 +342,12 @@ class MultiActionFormView(
         )
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        context = super(MultiActionFormView, self).get_context_data(**kwargs)
+        context['tracker_form'] = True
+        return context
+
+
 
 class AssignmentPossessionView(
     MultiActionFormView

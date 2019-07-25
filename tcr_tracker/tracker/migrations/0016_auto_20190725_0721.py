@@ -7,6 +7,16 @@ def activate_riders(apps, schema):
     Riders = apps.get_model('tracker', 'Rider')
     Riders.objects.all().update(status='active')
 
+def set_category(apps, schema):
+    Riders = apps.get_model('tracker', 'Rider')
+    all_riders = Riders.objects.all()
+    for rider in all_riders:
+        try:
+            int(rider.cap_number)
+            rider.category = 'Solo'
+        except ValueError:
+            rider.category = 'Pairs'
+        rider.save()
 
 class Migration(migrations.Migration):
 
@@ -46,5 +56,10 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             activate_riders,
             reverse_code=migrations.RunPython.noop
-        )
+        ),
+        migrations.AlterField(
+            model_name='rider',
+            name='cap_number',
+            field=models.CharField(max_length=50),
+        ),
     ]

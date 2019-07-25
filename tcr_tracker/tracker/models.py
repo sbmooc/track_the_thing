@@ -131,8 +131,7 @@ class Rider(AbstractModel):
     first_name = CharField(max_length=50, verbose_name='First Name')
     last_name = CharField(max_length=50)
     email = CharField(max_length=50)
-    cap_number = CharField(max_length=50,
-                           validators=[RegexValidator(regex='^.{1}$', message='Length has to be 1', code='nomatch')])
+    cap_number = CharField(max_length=50)
     category = CharField(max_length=50, choices=RIDER_CATEGORIES, null=True)
     gender = CharField(max_length=10, choices=RIDER_GENDERS, null=True)
     tcr_id = CharField(max_length=10, null=True)

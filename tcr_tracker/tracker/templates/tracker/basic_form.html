@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-    {% if not user.profile.is_tcr_staff %}
+    {% if not user.profile.is_tcr_staff and tracker_form %}
         <div class="container-fluid">
             <div class="row my-2">
                 <div class="col-1">
