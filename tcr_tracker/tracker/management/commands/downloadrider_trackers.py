@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        datetime = arrow.Arrow.now().format("DD-MM-YY::HH:MM")
+        datetime = arrow.Arrow.now().format("DD-MM-YY")
         with open('rider_tracker_download_'+datetime, 'w', encoding='utf-8') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow([
