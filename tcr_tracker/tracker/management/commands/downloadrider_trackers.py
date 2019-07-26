@@ -34,7 +34,7 @@ class Command(BaseCommand):
 
                 writer.writerow(
                     [
-                        tracker.rider_possesd.tcr_id,
+                        tracker.rider_possesed.tcr_id,
                         tracker.esn_number,
                     ]
                 )
