@@ -17,6 +17,7 @@ class Command(BaseCommand):
                 'Tracker TCR ID',
                 'Tracker ESN Number',
                 'Rider Cap Number',
+                'Rider TCR_ID',
                 'Rider Full Name',
                 'Tracker URL (if rider\'s own tracker',
                 ]
@@ -36,6 +37,7 @@ class Command(BaseCommand):
                         tracker.tcr_id,
                         tracker.esn_number,
                         tracker.rider_assigned.cap_number,
+                        tracker.rider_assigned.tcr_id,
                         tracker.rider_assigned.full_name,
                         tracker.rider_assigned.tracker_url
                     ]
