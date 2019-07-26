@@ -32,9 +32,10 @@ class Command(BaseCommand):
                     rider_assigned__status='active'
             ):
 
-                writer.writerow(
-                    [
-                        tracker.rider_possesed.tcr_id,
-                        tracker.esn_number,
-                    ]
-                )
+               if tracker.rider_possesed:
+                    writer.writerow(
+                        [
+                            tracker.rider_possesed.tcr_id,
+                            tracker.esn_number,
+                        ]
+                    )
