@@ -57,6 +57,6 @@ urlpatterns = [
     path('issues/record/', RecordIssue.as_view(),
          name='record_issue'),
     path('events/', AllEvents.as_view(), name='all_events'),
+    path('accounts/login/', TrackerLoginView.as_view(redirect_authenticated_user=True)),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/login/', TrackerLoginView.as_view()),
 ]

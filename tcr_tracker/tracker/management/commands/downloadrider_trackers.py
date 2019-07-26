@@ -1,8 +1,8 @@
 import csv
 
 from arrow import arrow
-from django.core.management.base import BaseCommand, CommandError
-from tcr_tracker.tracker.models import Rider, Deposit, Event, Tracker
+from django.core.management.base import BaseCommand
+from tcr_tracker.tracker.models import Rider, Tracker
 
 
 class Command(BaseCommand):
