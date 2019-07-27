@@ -40,6 +40,7 @@ class CPOrder(
 
     def get_context_data(self, **kwargs):
         context = super(CPOrder, self).get_context_data(**kwargs)
+        context['active_tab'] = 'cp_order'
         context['control_points'] = {
             'cp_1':
                 {
