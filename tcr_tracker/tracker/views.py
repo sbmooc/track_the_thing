@@ -297,8 +297,6 @@ class AllRiders(
         context['key_stats'] = {
             'active_riders':
                 Rider.objects.filter(status='active').count(),
-            'scratched_riders':
-                Rider.objects.filter(status='scratched').count(),
             'cp1':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
