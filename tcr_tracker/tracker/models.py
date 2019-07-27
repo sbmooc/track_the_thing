@@ -104,7 +104,7 @@ class TimeStampedModel(models.Model):
     # todo: uncomment before merge
     user = ForeignKey(
         Profile,
-        on_delete=models.SET_NULL, null=True
+        on_delete=models.SET_NULL, null=True, blank=True
     )
 
 
