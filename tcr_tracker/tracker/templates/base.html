@@ -35,12 +35,22 @@
           </div>
           <div>Riders</div>
       </a>
-      <a class="nav-item nav-link" style="{% if active_tab != 'events' %} color: slategray {% endif %}" href="{% url 'all_events' %}">
+  {% if user.is_superuser %}
+      <a class="nav-item nav-link" style="{% if active_tab != 'cp_order' %} color: slategray {% endif %}" href="{% url 'cp_order' %}">
           <div>
             <i class="fa fa-flag-checkered"></i>
           </div>
+          <div>CP Order</div>
+      </a>
+      {% endif %}
+  {% if user.profile.is_staff %} }
+      <a class="nav-item nav-link" style="{% if active_tab != 'events' %} color: slategray {% endif %}" href="{% url 'all_events' %}">
+          <div>
+              <i class="fa fa-flag-checkered"></i>
+          </div>
           <div>Events</div>
       </a>
+  {% endif %}
   </nav>
   <!--/footer-->
 

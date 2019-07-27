@@ -20,7 +20,9 @@ from tcr_tracker.tracker.views import (
     TrackerLoginView,
     AssignmentPossessionView,
     AllEvents,
-    Registration)
+    Registration,
+    CPOrder
+)
 
 urlpatterns = [
     path(r'', RedirectView.as_view(url='/accounts/login', permanent=False), name='index'),
@@ -57,6 +59,7 @@ urlpatterns = [
     path('issues/record/', RecordIssue.as_view(),
          name='record_issue'),
     path('events/', AllEvents.as_view(), name='all_events'),
+    path('cp_order/', CPOrder.as_view(), name='cp_order'),
     path('accounts/login/', TrackerLoginView.as_view(redirect_authenticated_user=True)),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

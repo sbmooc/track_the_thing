@@ -30,6 +30,31 @@ class TrackerLoginView(
     pass
 
 
+class CPOrder(
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    ListView
+):
+    template_name = 'tracker/control_point_order.html'
+    model = RiderControlPoint
+
+    def get_context_data(self, **kwargs):
+        context = super(CPOrder, self).get_context_data(**kwargs)
+        context['control_points'] = {
+            'cp_1':
+                {
+                    'name': 'Control Point 1',
+                    'control_point': ControlPoint.objects.get(abbreviation='CP1'),
+                    'rider_cps': context['ridercontrolpoint_list'].filter(
+                        control_point=ControlPoint.objects.get(abbreviation='CP1')
+                    ).order_by(
+                        'race_time'
+                    )
+                }
+        }
+        return context
+
+
 class RecordIssue(
     RaceStatusMixin,
     EnvironmentMixin,

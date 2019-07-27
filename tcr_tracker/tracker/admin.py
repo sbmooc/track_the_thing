@@ -1,5 +1,6 @@
 from django.contrib import admin
-from tcr_tracker.tracker.models import Rider, Tracker, Event, RaceStatus, Profile, ControlPoint, Deposit
+from tcr_tracker.tracker.models import Rider, Tracker, Event, RaceStatus, Profile, ControlPoint, \
+    Deposit, RiderControlPoint
 
 
 @admin.register(Rider)
@@ -11,6 +12,9 @@ class RiderAdmin(admin.ModelAdmin):
 class TrackerAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(RiderControlPoint)
+class RiderControlPointAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(Event)
 class EventsAdmin(admin.ModelAdmin):
