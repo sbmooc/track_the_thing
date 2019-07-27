@@ -65,6 +65,7 @@ class RiderControlPointForm(
     race_time = forms.SplitDateTimeField(
         widget=forms.widgets.SplitDateTimeWidget(date_attrs={'type': 'date'},
                                                  time_attrs={'type': 'time'}),
+        label='Race time (Central European Summer Time)'
     )
     input_by = forms.CharField(
         label='Volunteer Name'
