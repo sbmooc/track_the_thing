@@ -20,7 +20,7 @@ from .forms import (
     AssignmentPossessionForm
 )
 
-from .models import Tracker, Rider, Event, RiderControlPoint, RaceStatus, Deposit
+from .models import Tracker, Rider, Event, RiderControlPoint, RaceStatus, Deposit, ControlPoint
 
 
 class TrackerLoginView(
@@ -299,8 +299,12 @@ class AllRiders(
                 Rider.objects.filter(status='active').count(),
             'scratched_riders':
                 Rider.objects.filter(status='scratched').count(),
-            'attended_registration_desk':
-                Rider.objects.filter(attended_registration_desk=True).count()
+            'cp1':
+                RiderControlPoint.objects.filter(
+                    control_point=ControlPoint.objects.get(
+                        abbreviation='CP1'
+                    )
+                ).count()
         }
         return context
 
