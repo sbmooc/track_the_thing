@@ -566,7 +566,7 @@ class RiderControlPoint(TimeStampedModel):
         on_delete=models.SET_NULL, null=True,
         related_name='riders'
     )
-    race_time = DateField()
+    race_time = DateTimeField()
     input_by = CharField(
        max_length=50
     )
@@ -574,5 +574,8 @@ class RiderControlPoint(TimeStampedModel):
         max_length=100,
         null=True
     )
+
+    def __str__(self):
+        return self.rider.cap_number + "--" + self.rider.full_name + "--" + self.race_time_string
 
 

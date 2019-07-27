@@ -23,7 +23,7 @@ class EventsAdmin(admin.ModelAdmin):
 
 @admin.register(RaceStatus)
 class RaceStatusAdmin(admin.ModelAdmin):
-    pass
+    readonly_fields = ('created', )
 
 
 @admin.register(Profile)
