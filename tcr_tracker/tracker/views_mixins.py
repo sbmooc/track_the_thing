@@ -1,6 +1,30 @@
 from django.conf import settings
 
-from tcr_tracker.tracker.models import RaceStatus, Tracker, Rider
+from tcr_tracker.tracker.models import RaceStatus, Tracker, Rider, RiderControlPoint, ControlPoint
+
+
+class KeyStatsMixin:
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['key_stats'] = {
+            'active_riders':
+                Rider.objects.filter(status='active').count(),
+            'cp1':
+                RiderControlPoint.objects.filter(
+                    control_point=ControlPoint.objects.get(
+                        abbreviation='CP1'
+                    )
+                ).count(),
+            'cp2':
+                RiderControlPoint.objects.filter(
+                    control_point=ControlPoint.objects.get(
+                        abbreviation='CP2'
+                    )
+                ).count()
+        }
+
+        return context
 
 
 class GetObjectMixin:

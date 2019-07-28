@@ -1,6 +1,5 @@
 import arrow as arrow
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import (
     CharField,
@@ -45,6 +44,7 @@ RIDER_GENDERS = (
 
 
 RIDER_STATUS = (
+    ('dns', 'DNS'),
     ('active', 'Active'),
     ('finished', 'Finished'),
     ('scratched', 'Scratched')

@@ -7,7 +7,13 @@ from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, FormView
 
 from tcr_tracker.api_clients import GitHubClient
-from tcr_tracker.tracker.views_mixins import RaceStatusMixin, EnvironmentMixin, GetObjectMixin, StaffOnlyMixin
+from tcr_tracker.tracker.views_mixins import(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    GetObjectMixin,
+    StaffOnlyMixin,
+    KeyStatsMixin
+)
 from .forms import (
     EditTracker,
     EditRider,
@@ -33,6 +39,7 @@ class TrackerLoginView(
 class CPOrder(
     EnvironmentMixin,
     LoginRequiredMixin,
+    KeyStatsMixin,
     ListView
 ):
     template_name = 'tracker/control_point_order.html'
@@ -321,6 +328,7 @@ class AllRiders(
     RaceStatusMixin,
     EnvironmentMixin,
     LoginRequiredMixin,
+    KeyStatsMixin,
     ListView
 ):
     model = Rider
@@ -330,22 +338,6 @@ class AllRiders(
         context = super(AllRiders, self).get_context_data(**kwargs)
         context['page_title'] = 'Riders'
         context['active_tab'] = 'riders'
-        context['key_stats'] = {
-            'active_riders':
-                Rider.objects.filter(status='active').count(),
-            'cp1':
-                RiderControlPoint.objects.filter(
-                    control_point=ControlPoint.objects.get(
-                        abbreviation='CP1'
-                    )
-                ).count(),
-            'cp2':
-                RiderControlPoint.objects.filter(
-                    control_point=ControlPoint.objects.get(
-                        abbreviation='CP2'
-                    )
-                ).count()
-        }
         return context
 
 
