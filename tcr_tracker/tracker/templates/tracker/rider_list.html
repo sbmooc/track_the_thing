@@ -53,6 +53,10 @@
                     <td>Riders through CP1</td>
                     <td>{{ key_stats.cp1 }}</td>
                 </tr>
+                <tr>
+                    <td>Riders through CP2</td>
+                    <td>{{ key_stats.cp2 }}</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -68,8 +72,7 @@
             <tr>
               <th scope="col">Cap No.</th>
               <th scope="col">Name</th>
-              <th scope="col">Assigned Trackers</th>
-                <th scope="col">Trackers in Possession</th>
+              <th scope="col">Last Controlpoint</th>
               <th scope="col">Status</th>
             </tr>
           </thead>
@@ -78,15 +81,7 @@
                 <tr class="filterable{% if rider.current_tracker is not None %} no_tracker{% endif %}{% if rider.status != 'finished' %} finished{% endif %}{% if rider.status != 'scratched' %} scratched{% endif %}">
                   <td>{{ rider.cap_number }}</td>
                     <td><a href="{{ rider.url }}">{{ rider.full_name }}</a></td>
-                  <td>{% for tracker in rider.trackers_assigned.all %}
-                      <a href="{{ tracker.url }}">{{ tracker.tcr_id }}</a>
-                      {% endfor %}
-                      </td>
-                    <td>
-                        {% for tracker in rider.trackers_possessed.all %}
-                            <a href="{{ tracker.url }}">{{ tracker.tcr_id }}</a>
-                        {% endfor %}
-                            </td>
+                  <td>{{ rider.last_control }} </td>
                   <td>{{ rider.status }}</td>
                 </tr>
             {% endfor %}

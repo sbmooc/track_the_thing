@@ -150,6 +150,14 @@ class Rider(AbstractModel):
     attended_registration_desk = BooleanField()
 
     @property
+    def last_control(self):
+        last_control = self.controlpoints.last()
+        if last_control:
+            return last_control.control_point.abbreviation
+        else:
+            return 'N/A'
+
+    @property
     def balance(self):
         all_deposits = Deposit.objects.filter(
             rider=self

@@ -328,6 +328,12 @@ class AllRiders(
                     control_point=ControlPoint.objects.get(
                         abbreviation='CP1'
                     )
+                ).count(),
+            'cp2':
+                RiderControlPoint.objects.filter(
+                    control_point=ControlPoint.objects.get(
+                        abbreviation='CP2'
+                    )
                 ).count()
         }
         return context
