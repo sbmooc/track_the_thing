@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="container-fluid my-2">
-    {% for cp, data in control_points.items %}
         <div class="row">
             <div class="col my-2">
-                <h5>{{ data.name }}</h5>
+                <h5>{{ control_points.cp_2.name }}</h5>
             </div>
             <table class="table table-hover table-responsive-xs">
                 <thead>
@@ -18,7 +17,36 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for rider_cp in data.rider_cps %}
+                {% for rider_cp in control_points.cp_2.rider_cps %}
+                    <tr>
+                        <td> {{ forloop.counter }}</td>
+                        <td> {{ rider_cp.rider.cap_number }}</td>
+                        <td> {{ rider_cp.rider.full_name }}</td>
+                        <td> {{ rider_cp.race_time }}</td>
+                        <td> {{ rider_cp.race_time_string }}</td>
+                        <td> {{ rider_cp.input_by }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <div class="col my-2">
+                <h5>{{ control_points.cp_1.name }}</h5>
+            </div>
+            <table class="table table-hover table-responsive-xs">
+                <thead>
+                <tr>
+                    <th scope="col">Position</th>
+                    <th scope="col">Cap No.</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Arrival (Central European Summer Time)</th>
+                    <th scope="col">Race Time</th>
+                    <th scope="col">Recorded by</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for rider_cp in control_points.cp_1.rider_cps %}
                     <tr>
                     <td> {{ forloop.counter }}</td>
                     <td> {{ rider_cp.rider.cap_number }}</td>
@@ -31,6 +59,5 @@
                 </tbody>
             </table>
             </div>
-    {% endfor %}
     </div>
 {% endblock %}
