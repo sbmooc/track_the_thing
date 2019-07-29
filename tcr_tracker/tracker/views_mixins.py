@@ -10,6 +10,8 @@ class KeyStatsMixin:
         context['key_stats'] = {
             'active_riders':
                 Rider.objects.filter(status='active').count(),
+            'scratched_riders':
+                Rider.objects.filter(status='scratched').count(),
             'cp1':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
@@ -21,7 +23,9 @@ class KeyStatsMixin:
                     control_point=ControlPoint.objects.get(
                         abbreviation='CP2'
                     )
-                ).count()
+                ).count(),
+            'starters':
+                Rider.objects.all().count() - Rider.objects.filter(status='dns').count()
         }
 
         return context

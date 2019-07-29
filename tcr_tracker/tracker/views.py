@@ -353,7 +353,7 @@ class OneRider(
         context = super(OneRider, self).get_context_data(**kwargs)
         context['brevet_data'] = self.request.session.get('brevet_data')
         context['rider_dict'] = context['rider'].__dict__
-        context['page_title'] = 'Rider: %s' % context['rider'].full_name
+        context['page_title'] = f"#{context['rider'].cap_number} {context['rider'].full_name}"
         context['active_tab'] = 'riders'
         return context
 
