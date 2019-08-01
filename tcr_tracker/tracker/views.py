@@ -68,6 +68,16 @@ class CPOrder(
                     ).order_by(
                         'race_time'
                     )
+                },
+            'cp_3':
+                {
+                    'name': 'Control Point 3',
+                    'control_point': ControlPoint.objects.get(abbreviation='CP3'),
+                    'rider_cps': context['ridercontrolpoint_list'].filter(
+                        control_point=ControlPoint.objects.get(abbreviation='CP3')
+                    ).order_by(
+                        'race_time'
+                    )
                 }
         }
         return context

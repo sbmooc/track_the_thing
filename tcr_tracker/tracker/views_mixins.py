@@ -12,6 +12,8 @@ class KeyStatsMixin:
                 Rider.objects.filter(status='active').count(),
             'scratched_riders':
                 Rider.objects.filter(status='scratched').count(),
+            'starters':
+                Rider.objects.all().count() - Rider.objects.filter(status='dns').count(),
             'cp1':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
@@ -24,8 +26,12 @@ class KeyStatsMixin:
                         abbreviation='CP2'
                     )
                 ).count(),
-            'starters':
-                Rider.objects.all().count() - Rider.objects.filter(status='dns').count()
+            'cp3':
+                RiderControlPoint.objects.filter(
+                    control_point=ControlPoint.objects.get(
+                        abbreviation='CP3'
+                    )
+                ).count(),
         }
 
         return context
