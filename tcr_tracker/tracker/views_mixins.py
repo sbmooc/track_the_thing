@@ -32,6 +32,12 @@ class KeyStatsMixin:
                         abbreviation='CP3'
                     )
                 ).count(),
+            'cp4':
+                RiderControlPoint.objects.filter(
+                    control_point=ControlPoint.objects.get(
+                        abbreviation='CP4'
+                    )
+                ).count(),
         }
 
         return context
