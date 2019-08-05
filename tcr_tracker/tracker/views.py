@@ -88,6 +88,16 @@ class CPOrder(
                     ).order_by(
                         'race_time'
                     )
+                },
+            'finish':
+                {
+                    'name': 'Finished Riders',
+                    'control_point': ControlPoint.objects.get(abbreviation='Finish'),
+                    'rider_cps': context['ridercontrolpoint_list'].filter(
+                        control_point=ControlPoint.objects.get(abbreviation='Finish')
+                    ).order_by(
+                        'race_time'
+                    )
                 }
         }
         return context
@@ -248,6 +258,10 @@ class RiderControlpointView(
             control_point=form.cleaned_data['control_point'],
             notes=time_elapsed
         )
+        if form.cleaned_data['control_point'] == ControlPoint.objects.get(abbreviation='Finish'):
+            self.object.status = 'finished'
+            self.object.save()
+
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
