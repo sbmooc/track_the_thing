@@ -1,8 +1,10 @@
 import csv
 
 from arrow import arrow
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.management.base import BaseCommand
-from tcr_tracker.tracker.models import Rider, Tracker, ControlPoint
+
+from tcr_tracker.tracker.models import Rider
 
 
 class Command(BaseCommand):
@@ -11,9 +13,9 @@ class Command(BaseCommand):
     def _get_cp_race_time(self, rider, cp):
         try:
             return rider.controlpoints.get(control_point__abbreviation=cp).race_time
-        except ControlPoint.DoesNotExist:
+        except ObjectDoesNotExist:
             return 'N/A'
-        except ControlPoint.MultipleObjectsReturned:
+        except MultipleObjectsReturned:
             return '***MultipleControlPointsForRider***'
 
     def _get_cp_time_string(self, rider, cp):
