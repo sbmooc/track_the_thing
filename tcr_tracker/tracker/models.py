@@ -26,6 +26,14 @@ TRACKER_WORKING_STATUS = (
     ('unknown', 'Unknown')
 )
 
+TRACKER_TESTING_STATUS = (
+    ('to_be_tested', 'To Be Tested'),
+    ('visual_check_OK', 'Visual Check OK'),
+    ('visual_check_FAIL', 'Visual Check Fail'),
+    ('ping_test_OK', 'Ping Test OK'),
+    ('ping_test_FAIL', 'Ping Test Fail')
+)
+
 TRACKER_LOAN_STATUS = (
     ('with_rider', 'With Rider'),
     ('not_loaned', 'Not Loaned'),
@@ -383,6 +391,12 @@ class Tracker(AbstractModel):
     tcr_id = CharField(max_length=20, null=True)
     test_by = CharField(max_length=20, null=True)
     clip = BooleanField(null=True)
+    test_status = CharField(
+        max_length=50,
+        choices=TRACKER_TESTING_STATUS,
+        null=True,
+        default='to_be_tested'
+    )
 
     @property
     def all_events(self):
@@ -422,17 +436,13 @@ class Tracker(AbstractModel):
         return self.get_loan_status_display()
 
     @property
-    def record_status_button_display_state(self):
-        return True
-
-    @property
     def get_buttons(self):
         return {
             'record_status': {
-                'label': 'Record status',
-                'url': self.record_test,
+                'label': 'Test',
+                'url': reverse('tracker_test', kwargs={'pk': self.id}),
                 'staff_only': True,
-                'display': self.record_status_button_display_state
+                'display': True
             },
             'give': {
                 'label': 'Give to rider',
@@ -453,10 +463,6 @@ class Tracker(AbstractModel):
                 'display': True
             }
         }
-
-    def record_test(self, result):
-        self.working_status = 'working' if result == 'working' else 'broken'
-        self.save()
 
     class Meta:
         verbose_name_plural = 'Trackers'

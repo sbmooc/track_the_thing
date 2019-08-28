@@ -43,7 +43,7 @@
           <thead>
             <tr>
               <th scope="col">TCR ID</th>
-              <th scope="col">Status</th>
+              <th scope="col">Test Status</th>
               <th scope="col">Assignment</th>
                 <th scope="col">Possession</th>
               <th scope="col">Assignable</th>
@@ -55,7 +55,7 @@
                 <tr class="filterable{% if not tracker.assignable %} assignable{% endif %}{% if tracker.working_status != 'working' %} working{% endif %}">
                   <td><a href={{ tracker.url }}>{{ tracker.tcr_id }}</a></td>
                   <td>
-                      <div>{{ tracker.working_status }}</div>
+                      <div>{{ tracker.test_status }}</div>
                       <div style="font-size: 80%">{{ tracker.last_test_date }}</div>
                   </td>
                   <td>

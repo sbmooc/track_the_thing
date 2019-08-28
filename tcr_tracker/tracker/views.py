@@ -23,8 +23,8 @@ from .forms import (
     GiveRetriveForm,
     AdjustBalanceForm,
     RecordIssueForm,
-    AssignmentPossessionForm
-)
+    AssignmentPossessionForm,
+    TestTrackerForm)
 
 from .models import Tracker, Rider, Event, RiderControlPoint, RaceStatus, Deposit, ControlPoint
 
@@ -210,7 +210,6 @@ class AddNotes(
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
 
-
 class RiderControlpointView(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -307,27 +306,6 @@ class TrackerEdit(
     template_name = 'tracker/tracker_edit.html'
 
 
-class TrackerTest(
-    RaceStatusMixin,
-    EnvironmentMixin,
-    LoginRequiredMixin,
-    DetailView
-):
-    model = Tracker
-    template_name = 'tracker/tracker_detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(TrackerTest, self).get_context_data(**kwargs)
-        context['alert'] = 'changed'
-        return context
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.record_test(request.GET['result'])
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-
-
 class RiderEdit(
     LoginRequiredMixin,
     UpdateView,
@@ -405,6 +383,17 @@ class AllEvents(
         context['page_title'] = 'Events'
         context['active_tab'] = 'events'
         return context
+
+
+class TrackerTest(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    UpdateView
+):
+    model = Tracker
+    form_class = TestTrackerForm
+    template_name = 'tracker/basic_form.html'
 
 
 class MultiActionFormView(

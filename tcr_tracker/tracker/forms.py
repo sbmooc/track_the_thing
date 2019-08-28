@@ -14,6 +14,15 @@ class CrispyFormMixin:
         self.helper.add_input(Submit('submit', 'Save'))
 
 
+class TestTrackerForm(
+    CrispyFormMixin,
+    forms.ModelForm
+):
+
+    class Meta:
+        fields = ('test_status', )
+        model = Tracker
+
 class RecordIssueForm(
     CrispyFormMixin,
     forms.Form,
