@@ -12,9 +12,11 @@ class Command(BaseCommand):
         sat_31_aug = datetime(2019, 8, 31, 9)
         for tracker in all_trackers:
             if tracker.test_status != 'to_be_tested':
-                Event.objects.create(
+                event = Event.objects.create(
                     event_type=tracker.test_status,
                     tracker=tracker,
                     user=anna,
-                    created=sat_31_aug
+                    notes='Auto created mgmt command'
                 )
+                event.created = sat_31_aug
+                event.save()
