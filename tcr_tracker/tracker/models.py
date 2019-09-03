@@ -83,8 +83,6 @@ EVENT_CATEGORIES = (
     ('remove_tracker_assignment', 'Tracker remove assignment'),
     ('add_tracker_possession', 'Tracker Possession Add'),
     ('remove_tracker_possession', 'Tracker Possession Remove'),
-    ('tested_OK', 'Tested OK'),
-    ('tested_broken', 'Tested Broken'),
     ('add_tracker_assignment', 'Tracker add assignment'),
     ('remove_tracker_assignment', 'Tracker remove assignment'),
     ('add_tracker_possession', 'Tracker add possession'),
@@ -92,6 +90,7 @@ EVENT_CATEGORIES = (
     ('add_note', 'Add_note'),
     ('attend_registation', 'Attend Registration')
 )
+EVENT_CATEGORIES += TRACKER_TESTING_STATUS
 
 
 class Profile(models.Model):

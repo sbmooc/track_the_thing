@@ -395,6 +395,15 @@ class TrackerTest(
     form_class = TestTrackerForm
     template_name = 'tracker/basic_form.html'
 
+    def form_valid(self, form):
+        Event.objects.create(
+            event_type=form.cleaned_data['test_status'],
+            user=self.request.user.profile,
+            tracker=form.instance
+        )
+        return super().form_valid(form)
+
+
 
 class MultiActionFormView(
     RaceStatusMixin,
