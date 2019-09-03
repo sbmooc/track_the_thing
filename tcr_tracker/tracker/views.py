@@ -271,6 +271,7 @@ class AllTrackers(
     ListView
 ):
     model = Tracker
+    queryset = Tracker.objects.order_by('test_status')
 
     def get_context_data(self, **kwargs):
         context = super(AllTrackers, self).get_context_data(**kwargs)
