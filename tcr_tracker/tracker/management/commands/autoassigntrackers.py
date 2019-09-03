@@ -1,6 +1,3 @@
-import csv
-from datetime import datetime
-
 from django.core.management.base import BaseCommand
 from tcr_tracker.tracker.models import Tracker, Rider
 
