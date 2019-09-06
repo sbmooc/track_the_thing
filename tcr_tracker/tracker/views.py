@@ -397,11 +397,22 @@ class TrackerTest(
     template_name = 'tracker/basic_form.html'
 
     def form_valid(self, form):
+        ok_test_status = (
+            'visual_check_OK',
+            'ping_test_OK'
+        )
         Event.objects.create(
             event_type=form.cleaned_data['test_status'],
             user=self.request.user.profile,
             tracker=form.instance
         )
+        if form.cleaned_data['test_status'] in ok_test_status:
+            form.instance.rider_assigned.tracker_remove_assignment(
+                form.instance,
+                'Tracker Assignment Removed - TEST OK',
+                self.request.user,
+                self.request.user.first_name
+            )
         return super().form_valid(form)
 
 

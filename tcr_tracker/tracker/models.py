@@ -207,7 +207,7 @@ class Rider(AbstractModel):
 
     @property
     def refund_button_display_state(self):
-        return True if self.status != 'active' else False
+        return True
 
     @property
     def get_buttons(self):
