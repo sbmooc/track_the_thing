@@ -23,7 +23,8 @@ TRACKER_WORKING_STATUS = (
     ('broken', 'Broken'),
     ('to_be_tested', 'To Be Tested'),
     ('lost', 'Lost'),
-    ('unknown', 'Unknown')
+    ('unknown', 'Unknown'),
+    ('missing', 'Missing')
 )
 
 TRACKER_TESTING_STATUS = (
