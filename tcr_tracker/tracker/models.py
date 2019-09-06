@@ -24,7 +24,6 @@ TRACKER_WORKING_STATUS = (
     ('to_be_tested', 'To Be Tested'),
     ('lost', 'Lost'),
     ('unknown', 'Unknown'),
-    ('missing', 'Missing')
 )
 
 TRACKER_TESTING_STATUS = (
@@ -32,7 +31,8 @@ TRACKER_TESTING_STATUS = (
     ('visual_check_OK', 'Visual Check OK'),
     ('visual_check_FAIL', 'Visual Check Fail'),
     ('ping_test_OK', 'Ping Test OK'),
-    ('ping_test_FAIL', 'Ping Test Fail')
+    ('ping_test_FAIL', 'Ping Test Fail'),
+    ('missing', 'Missing')
 )
 
 TRACKER_LOAN_STATUS = (
