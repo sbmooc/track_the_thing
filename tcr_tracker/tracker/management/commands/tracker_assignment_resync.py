@@ -13,11 +13,15 @@ class Command(BaseCommand):
         )
         all_trackers = Tracker.objects.all()
         anna = User.objects.get(first_name='Anna')
+        count = 0
         for tracker in all_trackers:
-            if tracker.test_status in ok_test_status:
+            if tracker.test_status in ok_test_status and tracker.rider_assigned:
                 tracker.rider_assigned.tracker_remove_assignment(
                     tracker,
                     'Tracker Assignment Removed - TEST OK',
                     anna,
                     anna.first_name
                 )
+                count += 1
+
+        print(f'Successfully de-assigned {count} trackers')
