@@ -348,7 +348,7 @@ class RefundableRiders(
 
     def get_queryset(self):
         all_riders = Rider.objects.all()
-        return [rider for rider in all_riders if rider.balance < 0]
+        return [rider for rider in all_riders if rider.balance > 0]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
