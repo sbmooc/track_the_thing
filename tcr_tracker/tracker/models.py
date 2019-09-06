@@ -174,9 +174,8 @@ class Rider(AbstractModel):
 
     @property
     def balance_string(self):
-        current_balance = self.balance
-        sign = "-" if current_balance < 0 else ""
-        return sign + "£" + '%.2f' % abs(current_balance)
+        sign = "-" if self.balance < 0 else ""
+        return sign + "£" + '%.2f' % abs(self.balance)
 
     @property
     def current_tracker(self):

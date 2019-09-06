@@ -62,7 +62,8 @@
                       {% if tracker.rider_assigned %}
                         <div><a href={{ tracker.rider_url }}>
                             {{ tracker.rider_assigned.cap_number }}<br>
-                            {{ tracker.rider_assigned.full_name }}
+                            {{ tracker.rider_assigned.full_name }}<br>
+                            {{ tracker.rider_assigned.balance_string }}
                         </a></div>
                       {% endif %}
                   </td>
