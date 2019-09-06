@@ -318,7 +318,6 @@ class RiderEdit(
     template_name = 'tracker/rider_edit.html'
 
 
-
 class Registration(
     LoginRequiredMixin,
     RaceStatusMixin,
@@ -336,6 +335,26 @@ class Registration(
         rider.save()
         return HttpResponseRedirect(rider.url)
 
+
+class RefundableRiders(
+    RaceStatusMixin,
+    EnvironmentMixin,
+    LoginRequiredMixin,
+    KeyStatsMixin,
+    ListView
+):
+    model = Rider
+    template_name = 'tracker/refund_riders.html'
+
+    def get_queryset(self):
+        all_riders = Rider.objects.all()
+        return [rider for rider in all_riders if rider.balance < 0]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Refund'
+        context['active_tab'] = 'refundable_riders'
+        return context
 
 class AllRiders(
     RaceStatusMixin,

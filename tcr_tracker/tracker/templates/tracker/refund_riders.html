@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<!--main content-->
+
+    <div class="container-fluid my-2">
+        <div class="row">
+            <div class="col my-2">
+                <h5>Riders to be refunded</h5>
+            </div>
+        </div>
+        <table class="table table-hover table-responsive-xs">
+          <thead>
+            <tr>
+              <th scope="col">Cap No.</th>
+              <th scope="col">Name</th>
+              <th scope="col">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rider in object_list %}
+                <tr>
+                  <td>{{ rider.cap_number }}</td>
+                    <td><a href="{{ rider.url }}">{{ rider.full_name }}</a></td>
+                  <td>{{ rider.balance_string}} </td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </div>
+
+{% endblock %}

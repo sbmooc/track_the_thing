@@ -41,6 +41,12 @@
           </div>
           <div>CP Order</div>
       </a>
+      <a class="nav-item nav-link" style="{% if active_tab != 'refundable_riders' %} color: slategray {% endif %}" href="{% url 'refundable_riders' %}">
+          <div>
+              <i class="fa fa-coins"></i>
+          </div>
+          <div>Refund</div>
+      </a>
   {% if user.profile.is_staff %} }
       <a class="nav-item nav-link" style="{% if active_tab != 'events' %} color: slategray {% endif %}" href="{% url 'all_events' %}">
           <div>
