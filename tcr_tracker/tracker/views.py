@@ -425,7 +425,7 @@ class TrackerTest(
             user=self.request.user.profile,
             tracker=form.instance
         )
-        if form.cleaned_data['test_status'] in ok_test_status:
+        if form.cleaned_data['test_status'] in ok_test_status and form.instance.rider_assigned:
             form.instance.rider_assigned.tracker_remove_assignment(
                 form.instance,
                 'Tracker Assignment Removed - TEST OK',
