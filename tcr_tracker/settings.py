@@ -36,7 +36,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'tracker',
+            'NAME': 'track_local',
             'USER': 'track_thing',
             'PASSWORD': 'tracker',
             'HOST': 'localhost',
@@ -44,7 +44,9 @@ else:
         }
     }
 
-SECURE_SSL_REDIRECT=False if ENVIRONMENT == 'local' else True
+SECURE_SSL_REDIRECT = False if ENVIRONMENT == 'local' else True
+
+CURRENT_RACES = ['TCR', 'TPR']
 
 DEBUG = False if ENVIRONMENT == 'prod' else True
 

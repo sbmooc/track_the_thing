@@ -52,9 +52,9 @@ class CPOrder(
             'cp_1':
                 {
                     'name': 'Control Point 1',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP1'),
+                    'control_point': ControlPoint.objects.get(abbreviation='CP1', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP1')
+                        control_point=ControlPoint.objects.get(abbreviation='CP1', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -62,9 +62,9 @@ class CPOrder(
             'cp_2':
                 {
                     'name': 'Control Point 2',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP2'),
+                    'control_point': ControlPoint.objects.get(abbreviation='CP2', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP2')
+                        control_point=ControlPoint.objects.get(abbreviation='CP2', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -72,9 +72,9 @@ class CPOrder(
             'cp_3':
                 {
                     'name': 'Control Point 3',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP3'),
+                    'control_point': ControlPoint.objects.get(abbreviation='CP3', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP3')
+                        control_point=ControlPoint.objects.get(abbreviation='CP3', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -82,9 +82,9 @@ class CPOrder(
             'cp_4':
                 {
                     'name': 'Control Point 4',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP4'),
+                    'control_point': ControlPoint.objects.get(abbreviation='CP4', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP4')
+                        control_point=ControlPoint.objects.get(abbreviation='CP4', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -92,9 +92,9 @@ class CPOrder(
             'finish':
                 {
                     'name': 'Finished Riders',
-                    'control_point': ControlPoint.objects.get(abbreviation='Finish'),
+                    'control_point': ControlPoint.objects.get(abbreviation='Finish', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='Finish')
+                        control_point=ControlPoint.objects.get(abbreviation='Finish', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -271,7 +271,7 @@ class AllTrackers(
     ListView
 ):
     model = Tracker
-    queryset = Tracker.objects.order_by('test_status')
+    queryset = Tracker.objects.order_by('test_status').filter(active_tracker=True)
 
     def get_context_data(self, **kwargs):
         context = super(AllTrackers, self).get_context_data(**kwargs)
@@ -356,6 +356,7 @@ class RefundableRiders(
         context['active_tab'] = 'refundable_riders'
         return context
 
+
 class AllRiders(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -364,7 +365,7 @@ class AllRiders(
     ListView
 ):
     model = Rider
-    queryset = Rider.objects.order_by('display_order')
+    queryset = Rider.objects.order_by('display_order').filter(race='TPR')
 
     def get_context_data(self, **kwargs):
         context = super(AllRiders, self).get_context_data(**kwargs)

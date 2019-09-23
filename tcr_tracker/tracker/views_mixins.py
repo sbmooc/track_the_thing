@@ -9,39 +9,45 @@ class KeyStatsMixin:
         context = super().get_context_data(**kwargs)
         context['key_stats'] = {
             'active_riders':
-                Rider.objects.filter(status='active').count(),
+                Rider.objects.filter(status='active', race='TPR').count(),
             'scratched_riders':
-                Rider.objects.filter(status='scratched').count(),
+                Rider.objects.filter(status='scratched', race='TPR').count(),
             'starters':
-                Rider.objects.all().count() - Rider.objects.filter(status='dns').count(),
+                Rider.objects.filter(race='TPR').count(
+                ) - Rider.objects.filter(status='dns', race='TPR').count(),
             'cp1':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
-                        abbreviation='CP1'
+                        abbreviation='CP1',
+                        race='TPR'
                     )
                 ).count(),
             'cp2':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
-                        abbreviation='CP2'
+                        abbreviation='CP2',
+                        race='TPR'
                     )
                 ).count(),
             'cp3':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
-                        abbreviation='CP3'
+                        abbreviation='CP3',
+                        race='TPR'
                     )
                 ).count(),
             'cp4':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
-                        abbreviation='CP4'
+                        abbreviation='CP4',
+                        race='TPR'
                     )
                 ).count(),
             'finish':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
-                        abbreviation='Finish'
+                        abbreviation='Finish',
+                        race='TPR'
                     )
                 ).count(),
         }
