@@ -335,7 +335,7 @@ class RefundableRiders(
     template_name = 'tracker/refund_riders.html'
 
     def get_queryset(self):
-        all_riders = Rider.objects.all()
+        all_riders = Rider.objects.filter(race='TCR')
         return [rider for rider in all_riders if rider.balance > 0]
 
     def get_context_data(self, **kwargs):
