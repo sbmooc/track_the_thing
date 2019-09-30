@@ -9,7 +9,7 @@ from django.db.models import (
     ForeignKey,
     BooleanField,
     IntegerField,
-)
+    NullBooleanField)
 from django.urls import reverse
 
 from django.conf import settings
@@ -157,7 +157,7 @@ class Rider(AbstractModel):
         default='active'
     )
     display_order = IntegerField()
-    attended_registration_desk = BooleanField()
+    attended_registration_desk = NullBooleanField()
     visible = BooleanField(
         default=False
     )
