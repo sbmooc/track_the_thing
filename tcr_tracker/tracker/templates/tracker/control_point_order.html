@@ -28,10 +28,6 @@
                 <td>{{ key_stats.cp3 }}</td>
             </tr>
             <tr>
-                <td>Riders through CP4</td>
-                <td>{{ key_stats.cp4 }}</td>
-            </tr>
-            <tr>
                 <td>FINISHED RIDERS</td>
                 <td>{{ key_stats.finish }}</td>
             </tr>
@@ -168,7 +164,7 @@
                     <th scope="col">Name</th>
                     <th scope="col">Arrival Time</th>
                     <th scope="col">Race Time</th>
-                    <th scope="col">Recorded by</th>
+                    <th scope="col">Offset</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -179,7 +175,7 @@
                         <td> {{ rider_cp.rider.full_name }}</td>
                     <td> {{ rider_cp.race_time }}</td>
                     <td> {{ rider_cp.race_time_string }}</td>
-                    <td> {{ rider_cp.input_by }}</td>
+                    <td> {{ rider_cp.rider.offset }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

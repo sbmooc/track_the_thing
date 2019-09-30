@@ -22,11 +22,6 @@ def add_control_points(apps, _):
             'race': 'TPR'
         },
         {
-            'name': 'Control Point Four',
-            'abbreviation': 'CP4',
-            'race': 'TPR'
-        },
-        {
             'name': 'Finish',
             'abbreviation': 'Finish',
             'race': 'TPR'

@@ -79,16 +79,6 @@ class CPOrder(
                         'race_time'
                     )
                 },
-            'cp_4':
-                {
-                    'name': 'Control Point 4',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP4', race='TPR'),
-                    'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP4', race='TPR')
-                    ).order_by(
-                        'race_time'
-                    )
-                },
             'finish':
                 {
                     'name': 'Finished Riders',
@@ -185,7 +175,6 @@ class ScratchRider(
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-
 class AddNotes(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -196,7 +185,6 @@ class AddNotes(
     form_class = AddNotesForm
     template_name = 'tracker/basic_form.html'
     object = None
-
 
     def form_valid(self, form):
         self.get_object()
@@ -210,6 +198,7 @@ class AddNotes(
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
 
+
 class RiderControlpointView(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -222,13 +211,12 @@ class RiderControlpointView(
 
     def get_initial(self):
         initial = super(RiderControlpointView, self).get_initial()
-        initial['race_time'] = arrow.Arrow.now().datetime
+        initial['race_time'] = arrow.Arrow.now().shift(hours=-1).datetime
         return initial
 
     @staticmethod
     def days_hours_minutes(td):
         return td.days, td.seconds // 3600, (td.seconds // 60) % 60
-
 
     @classmethod
     def elapsed_time_string(cls, race_time, start_time):
@@ -238,7 +226,7 @@ class RiderControlpointView(
         return f'{days} Days {hours} Hours {minutes} Minutes'
 
     def form_valid(self, form):
-        race_time = arrow.get(form.cleaned_data['race_time']).shift(hours=-2).datetime
+        race_time = arrow.get(form.cleaned_data['race_time']).shift(hours=-1).datetime
         time_elapsed = self.elapsed_time_string(
             race_time,
             RaceStatus.objects.last().created

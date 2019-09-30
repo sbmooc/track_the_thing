@@ -162,6 +162,7 @@ class Rider(AbstractModel):
         default=False
     )
     race = CharField(max_length=3, default='TCR')
+    offset = IntegerField(null=True, default=0)
 
     @property
     def last_control(self):
@@ -406,9 +407,11 @@ class Tracker(AbstractModel):
 
     @property
     def assignable(self):
-        return self.rider_assigned is None and (
-                self.working_status == 'functioning' or self.working_status == 'working'
-        ) and (self.rider_possesed is None)
+        return (
+                self.rider_assigned is None
+                and self.test_status == 'ping_test_OK'
+                and self.rider_possesed is None
+        )
 
     @property
     def rider_url(self):

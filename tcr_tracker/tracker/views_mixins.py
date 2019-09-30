@@ -36,13 +36,6 @@ class KeyStatsMixin:
                         race='TPR'
                     )
                 ).count(),
-            'cp4':
-                RiderControlPoint.objects.filter(
-                    control_point=ControlPoint.objects.get(
-                        abbreviation='CP4',
-                        race='TPR'
-                    )
-                ).count(),
             'finish':
                 RiderControlPoint.objects.filter(
                     control_point=ControlPoint.objects.get(
