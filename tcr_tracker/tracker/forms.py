@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from .models import Tracker, Rider, RiderControlPoint
+from .models import Tracker, Rider, RiderControlPoint, ControlPoint
 
 
 class CrispyFormMixin:
@@ -22,6 +22,7 @@ class TestTrackerForm(
     class Meta:
         fields = ('test_status', )
         model = Tracker
+
 
 class RecordIssueForm(
     CrispyFormMixin,
@@ -74,11 +75,12 @@ class RiderControlPointForm(
     race_time = forms.SplitDateTimeField(
         widget=forms.widgets.SplitDateTimeWidget(date_attrs={'type': 'date'},
                                                  time_attrs={'type': 'time'}),
-        label='Race time (Central European Summer Time)'
+        label='Race time (Central European Time)'
     )
     input_by = forms.CharField(
         label='Volunteer Name'
     )
+    control_point = forms.ModelChoiceField(queryset=ControlPoint.objects.filter(race='TPR'))
 
     class Meta:
         model = RiderControlPoint

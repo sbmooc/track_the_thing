@@ -52,9 +52,9 @@ class CPOrder(
             'cp_1':
                 {
                     'name': 'Control Point 1',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP1'),
+                    'control_point': ControlPoint.objects.get(abbreviation='CP1', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP1')
+                        control_point=ControlPoint.objects.get(abbreviation='CP1', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -62,9 +62,9 @@ class CPOrder(
             'cp_2':
                 {
                     'name': 'Control Point 2',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP2'),
+                    'control_point': ControlPoint.objects.get(abbreviation='CP2', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP2')
+                        control_point=ControlPoint.objects.get(abbreviation='CP2', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -72,19 +72,9 @@ class CPOrder(
             'cp_3':
                 {
                     'name': 'Control Point 3',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP3'),
+                    'control_point': ControlPoint.objects.get(abbreviation='CP3', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP3')
-                    ).order_by(
-                        'race_time'
-                    )
-                },
-            'cp_4':
-                {
-                    'name': 'Control Point 4',
-                    'control_point': ControlPoint.objects.get(abbreviation='CP4'),
-                    'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='CP4')
+                        control_point=ControlPoint.objects.get(abbreviation='CP3', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -92,9 +82,9 @@ class CPOrder(
             'finish':
                 {
                     'name': 'Finished Riders',
-                    'control_point': ControlPoint.objects.get(abbreviation='Finish'),
+                    'control_point': ControlPoint.objects.get(abbreviation='Finish', race='TPR'),
                     'rider_cps': context['ridercontrolpoint_list'].filter(
-                        control_point=ControlPoint.objects.get(abbreviation='Finish')
+                        control_point=ControlPoint.objects.get(abbreviation='Finish', race='TPR')
                     ).order_by(
                         'race_time'
                     )
@@ -185,7 +175,6 @@ class ScratchRider(
         return HttpResponseRedirect(self.object.get_absolute_url())
 
 
-
 class AddNotes(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -196,7 +185,6 @@ class AddNotes(
     form_class = AddNotesForm
     template_name = 'tracker/basic_form.html'
     object = None
-
 
     def form_valid(self, form):
         self.get_object()
@@ -210,6 +198,7 @@ class AddNotes(
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
 
+
 class RiderControlpointView(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -222,13 +211,12 @@ class RiderControlpointView(
 
     def get_initial(self):
         initial = super(RiderControlpointView, self).get_initial()
-        initial['race_time'] = arrow.Arrow.now().datetime
+        initial['race_time'] = arrow.Arrow.now().shift(hours=-1).datetime
         return initial
 
     @staticmethod
     def days_hours_minutes(td):
         return td.days, td.seconds // 3600, (td.seconds // 60) % 60
-
 
     @classmethod
     def elapsed_time_string(cls, race_time, start_time):
@@ -238,7 +226,7 @@ class RiderControlpointView(
         return f'{days} Days {hours} Hours {minutes} Minutes'
 
     def form_valid(self, form):
-        race_time = arrow.get(form.cleaned_data['race_time']).shift(hours=-2).datetime
+        race_time = arrow.get(form.cleaned_data['race_time']).shift(hours=-1).datetime
         time_elapsed = self.elapsed_time_string(
             race_time,
             RaceStatus.objects.last().created
@@ -271,7 +259,7 @@ class AllTrackers(
     ListView
 ):
     model = Tracker
-    queryset = Tracker.objects.order_by('test_status')
+    queryset = Tracker.objects.order_by('test_status').filter(active_tracker=True)
 
     def get_context_data(self, **kwargs):
         context = super(AllTrackers, self).get_context_data(**kwargs)
@@ -356,6 +344,7 @@ class RefundableRiders(
         context['active_tab'] = 'refundable_riders'
         return context
 
+
 class AllRiders(
     RaceStatusMixin,
     EnvironmentMixin,
@@ -364,7 +353,7 @@ class AllRiders(
     ListView
 ):
     model = Rider
-    queryset = Rider.objects.order_by('display_order')
+    queryset = Rider.objects.order_by('display_order').filter(race='TPR')
 
     def get_context_data(self, **kwargs):
         context = super(AllRiders, self).get_context_data(**kwargs)

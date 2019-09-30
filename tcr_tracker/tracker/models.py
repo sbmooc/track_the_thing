@@ -8,9 +8,11 @@ from django.db.models import (
     DateTimeField,
     ForeignKey,
     BooleanField,
-    IntegerField
+    IntegerField,
 )
 from django.urls import reverse
+
+from django.conf import settings
 
 from tcr_tracker.tracker.errors import (
     TrackerNotAssigned,
@@ -156,6 +158,11 @@ class Rider(AbstractModel):
     )
     display_order = IntegerField()
     attended_registration_desk = BooleanField()
+    visible = BooleanField(
+        default=False
+    )
+    race = CharField(max_length=3, default='TCR')
+    offset = IntegerField(null=True, default=0)
 
     @property
     def last_control(self):
@@ -196,7 +203,7 @@ class Rider(AbstractModel):
 
     @property
     def all_events(self):
-        return self.events.all().order_by('created')
+        return self.events.filter(race__in=settings.CURRENT_RACES).order_by('created')
 
     def get_absolute_url(self):
         return reverse('one_rider', kwargs={'pk': self.id})
@@ -204,10 +211,6 @@ class Rider(AbstractModel):
     @property
     def scratch_button_display_state(self):
         return True if self.status == 'active' else False
-
-    @property
-    def refund_button_display_state(self):
-        return True
 
     @property
     def get_buttons(self):
@@ -253,7 +256,7 @@ class Rider(AbstractModel):
                 'label': 'Refund',
                 'url': reverse('add_refund', kwargs={'pk': self.id}),
                 'staff_only': True,
-                'display': self.refund_button_display_state
+                'display': True
             },
             'add_payment': {
                 'label': 'Add payment',
@@ -396,16 +399,19 @@ class Tracker(AbstractModel):
         null=True,
         default='to_be_tested'
     )
+    active_tracker = BooleanField(default=True)
 
     @property
     def all_events(self):
-        return self.events.all()
+        return self.events.filter(race__in=settings.CURRENT_RACES).order_by('created')
 
     @property
     def assignable(self):
-        return self.rider_assigned is None and (
-                self.working_status == 'functioning' or self.working_status == 'working')and (
-                self.rider_possesed is None)
+        return (
+                self.rider_assigned is None
+                and self.test_status == 'ping_test_OK'
+                and self.rider_possesed is None
+        )
 
     @property
     def rider_url(self):
@@ -509,6 +515,11 @@ class Event(TimeStampedModel):
         max_length=50,
         null=True
     )
+    race = CharField(
+        choices=(('TCR', 'TCR'), ('TPR', 'TPR')),
+        max_length=50,
+        null=True
+    )
 
     @property
     def deposit_change_string(self):
@@ -525,6 +536,10 @@ class RaceStatus(TimeStampedModel):
             ('finished', 'Finished')
         ),
         unique=True
+    )
+    race = CharField(
+        max_length=3,
+        default='TCR'
     )
 
     @property
@@ -561,8 +576,7 @@ class RaceStatus(TimeStampedModel):
 class ControlPoint(models.Model):
     name = CharField(max_length=50)
     abbreviation = CharField(max_length=50)
-    latitude = CharField(max_length=50)
-    longitude = CharField(max_length=50)
+    race = CharField(max_length=3, default='TCR')
 
     def __str__(self):
         return self.abbreviation
