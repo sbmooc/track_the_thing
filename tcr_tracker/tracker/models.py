@@ -9,6 +9,7 @@ from django.db.models import (
     ForeignKey,
     BooleanField,
     IntegerField,
+    NullBooleanField
 )
 from django.urls import reverse
 
@@ -157,7 +158,7 @@ class Rider(AbstractModel):
         default='active'
     )
     display_order = IntegerField()
-    attended_registration_desk = BooleanField()
+    attended_registration_desk = NullBooleanField()
     visible = BooleanField(
         default=False
     )
@@ -520,6 +521,7 @@ class Event(TimeStampedModel):
         max_length=50,
         null=True,
         default='TPR'
+        null=True
     )
 
     @property

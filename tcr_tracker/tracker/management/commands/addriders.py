@@ -21,10 +21,14 @@ class Command(BaseCommand):
         with open(rider_csv, 'r', encoding='utf-8') as csv_file:
             csv_reader = csv.DictReader(csv_file)
             for row in csv_reader:
-                row['hire_tracker'] = True if row['hire_tracker'] == 'Hire TCR' else False
+                row['hire_tracker'] = True if row['hire_tracker'] == 'HIRE TRACKER' else False
                 balance = int(row['balance'])
                 row.pop('balance')
-                rider = Rider(**row)
+                rider = Rider(
+                    **row,
+                    visible=True,
+                    race='TPR'
+                )
                 try:
                     rider.display_order = int(rider.cap_number)
                 except ValueError:
@@ -43,7 +47,8 @@ class Command(BaseCommand):
                             notes='Automatic Import'
                         )
                     count += 1
-                except:
+                except Exception as e:
+                    print(e)
                     print(
                         row['tcr_id'], row['first_name'], row['last_name'] + ' did not import')
 
