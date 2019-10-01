@@ -215,12 +215,17 @@ class GiveRetriveForm(MultiActionForm):
         self.fields['tracker'] = forms.ModelChoiceField(
             queryset=Tracker.objects.filter(
                 rider_assigned=None,
-                working_status='functioning'
+                test_status='ping_test_OK',
+                active_tracker=True
             )
         )
 
     def add_tracker_retrive_fields(self, obj):
-        self.fields['rider'] = forms.ModelChoiceField(queryset=Rider.objects.filter(trackers_possessed=obj))
+        self.fields['rider'] = forms.ModelChoiceField(
+            queryset=Rider.objects.filter(
+                trackers_possessed=obj
+            )
+        )
 
     def add_rider_retrive_fields(self, obj):
         self.fields['tracker'] = forms.ModelChoiceField(

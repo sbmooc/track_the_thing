@@ -245,7 +245,10 @@ class RiderControlpointView(
             control_point=form.cleaned_data['control_point'],
             notes=time_elapsed
         )
-        if form.cleaned_data['control_point'] == ControlPoint.objects.get(abbreviation='Finish'):
+        if form.cleaned_data['control_point'] == ControlPoint.objects.get(
+                abbreviation='Finish',
+                race='TPR'
+        ):
             self.object.status = 'finished'
             self.object.save()
 

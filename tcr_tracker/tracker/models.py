@@ -518,7 +518,8 @@ class Event(TimeStampedModel):
     race = CharField(
         choices=(('TCR', 'TCR'), ('TPR', 'TPR')),
         max_length=50,
-        null=True
+        null=True,
+        default='TPR'
     )
 
     @property
