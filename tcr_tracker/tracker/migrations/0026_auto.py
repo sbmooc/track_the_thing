@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tracker', '0024_rider_offset'),
+        ('tracker', '0025_auto_20190930_2018'),
     ]
 
     operations = [
