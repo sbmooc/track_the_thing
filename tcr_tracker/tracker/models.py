@@ -520,8 +520,7 @@ class Event(TimeStampedModel):
         choices=(('TCR', 'TCR'), ('TPR', 'TPR')),
         max_length=50,
         null=True,
-        default='TPR'
-        null=True
+        default='TPR',
     )
 
     @property
