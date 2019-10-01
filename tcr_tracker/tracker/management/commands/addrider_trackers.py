@@ -21,14 +21,17 @@ class Command(BaseCommand):
             for row in csv_reader:
                 try:
                     rider = Rider.objects.get(
-                        tcr_id=row['rider_id']
+                        tcr_id=row['rider_id'],
+                        race='TPR'
                     )
                     rider_own_id = 'RIDER_OWN_' + str(count)
                     tracker = Tracker.objects.create(
                         esn_number=row['tracker_esn'],
                         owner='rider_owned',
                         working_status='functioning',
-                        tcr_id=rider_own_id
+                        test_status='ping_test_OK',
+                        tcr_id=rider_own_id,
+                        active_tracker=True
                     )
                     rider.tracker_add_assignment(
                         tracker,
@@ -46,7 +49,8 @@ class Command(BaseCommand):
                     rider.tracker_url = row['tracker_url']
                     rider.save()
                     count += 1
-                except:
+                except Exception as e:
+                    print(e)
                     print(row['rider_id'] + ' tracker_did_not_import')
             print(str(count) + ' riders own trackers successfully imported')
 

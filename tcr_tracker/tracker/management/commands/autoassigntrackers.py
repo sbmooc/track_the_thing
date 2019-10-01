@@ -9,12 +9,14 @@ class Command(BaseCommand):
         count = 0
         all_riders_without_trackers = Rider.objects.filter(
             trackers_assigned=None,
-            payment__isnull=False
+            payment__isnull=False,
+            race='TPR'
         )
         print(str(all_riders_without_trackers.count()) + ' without assigned trackers')
         assignable_trackers = Tracker.objects.filter(
             working_status='Functioning',
-            rider_assigned=None
+            rider_assigned=None,
+            active_tracker=True
         )
 
         for rider, tracker in list(zip(all_riders_without_trackers, assignable_trackers)):
@@ -30,5 +32,5 @@ class Command(BaseCommand):
                 print(f'unable to attach {rider} to {tracker} tracker_did_not_import')
 
         print(f'Assigned {count} riders to trackers')
-        print(f'There are {Rider.objects.filter(trackers_assigned=None).count()} riders without a tracker')
+        print(f"There are {Rider.objects.filter(trackers_assigned=None, race='TPR').count()} riders without a tracker")
 
