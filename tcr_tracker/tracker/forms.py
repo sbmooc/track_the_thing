@@ -147,11 +147,11 @@ class AssignmentPossessionForm(MultiActionForm):
             self.possession_rider_fields()
 
     def assignment_rider_fields(self):
-        # todo put assignable trackers into custom manager
         self.fields['assign_tracker'] = forms.ModelChoiceField(
             queryset=Tracker.objects.filter(
                 rider_assigned=None,
-                working_status='functioning'
+                test_status='ping_test_OK',
+                active_tracker=True
             ),
             required=False
         )

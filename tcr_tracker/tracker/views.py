@@ -459,7 +459,6 @@ class MultiActionFormView(
         return context
 
 
-
 class AssignmentPossessionView(
     MultiActionFormView
 ):
