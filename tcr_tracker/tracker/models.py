@@ -9,7 +9,8 @@ from django.db.models import (
     ForeignKey,
     BooleanField,
     IntegerField,
-    NullBooleanField)
+    NullBooleanField
+)
 from django.urls import reverse
 
 from django.conf import settings
@@ -518,6 +519,8 @@ class Event(TimeStampedModel):
     race = CharField(
         choices=(('TCR', 'TCR'), ('TPR', 'TPR')),
         max_length=50,
+        null=True,
+        default='TPR'
         null=True
     )
 

@@ -24,7 +24,7 @@ class Command(BaseCommand):
                     if cap_number == '':
                         continue
                     tracker = Tracker.objects.get(tcr_id=tracker_id)
-                    rider = Rider.objects.get(cap_number=cap_number)
+                    rider = Rider.objects.get(cap_number=cap_number, race='TPR')
                     rider.tracker_add_assignment(
                         tracker,
                         'Auto_Assignment',

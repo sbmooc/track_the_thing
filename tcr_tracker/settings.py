@@ -46,7 +46,7 @@ else:
 
 SECURE_SSL_REDIRECT = False if ENVIRONMENT == 'local' else True
 
-CURRENT_RACES = ['TCR', 'TPR']
+CURRENT_RACES = ['TPR', ]
 
 DEBUG = False if ENVIRONMENT == 'prod' else True
 
