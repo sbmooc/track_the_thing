@@ -14,10 +14,11 @@ class Command(BaseCommand):
         )
         print(str(all_riders_without_trackers.count()) + ' without assigned trackers')
         assignable_trackers = Tracker.objects.filter(
-            working_status='Functioning',
+            test_status='ping_test_OK',
             rider_assigned=None,
             active_tracker=True
         )
+        print(len(assignable_trackers))
 
         for rider, tracker in list(zip(all_riders_without_trackers, assignable_trackers)):
             try:
@@ -28,7 +29,8 @@ class Command(BaseCommand):
                     'management_command'
                 )
                 count += 1
-            except:
+            except Exception as e:
+                print(e)
                 print(f'unable to attach {rider} to {tracker} tracker_did_not_import')
 
         print(f'Assigned {count} riders to trackers')
