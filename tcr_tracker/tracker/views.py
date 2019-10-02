@@ -24,7 +24,8 @@ from .forms import (
     AdjustBalanceForm,
     RecordIssueForm,
     AssignmentPossessionForm,
-    TestTrackerForm)
+    TestTrackerForm
+)
 
 from .models import Tracker, Rider, Event, RiderControlPoint, RaceStatus, Deposit, ControlPoint
 
@@ -139,7 +140,8 @@ class AddPayment(
             user=self.request.user.profile,
             notes=form.cleaned_data['notes'],
             rider=self.object,
-            deposit_change=deposit
+            deposit_change=deposit,
+            race='TPR'
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
 
@@ -168,7 +170,8 @@ class ScratchRider(
             event_type='scratch',
             notes=form.cleaned_data['notes'],
             user=self.request.user.profile,
-            rider=self.object if type(self.object) is Rider else None
+            rider=self.object if type(self.object) is Rider else None,
+            race='TPR'
         )
         self.object.status = 'scratched'
         self.object.save()
@@ -194,7 +197,8 @@ class AddNotes(
             user=self.request.user.profile,
             input_by=form.cleaned_data['input_by'],
             tracker=self.object if type(self.object) is Tracker else None,
-            rider=self.object if type(self.object) is Rider else None
+            rider=self.object if type(self.object) is Rider else None,
+            race='TPR'
         )
         return HttpResponseRedirect(self.object.get_absolute_url())
 
@@ -243,7 +247,8 @@ class RiderControlpointView(
             rider=self.object,
             input_by=form.cleaned_data['input_by'],
             control_point=form.cleaned_data['control_point'],
-            notes=time_elapsed
+            notes=time_elapsed,
+            race='TPR'
         )
         if form.cleaned_data['control_point'] == ControlPoint.objects.get(
                 abbreviation='Finish',
@@ -322,6 +327,7 @@ class Registration(
             rider=rider,
             event_type='attend_registration',
             user=request.user.profile,
+            race='TPR'
         )
         rider.save()
         return HttpResponseRedirect(rider.url)
@@ -415,7 +421,8 @@ class TrackerTest(
         Event.objects.create(
             event_type=form.cleaned_data['test_status'],
             user=self.request.user.profile,
-            tracker=form.instance
+            tracker=form.instance,
+            race='TPR'
         )
         if form.cleaned_data['test_status'] in ok_test_status and form.instance.rider_assigned:
             form.instance.rider_assigned.tracker_remove_assignment(

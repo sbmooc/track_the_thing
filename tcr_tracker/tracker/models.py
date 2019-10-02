@@ -297,7 +297,8 @@ class Rider(AbstractModel):
             event_type='add_tracker_assignment',
             deposit_change=deposit,
             user=user.profile if user else None,
-            input_by=input_by
+            input_by=input_by,
+            race='TPR'
         )
         self.save()
 
@@ -317,7 +318,8 @@ class Rider(AbstractModel):
             event_type='remove_tracker_assignment',
             deposit_change=deposit,
             user=user.profile if user else None,
-            input_by=input_by
+            input_by=input_by,
+            race='TPR'
         )
         tracker.working_status = 'to_be_tested'
         tracker.save()
@@ -333,7 +335,8 @@ class Rider(AbstractModel):
             notes=notes,
             event_type='add_tracker_possession',
             user=user.profile if user else None,
-            input_by=input_by
+            input_by=input_by,
+            race='TPR'
         )
         self.save()
 
@@ -347,7 +350,8 @@ class Rider(AbstractModel):
             notes=notes,
             event_type='remove_tracker_possession',
             user=user.profile if user else None,
-            input_by=input_by
+            input_by=input_by,
+            race='TPR'
         )
         tracker.save()
         self.save()
