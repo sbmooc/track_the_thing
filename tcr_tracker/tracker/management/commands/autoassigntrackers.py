@@ -21,17 +21,18 @@ class Command(BaseCommand):
         print(len(assignable_trackers))
 
         for rider, tracker in list(zip(all_riders_without_trackers, assignable_trackers)):
-            try:
-                rider.tracker_add_assignment(
-                    tracker,
-                    'Bulk Assignment',
-                    None,
-                    'management_command'
-                )
-                count += 1
-            except Exception as e:
-                print(e)
-                print(f'unable to attach {rider} to {tracker} tracker_did_not_import')
+            print(rider, tracker)
+            # try:
+            #     rider.tracker_add_assignment(
+            #         tracker,
+            #         'Bulk Assignment',
+            #         None,
+            #         'management_command'
+            #     )
+            #     count += 1
+            # except Exception as e:
+            #     print(e)
+            #     print(f'unable to attach {rider} to {tracker} tracker_did_not_import')
 
         print(f'Assigned {count} riders to trackers')
         print(f"There are {Rider.objects.filter(trackers_assigned=None, race='TPR').count()} riders without a tracker")
