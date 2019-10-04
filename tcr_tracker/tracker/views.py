@@ -215,7 +215,7 @@ class RiderControlpointView(
 
     def get_initial(self):
         initial = super(RiderControlpointView, self).get_initial()
-        initial['race_time'] = arrow.Arrow.now().shift(hours=-1).datetime
+        initial['race_time'] = arrow.Arrow.now().datetime
         return initial
 
     @staticmethod
