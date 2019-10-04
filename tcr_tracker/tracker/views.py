@@ -215,7 +215,7 @@ class RiderControlpointView(
 
     def get_initial(self):
         initial = super(RiderControlpointView, self).get_initial()
-        initial['race_time'] = arrow.Arrow.now().shift(hours=1).datetime
+        initial['race_time'] = arrow.Arrow.now().datetime
         return initial
 
     @staticmethod
@@ -267,7 +267,8 @@ class AllTrackers(
     ListView
 ):
     model = Tracker
-    queryset = Tracker.objects.order_by('test_status').filter(active_tracker=True)
+    queryset = Tracker.objects.order_by('test_status').filter(
+        active_tracker=True).exclude(test_status='no_spot_plan')
 
     def get_context_data(self, **kwargs):
         context = super(AllTrackers, self).get_context_data(**kwargs)
