@@ -608,6 +608,7 @@ class RiderControlPoint(TimeStampedModel):
         max_length=100,
         null=True
     )
+    position = IntegerField(null=True)
 
     def __str__(self):
         return self.rider.cap_number + "--" + self.rider.full_name + "--" + self.race_time_string
