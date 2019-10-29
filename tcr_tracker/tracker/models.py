@@ -409,7 +409,7 @@ class Tracker(AbstractModel):
 
     @property
     def all_events(self):
-        return self.events.all().order_by('created')
+        return self.events.all().order_by('-created')
 
     @property
     def assignable(self):
