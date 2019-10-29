@@ -267,8 +267,7 @@ class AllTrackers(
     ListView
 ):
     model = Tracker
-    queryset = Tracker.objects.order_by('test_status').filter(
-        active_tracker=True).exclude(test_status='no_spot_plan')
+    queryset = Tracker.objects.order_by('test_status')
 
     def get_context_data(self, **kwargs):
         context = super(AllTrackers, self).get_context_data(**kwargs)
@@ -345,7 +344,7 @@ class RefundableRiders(
     template_name = 'tracker/refund_riders.html'
 
     def get_queryset(self):
-        all_riders = Rider.objects.filter(race='TCR')
+        all_riders = Rider.objects.all()
         return [rider for rider in all_riders if rider.balance > 0]
 
     def get_context_data(self, **kwargs):

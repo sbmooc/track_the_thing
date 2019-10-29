@@ -361,7 +361,7 @@ class Rider(AbstractModel):
         verbose_name_plural = 'Riders'
 
     def __str__(self):
-        return str(self.cap_number)
+        return '#' + self.race + self.cap_number
 
 
 class Deposit(TimeStampedModel):
@@ -409,7 +409,7 @@ class Tracker(AbstractModel):
 
     @property
     def all_events(self):
-        return self.events.filter(race__in=settings.CURRENT_RACES).order_by('created')
+        return self.events.all().order_by('created')
 
     @property
     def assignable(self):
