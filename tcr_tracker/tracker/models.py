@@ -205,7 +205,7 @@ class Rider(AbstractModel):
 
     @property
     def all_events(self):
-        return self.events.filter(race__in=settings.CURRENT_RACES).order_by('created')
+        return self.events.all().order_by('created')
 
     def get_absolute_url(self):
         return reverse('one_rider', kwargs={'pk': self.id})
