@@ -13,8 +13,6 @@ from django.db.models import (
 )
 from django.urls import reverse
 
-from django.conf import settings
-
 from tcr_tracker.tracker.errors import (
     TrackerNotAssigned,
     TrackerAlreadyAssigned,
@@ -165,6 +163,7 @@ class Rider(AbstractModel):
     )
     race = CharField(max_length=3, default='TCR')
     offset = IntegerField(null=True, default=0)
+    ignore_refund = NullBooleanField(default=None)
 
     @property
     def last_control(self):
