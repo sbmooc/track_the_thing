@@ -28,7 +28,7 @@ if ENVIRONMENT != 'local':
     DATABASES = {
         'default':
             dj_database_url.config(
-                default=os.environ.get('DATABASE_URL') or os.environ.get('HEROKU_POSTGRESQL_AMBER_URL'),
+                default=os.environ.get('DATABASE_URL'),
                 conn_max_age=600
             )
     }
